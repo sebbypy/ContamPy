@@ -1,0 +1,681 @@
+Testing  {'building': 'COVL-REN-HO1', 'orientation': 35, 'v50': 6, 'system': 'CNBN', 'control': 'fulllocal', 'occupancy': 'default-active'}
+WARNING, more than one location to define natural supply
+Choosing the first one in the list, please check your model afterwards
+WARNING, more than one location to define natural supply
+Choosing the first one in the list, please check your model afterwards
+WARNING, more than one location to define natural supply
+Choosing the first one in the list, please check your model afterwards
+NT_2Pa element does not exist yet, adding it
+C:\Users\spec\Documents\Projects\RESEARCH\COMISVENT\ForSVNFirstCommit\contamPy\..\comisventData\0-TemplatesAndLibs\occupancyProfiles\profile_Occupant1_Away.csv does not exist, skipping
+C:\Users\spec\Documents\Projects\RESEARCH\COMISVENT\ForSVNFirstCommit\contamPy\..\comisventData\0-TemplatesAndLibs\occupancyProfiles\profile_Occupant2_Away.csv does not exist, skipping
+C:\Users\spec\Documents\Projects\RESEARCH\COMISVENT\ForSVNFirstCommit\contamPy\..\comisventData\0-TemplatesAndLibs\occupancyProfiles\profile_Occupant3_Away.csv does not exist, skipping
+C:\Users\spec\Documents\Projects\RESEARCH\COMISVENT\ForSVNFirstCommit\contamPy\..\comisventData\0-TemplatesAndLibs\occupancyProfiles\profile_Occupant4_Away.csv does not exist, skipping
+Testing  {'building': 'COVL-REN-HO1', 'orientation': 35, 'v50': 6, 'system': 'DNBN', 'control': 'fulllocal', 'occupancy': 'default-active'}
+NT_2Pa element does not exist yet, adding it
+C:\Users\spec\Documents\Projects\RESEARCH\COMISVENT\ForSVNFirstCommit\contamPy\..\comisventData\0-TemplatesAndLibs\occupancyProfiles\profile_Occupant1_Away.csv does not exist, skipping
+C:\Users\spec\Documents\Projects\RESEARCH\COMISVENT\ForSVNFirstCommit\contamPy\..\comisventData\0-TemplatesAndLibs\occupancyProfiles\profile_Occupant2_Away.csv does not exist, skipping
+C:\Users\spec\Documents\Projects\RESEARCH\COMISVENT\ForSVNFirstCommit\contamPy\..\comisventData\0-TemplatesAndLibs\occupancyProfiles\profile_Occupant3_Away.csv does not exist, skipping
+C:\Users\spec\Documents\Projects\RESEARCH\COMISVENT\ForSVNFirstCommit\contamPy\..\comisventData\0-TemplatesAndLibs\occupancyProfiles\profile_Occupant4_Away.csv does not exist, skipping
+Testing  {'building': 'COVL-REN-HO1', 'orientation': 35, 'v50': 6, 'system': 'CNBNSLAAP', 'control': 'fulllocal', 'occupancy': 'default-active'}
+WARNING, more than one location to define natural supply
+Choosing the first one in the list, please check your model afterwards
+WARNING, more than one location to define natural supply
+Choosing the first one in the list, please check your model afterwards
+WARNING, more than one location to define natural supply
+Choosing the first one in the list, please check your model afterwards
+NT_2Pa element does not exist yet, adding it
+C:\Users\spec\Documents\Projects\RESEARCH\COMISVENT\ForSVNFirstCommit\contamPy\..\comisventData\0-TemplatesAndLibs\occupancyProfiles\profile_Occupant1_Away.csv does not exist, skipping
+C:\Users\spec\Documents\Projects\RESEARCH\COMISVENT\ForSVNFirstCommit\contamPy\..\comisventData\0-TemplatesAndLibs\occupancyProfiles\profile_Occupant2_Away.csv does not exist, skipping
+C:\Users\spec\Documents\Projects\RESEARCH\COMISVENT\ForSVNFirstCommit\contamPy\..\comisventData\0-TemplatesAndLibs\occupancyProfiles\profile_Occupant3_Away.csv does not exist, skipping
+C:\Users\spec\Documents\Projects\RESEARCH\COMISVENT\ForSVNFirstCommit\contamPy\..\comisventData\0-TemplatesAndLibs\occupancyProfiles\profile_Occupant4_Away.csv does not exist, skipping
+Testing  {'building': 'COVL-REN-HO1', 'orientation': 35, 'v50': 6, 'system': 'CPREVENT', 'control': 'fulllocal', 'occupancy': 'default-active'}
+in unbal WK
+WARNING, more than one location to define natural supply
+Choosing the first one in the list, please check your model afterwards
+WARNING, more than one location to define natural supply
+Choosing the first one in the list, please check your model afterwards
+WARNING, more than one location to define natural supply
+Choosing the first one in the list, please check your model afterwards
+NT_2Pa element does not exist yet, adding it
+C:\Users\spec\Documents\Projects\RESEARCH\COMISVENT\ForSVNFirstCommit\contamPy\..\comisventData\0-TemplatesAndLibs\occupancyProfiles\profile_Occupant1_Away.csv does not exist, skipping
+C:\Users\spec\Documents\Projects\RESEARCH\COMISVENT\ForSVNFirstCommit\contamPy\..\comisventData\0-TemplatesAndLibs\occupancyProfiles\profile_Occupant2_Away.csv does not exist, skipping
+C:\Users\spec\Documents\Projects\RESEARCH\COMISVENT\ForSVNFirstCommit\contamPy\..\comisventData\0-TemplatesAndLibs\occupancyProfiles\profile_Occupant3_Away.csv does not exist, skipping
+C:\Users\spec\Documents\Projects\RESEARCH\COMISVENT\ForSVNFirstCommit\contamPy\..\comisventData\0-TemplatesAndLibs\occupancyProfiles\profile_Occupant4_Away.csv does not exist, skipping
+Testing  {'building': 'COVL-REN-HO1', 'orientation': 35, 'v50': 6, 'system': 'DPREVENT', 'control': 'fulllocal', 'occupancy': 'default-active'}
+in unbal WK
+NT_2Pa element does not exist yet, adding it
+C:\Users\spec\Documents\Projects\RESEARCH\COMISVENT\ForSVNFirstCommit\contamPy\..\comisventData\0-TemplatesAndLibs\occupancyProfiles\profile_Occupant1_Away.csv does not exist, skipping
+C:\Users\spec\Documents\Projects\RESEARCH\COMISVENT\ForSVNFirstCommit\contamPy\..\comisventData\0-TemplatesAndLibs\occupancyProfiles\profile_Occupant2_Away.csv does not exist, skipping
+C:\Users\spec\Documents\Projects\RESEARCH\COMISVENT\ForSVNFirstCommit\contamPy\..\comisventData\0-TemplatesAndLibs\occupancyProfiles\profile_Occupant3_Away.csv does not exist, skipping
+C:\Users\spec\Documents\Projects\RESEARCH\COMISVENT\ForSVNFirstCommit\contamPy\..\comisventData\0-TemplatesAndLibs\occupancyProfiles\profile_Occupant4_Away.csv does not exist, skipping
+Testing  {'building': 'COVL-REN-HO1', 'orientation': 35, 'v50': 6, 'system': 'CSLAAPPREVENT', 'control': 'fulllocal', 'occupancy': 'default-active'}
+Only one unbalanced zone, impossible to perfectly balance natural transfers
+WARNING, more than one location to define natural supply
+Choosing the first one in the list, please check your model afterwards
+WARNING, more than one location to define natural supply
+Choosing the first one in the list, please check your model afterwards
+WARNING, more than one location to define natural supply
+Choosing the first one in the list, please check your model afterwards
+NT_2Pa element does not exist yet, adding it
+C:\Users\spec\Documents\Projects\RESEARCH\COMISVENT\ForSVNFirstCommit\contamPy\..\comisventData\0-TemplatesAndLibs\occupancyProfiles\profile_Occupant1_Away.csv does not exist, skipping
+C:\Users\spec\Documents\Projects\RESEARCH\COMISVENT\ForSVNFirstCommit\contamPy\..\comisventData\0-TemplatesAndLibs\occupancyProfiles\profile_Occupant2_Away.csv does not exist, skipping
+C:\Users\spec\Documents\Projects\RESEARCH\COMISVENT\ForSVNFirstCommit\contamPy\..\comisventData\0-TemplatesAndLibs\occupancyProfiles\profile_Occupant3_Away.csv does not exist, skipping
+C:\Users\spec\Documents\Projects\RESEARCH\COMISVENT\ForSVNFirstCommit\contamPy\..\comisventData\0-TemplatesAndLibs\occupancyProfiles\profile_Occupant4_Away.csv does not exist, skipping
+Testing  {'building': 'COVL-REN-HO1', 'orientation': 35, 'v50': 6, 'system': 'CSupplyHall', 'control': 'fulllocal', 'occupancy': 'default-active'}
+in unbal WK
+Only one unbalanced zone, impossible to perfectly balance natural transfers
+NT_2Pa element does not exist yet, adding it
+C:\Users\spec\Documents\Projects\RESEARCH\COMISVENT\ForSVNFirstCommit\contamPy\..\comisventData\0-TemplatesAndLibs\occupancyProfiles\profile_Occupant1_Away.csv does not exist, skipping
+C:\Users\spec\Documents\Projects\RESEARCH\COMISVENT\ForSVNFirstCommit\contamPy\..\comisventData\0-TemplatesAndLibs\occupancyProfiles\profile_Occupant2_Away.csv does not exist, skipping
+C:\Users\spec\Documents\Projects\RESEARCH\COMISVENT\ForSVNFirstCommit\contamPy\..\comisventData\0-TemplatesAndLibs\occupancyProfiles\profile_Occupant3_Away.csv does not exist, skipping
+C:\Users\spec\Documents\Projects\RESEARCH\COMISVENT\ForSVNFirstCommit\contamPy\..\comisventData\0-TemplatesAndLibs\occupancyProfiles\profile_Occupant4_Away.csv does not exist, skipping
+Testing  {'building': 'COVL-REN-HO1', 'orientation': 35, 'v50': 6, 'system': 'Windows', 'control': 'fulllocal', 'occupancy': 'default-active'}
+Slaapkamer2
+   flags ps pc pk pl     ...     vf_type vf_node_name cfd type    function
+nr                       ...                                              
+1      3  0  0  0  3     ...           0          NaN   0  dry  Slaapkamer
+2      3  0  0  0  3     ...           0          NaN   0  dry  Slaapkamer
+3      3  0  0  0  3     ...           0          NaN   0  wet    Badkamer
+4      3  0  0  0  3     ...           0          NaN   0  hal         hal
+5      3  0  0  0  3     ...           0          NaN   0  dry  Slaapkamer
+6      3  0  0  0  2     ...           0          NaN   0  wet     OKeuken
+7      3  0  0  0  2     ...           0          NaN   0  dry   Woonkamer
+8      3  0  0  0  2     ...           0          NaN   0  hal         hal
+9      3  0  0  0  2     ...           0          NaN   0  wet          WC
+10     3  0  0  0  2     ...           0          NaN   0  hal         hal
+11    10  0  0  0  2     ...           0          NaN   0  NaN         NaN
+12    10  0  0  0  2     ...           0          NaN   0  NaN         NaN
+
+[12 rows x 21 columns]
+Defining Window opening for roomSlaapkamer2
+WARNING, more than one location to define natural supply
+Choosing the first one in the list, please check your model afterwards
+Slaapkamer3
+   flags ps pc pk pl     ...     vf_type vf_node_name cfd type    function
+nr                       ...                                              
+1      3  0  0  0  3     ...           0          NaN   0  dry  Slaapkamer
+2      3  0  0  0  3     ...           0          NaN   0  dry  Slaapkamer
+3      3  0  0  0  3     ...           0          NaN   0  wet    Badkamer
+4      3  0  0  0  3     ...           0          NaN   0  hal         hal
+5      3  0  0  0  3     ...           0          NaN   0  dry  Slaapkamer
+6      3  0  0  0  2     ...           0          NaN   0  wet     OKeuken
+7      3  0  0  0  2     ...           0          NaN   0  dry   Woonkamer
+8      3  0  0  0  2     ...           0          NaN   0  hal         hal
+9      3  0  0  0  2     ...           0          NaN   0  wet          WC
+10     3  0  0  0  2     ...           0          NaN   0  hal         hal
+11    10  0  0  0  2     ...           0          NaN   0  NaN         NaN
+12    10  0  0  0  2     ...           0          NaN   0  NaN         NaN
+
+[12 rows x 21 columns]
+Defining Window opening for roomSlaapkamer3
+WARNING, more than one location to define natural supply
+Choosing the first one in the list, please check your model afterwards
+Badkamer
+   flags ps pc pk pl     ...     vf_type vf_node_name cfd type    function
+nr                       ...                                              
+1      3  0  0  0  3     ...           0          NaN   0  dry  Slaapkamer
+2      3  0  0  0  3     ...           0          NaN   0  dry  Slaapkamer
+3      3  0  0  0  3     ...           0          NaN   0  wet    Badkamer
+4      3  0  0  0  3     ...           0          NaN   0  hal         hal
+5      3  0  0  0  3     ...           0          NaN   0  dry  Slaapkamer
+6      3  0  0  0  2     ...           0          NaN   0  wet     OKeuken
+7      3  0  0  0  2     ...           0          NaN   0  dry   Woonkamer
+8      3  0  0  0  2     ...           0          NaN   0  hal         hal
+9      3  0  0  0  2     ...           0          NaN   0  wet          WC
+10     3  0  0  0  2     ...           0          NaN   0  hal         hal
+11    10  0  0  0  2     ...           0          NaN   0  NaN         NaN
+12    10  0  0  0  2     ...           0          NaN   0  NaN         NaN
+
+[12 rows x 21 columns]
+Defining Window opening for roomBadkamer
+Slaapkamer1
+   flags ps pc pk pl     ...     vf_type vf_node_name cfd type    function
+nr                       ...                                              
+1      3  0  0  0  3     ...           0          NaN   0  dry  Slaapkamer
+2      3  0  0  0  3     ...           0          NaN   0  dry  Slaapkamer
+3      3  0  0  0  3     ...           0          NaN   0  wet    Badkamer
+4      3  0  0  0  3     ...           0          NaN   0  hal         hal
+5      3  0  0  0  3     ...           0          NaN   0  dry  Slaapkamer
+6      3  0  0  0  2     ...           0          NaN   0  wet     OKeuken
+7      3  0  0  0  2     ...           0          NaN   0  dry   Woonkamer
+8      3  0  0  0  2     ...           0          NaN   0  hal         hal
+9      3  0  0  0  2     ...           0          NaN   0  wet          WC
+10     3  0  0  0  2     ...           0          NaN   0  hal         hal
+11    10  0  0  0  2     ...           0          NaN   0  NaN         NaN
+12    10  0  0  0  2     ...           0          NaN   0  NaN         NaN
+
+[12 rows x 21 columns]
+Defining Window opening for roomSlaapkamer1
+OKeuken
+   flags ps pc pk pl     ...     vf_type vf_node_name cfd type    function
+nr                       ...                                              
+1      3  0  0  0  3     ...           0          NaN   0  dry  Slaapkamer
+2      3  0  0  0  3     ...           0          NaN   0  dry  Slaapkamer
+3      3  0  0  0  3     ...           0          NaN   0  wet    Badkamer
+4      3  0  0  0  3     ...           0          NaN   0  hal         hal
+5      3  0  0  0  3     ...           0          NaN   0  dry  Slaapkamer
+6      3  0  0  0  2     ...           0          NaN   0  wet     OKeuken
+7      3  0  0  0  2     ...           0          NaN   0  dry   Woonkamer
+8      3  0  0  0  2     ...           0          NaN   0  hal         hal
+9      3  0  0  0  2     ...           0          NaN   0  wet          WC
+10     3  0  0  0  2     ...           0          NaN   0  hal         hal
+11    10  0  0  0  2     ...           0          NaN   0  NaN         NaN
+12    10  0  0  0  2     ...           0          NaN   0  NaN         NaN
+
+[12 rows x 21 columns]
+Defining Window opening for roomOKeuken
+WARNING, more than one location to define natural supply
+Choosing the first one in the list, please check your model afterwards
+Woonkamer
+   flags ps pc pk pl     ...     vf_type vf_node_name cfd type    function
+nr                       ...                                              
+1      3  0  0  0  3     ...           0          NaN   0  dry  Slaapkamer
+2      3  0  0  0  3     ...           0          NaN   0  dry  Slaapkamer
+3      3  0  0  0  3     ...           0          NaN   0  wet    Badkamer
+4      3  0  0  0  3     ...           0          NaN   0  hal         hal
+5      3  0  0  0  3     ...           0          NaN   0  dry  Slaapkamer
+6      3  0  0  0  2     ...           0          NaN   0  wet     OKeuken
+7      3  0  0  0  2     ...           0          NaN   0  dry   Woonkamer
+8      3  0  0  0  2     ...           0          NaN   0  hal         hal
+9      3  0  0  0  2     ...           0          NaN   0  wet          WC
+10     3  0  0  0  2     ...           0          NaN   0  hal         hal
+11    10  0  0  0  2     ...           0          NaN   0  NaN         NaN
+12    10  0  0  0  2     ...           0          NaN   0  NaN         NaN
+
+[12 rows x 21 columns]
+Defining Window opening for roomWoonkamer
+WARNING, more than one location to define natural supply
+Choosing the first one in the list, please check your model afterwards
+WC
+   flags ps pc pk pl     ...     vf_type vf_node_name cfd type    function
+nr                       ...                                              
+1      3  0  0  0  3     ...           0          NaN   0  dry  Slaapkamer
+2      3  0  0  0  3     ...           0          NaN   0  dry  Slaapkamer
+3      3  0  0  0  3     ...           0          NaN   0  wet    Badkamer
+4      3  0  0  0  3     ...           0          NaN   0  hal         hal
+5      3  0  0  0  3     ...           0          NaN   0  dry  Slaapkamer
+6      3  0  0  0  2     ...           0          NaN   0  wet     OKeuken
+7      3  0  0  0  2     ...           0          NaN   0  dry   Woonkamer
+8      3  0  0  0  2     ...           0          NaN   0  hal         hal
+9      3  0  0  0  2     ...           0          NaN   0  wet          WC
+10     3  0  0  0  2     ...           0          NaN   0  hal         hal
+11    10  0  0  0  2     ...           0          NaN   0  NaN         NaN
+12    10  0  0  0  2     ...           0          NaN   0  NaN         NaN
+
+[12 rows x 21 columns]
+Defining Window opening for roomWC
+C:\Users\spec\Documents\Projects\RESEARCH\COMISVENT\ForSVNFirstCommit\contamPy\..\comisventData\0-TemplatesAndLibs\occupancyProfiles\profile_Occupant1_Away.csv does not exist, skipping
+C:\Users\spec\Documents\Projects\RESEARCH\COMISVENT\ForSVNFirstCommit\contamPy\..\comisventData\0-TemplatesAndLibs\occupancyProfiles\profile_Occupant2_Away.csv does not exist, skipping
+C:\Users\spec\Documents\Projects\RESEARCH\COMISVENT\ForSVNFirstCommit\contamPy\..\comisventData\0-TemplatesAndLibs\occupancyProfiles\profile_Occupant3_Away.csv does not exist, skipping
+C:\Users\spec\Documents\Projects\RESEARCH\COMISVENT\ForSVNFirstCommit\contamPy\..\comisventData\0-TemplatesAndLibs\occupancyProfiles\profile_Occupant4_Away.csv does not exist, skipping
+Testing  {'building': 'COVL-REN-HO2', 'orientation': 35, 'v50': 6, 'system': 'CNBN', 'control': 'fulllocal', 'occupancy': 'default-active'}
+WARNING, more than one location to define natural supply
+Choosing the first one in the list, please check your model afterwards
+WARNING, more than one location to define natural supply
+Choosing the first one in the list, please check your model afterwards
+WARNING, more than one location to define natural supply
+Choosing the first one in the list, please check your model afterwards
+NT_2Pa element does not exist yet, adding it
+C:\Users\spec\Documents\Projects\RESEARCH\COMISVENT\ForSVNFirstCommit\contamPy\..\comisventData\0-TemplatesAndLibs\occupancyProfiles\profile_Occupant1_Away.csv does not exist, skipping
+C:\Users\spec\Documents\Projects\RESEARCH\COMISVENT\ForSVNFirstCommit\contamPy\..\comisventData\0-TemplatesAndLibs\occupancyProfiles\profile_Occupant2_Away.csv does not exist, skipping
+C:\Users\spec\Documents\Projects\RESEARCH\COMISVENT\ForSVNFirstCommit\contamPy\..\comisventData\0-TemplatesAndLibs\occupancyProfiles\profile_Occupant3_Away.csv does not exist, skipping
+C:\Users\spec\Documents\Projects\RESEARCH\COMISVENT\ForSVNFirstCommit\contamPy\..\comisventData\0-TemplatesAndLibs\occupancyProfiles\profile_Occupant4_Away.csv does not exist, skipping
+Testing  {'building': 'COVL-REN-HO2', 'orientation': 35, 'v50': 6, 'system': 'DNBN', 'control': 'fulllocal', 'occupancy': 'default-active'}
+NT_2Pa element does not exist yet, adding it
+C:\Users\spec\Documents\Projects\RESEARCH\COMISVENT\ForSVNFirstCommit\contamPy\..\comisventData\0-TemplatesAndLibs\occupancyProfiles\profile_Occupant1_Away.csv does not exist, skipping
+C:\Users\spec\Documents\Projects\RESEARCH\COMISVENT\ForSVNFirstCommit\contamPy\..\comisventData\0-TemplatesAndLibs\occupancyProfiles\profile_Occupant2_Away.csv does not exist, skipping
+C:\Users\spec\Documents\Projects\RESEARCH\COMISVENT\ForSVNFirstCommit\contamPy\..\comisventData\0-TemplatesAndLibs\occupancyProfiles\profile_Occupant3_Away.csv does not exist, skipping
+C:\Users\spec\Documents\Projects\RESEARCH\COMISVENT\ForSVNFirstCommit\contamPy\..\comisventData\0-TemplatesAndLibs\occupancyProfiles\profile_Occupant4_Away.csv does not exist, skipping
+Testing  {'building': 'COVL-REN-HO2', 'orientation': 35, 'v50': 6, 'system': 'CNBNSLAAP', 'control': 'fulllocal', 'occupancy': 'default-active'}
+WARNING, more than one location to define natural supply
+Choosing the first one in the list, please check your model afterwards
+WARNING, more than one location to define natural supply
+Choosing the first one in the list, please check your model afterwards
+WARNING, more than one location to define natural supply
+Choosing the first one in the list, please check your model afterwards
+NT_2Pa element does not exist yet, adding it
+C:\Users\spec\Documents\Projects\RESEARCH\COMISVENT\ForSVNFirstCommit\contamPy\..\comisventData\0-TemplatesAndLibs\occupancyProfiles\profile_Occupant1_Away.csv does not exist, skipping
+C:\Users\spec\Documents\Projects\RESEARCH\COMISVENT\ForSVNFirstCommit\contamPy\..\comisventData\0-TemplatesAndLibs\occupancyProfiles\profile_Occupant2_Away.csv does not exist, skipping
+C:\Users\spec\Documents\Projects\RESEARCH\COMISVENT\ForSVNFirstCommit\contamPy\..\comisventData\0-TemplatesAndLibs\occupancyProfiles\profile_Occupant3_Away.csv does not exist, skipping
+C:\Users\spec\Documents\Projects\RESEARCH\COMISVENT\ForSVNFirstCommit\contamPy\..\comisventData\0-TemplatesAndLibs\occupancyProfiles\profile_Occupant4_Away.csv does not exist, skipping
+Testing  {'building': 'COVL-REN-HO2', 'orientation': 35, 'v50': 6, 'system': 'CPREVENT', 'control': 'fulllocal', 'occupancy': 'default-active'}
+in unbal WK
+WARNING, more than one location to define natural supply
+Choosing the first one in the list, please check your model afterwards
+WARNING, more than one location to define natural supply
+Choosing the first one in the list, please check your model afterwards
+WARNING, more than one location to define natural supply
+Choosing the first one in the list, please check your model afterwards
+NT_2Pa element does not exist yet, adding it
+C:\Users\spec\Documents\Projects\RESEARCH\COMISVENT\ForSVNFirstCommit\contamPy\..\comisventData\0-TemplatesAndLibs\occupancyProfiles\profile_Occupant1_Away.csv does not exist, skipping
+C:\Users\spec\Documents\Projects\RESEARCH\COMISVENT\ForSVNFirstCommit\contamPy\..\comisventData\0-TemplatesAndLibs\occupancyProfiles\profile_Occupant2_Away.csv does not exist, skipping
+C:\Users\spec\Documents\Projects\RESEARCH\COMISVENT\ForSVNFirstCommit\contamPy\..\comisventData\0-TemplatesAndLibs\occupancyProfiles\profile_Occupant3_Away.csv does not exist, skipping
+C:\Users\spec\Documents\Projects\RESEARCH\COMISVENT\ForSVNFirstCommit\contamPy\..\comisventData\0-TemplatesAndLibs\occupancyProfiles\profile_Occupant4_Away.csv does not exist, skipping
+Testing  {'building': 'COVL-REN-HO2', 'orientation': 35, 'v50': 6, 'system': 'DPREVENT', 'control': 'fulllocal', 'occupancy': 'default-active'}
+in unbal WK
+NT_2Pa element does not exist yet, adding it
+C:\Users\spec\Documents\Projects\RESEARCH\COMISVENT\ForSVNFirstCommit\contamPy\..\comisventData\0-TemplatesAndLibs\occupancyProfiles\profile_Occupant1_Away.csv does not exist, skipping
+C:\Users\spec\Documents\Projects\RESEARCH\COMISVENT\ForSVNFirstCommit\contamPy\..\comisventData\0-TemplatesAndLibs\occupancyProfiles\profile_Occupant2_Away.csv does not exist, skipping
+C:\Users\spec\Documents\Projects\RESEARCH\COMISVENT\ForSVNFirstCommit\contamPy\..\comisventData\0-TemplatesAndLibs\occupancyProfiles\profile_Occupant3_Away.csv does not exist, skipping
+C:\Users\spec\Documents\Projects\RESEARCH\COMISVENT\ForSVNFirstCommit\contamPy\..\comisventData\0-TemplatesAndLibs\occupancyProfiles\profile_Occupant4_Away.csv does not exist, skipping
+Testing  {'building': 'COVL-REN-HO2', 'orientation': 35, 'v50': 6, 'system': 'CSLAAPPREVENT', 'control': 'fulllocal', 'occupancy': 'default-active'}
+Only one unbalanced zone, impossible to perfectly balance natural transfers
+WARNING, more than one location to define natural supply
+Choosing the first one in the list, please check your model afterwards
+WARNING, more than one location to define natural supply
+Choosing the first one in the list, please check your model afterwards
+WARNING, more than one location to define natural supply
+Choosing the first one in the list, please check your model afterwards
+NT_2Pa element does not exist yet, adding it
+C:\Users\spec\Documents\Projects\RESEARCH\COMISVENT\ForSVNFirstCommit\contamPy\..\comisventData\0-TemplatesAndLibs\occupancyProfiles\profile_Occupant1_Away.csv does not exist, skipping
+C:\Users\spec\Documents\Projects\RESEARCH\COMISVENT\ForSVNFirstCommit\contamPy\..\comisventData\0-TemplatesAndLibs\occupancyProfiles\profile_Occupant2_Away.csv does not exist, skipping
+C:\Users\spec\Documents\Projects\RESEARCH\COMISVENT\ForSVNFirstCommit\contamPy\..\comisventData\0-TemplatesAndLibs\occupancyProfiles\profile_Occupant3_Away.csv does not exist, skipping
+C:\Users\spec\Documents\Projects\RESEARCH\COMISVENT\ForSVNFirstCommit\contamPy\..\comisventData\0-TemplatesAndLibs\occupancyProfiles\profile_Occupant4_Away.csv does not exist, skipping
+Testing  {'building': 'COVL-REN-HO2', 'orientation': 35, 'v50': 6, 'system': 'CSupplyHall', 'control': 'fulllocal', 'occupancy': 'default-active'}
+in unbal WK
+Only one unbalanced zone, impossible to perfectly balance natural transfers
+NT_2Pa element does not exist yet, adding it
+C:\Users\spec\Documents\Projects\RESEARCH\COMISVENT\ForSVNFirstCommit\contamPy\..\comisventData\0-TemplatesAndLibs\occupancyProfiles\profile_Occupant1_Away.csv does not exist, skipping
+C:\Users\spec\Documents\Projects\RESEARCH\COMISVENT\ForSVNFirstCommit\contamPy\..\comisventData\0-TemplatesAndLibs\occupancyProfiles\profile_Occupant2_Away.csv does not exist, skipping
+C:\Users\spec\Documents\Projects\RESEARCH\COMISVENT\ForSVNFirstCommit\contamPy\..\comisventData\0-TemplatesAndLibs\occupancyProfiles\profile_Occupant3_Away.csv does not exist, skipping
+C:\Users\spec\Documents\Projects\RESEARCH\COMISVENT\ForSVNFirstCommit\contamPy\..\comisventData\0-TemplatesAndLibs\occupancyProfiles\profile_Occupant4_Away.csv does not exist, skipping
+Testing  {'building': 'COVL-REN-HO2', 'orientation': 35, 'v50': 6, 'system': 'Windows', 'control': 'fulllocal', 'occupancy': 'default-active'}
+Slaapkamer1
+   flags ps pc pk pl     ...     vf_type vf_node_name cfd type    function
+nr                       ...                                              
+1      3  0  0  0  3     ...           0          NaN   0  dry  Slaapkamer
+2      3  0  0  0  3     ...           0          NaN   0  wet    Badkamer
+3      3  0  0  0  3     ...           0          NaN   0  hal         hal
+4      3  0  0  0  3     ...           0          NaN   0  dry  Slaapkamer
+5      3  0  0  0  3     ...           0          NaN   0  dry  Slaapkamer
+6      3  0  0  0  2     ...           0          NaN   0  wet     OKeuken
+7      3  0  0  0  2     ...           0          NaN   0  hal         hal
+8      3  0  0  0  2     ...           0          NaN   0  dry   Woonkamer
+9      3  0  0  0  2     ...           0          NaN   0  hal         hal
+10     3  0  0  0  2     ...           0          NaN   0  wet          WC
+11     3  0  0  0  2     ...           0          NaN   0  hal         hal
+12    10  0  0  0  2     ...           0          NaN   0  NaN         NaN
+13    10  0  0  0  2     ...           0          NaN   0  NaN         NaN
+
+[13 rows x 21 columns]
+Defining Window opening for roomSlaapkamer1
+WARNING, more than one location to define natural supply
+Choosing the first one in the list, please check your model afterwards
+Badkamer
+   flags ps pc pk pl     ...     vf_type vf_node_name cfd type    function
+nr                       ...                                              
+1      3  0  0  0  3     ...           0          NaN   0  dry  Slaapkamer
+2      3  0  0  0  3     ...           0          NaN   0  wet    Badkamer
+3      3  0  0  0  3     ...           0          NaN   0  hal         hal
+4      3  0  0  0  3     ...           0          NaN   0  dry  Slaapkamer
+5      3  0  0  0  3     ...           0          NaN   0  dry  Slaapkamer
+6      3  0  0  0  2     ...           0          NaN   0  wet     OKeuken
+7      3  0  0  0  2     ...           0          NaN   0  hal         hal
+8      3  0  0  0  2     ...           0          NaN   0  dry   Woonkamer
+9      3  0  0  0  2     ...           0          NaN   0  hal         hal
+10     3  0  0  0  2     ...           0          NaN   0  wet          WC
+11     3  0  0  0  2     ...           0          NaN   0  hal         hal
+12    10  0  0  0  2     ...           0          NaN   0  NaN         NaN
+13    10  0  0  0  2     ...           0          NaN   0  NaN         NaN
+
+[13 rows x 21 columns]
+Defining Window opening for roomBadkamer
+Slaapkamer2
+   flags ps pc pk pl     ...     vf_type vf_node_name cfd type    function
+nr                       ...                                              
+1      3  0  0  0  3     ...           0          NaN   0  dry  Slaapkamer
+2      3  0  0  0  3     ...           0          NaN   0  wet    Badkamer
+3      3  0  0  0  3     ...           0          NaN   0  hal         hal
+4      3  0  0  0  3     ...           0          NaN   0  dry  Slaapkamer
+5      3  0  0  0  3     ...           0          NaN   0  dry  Slaapkamer
+6      3  0  0  0  2     ...           0          NaN   0  wet     OKeuken
+7      3  0  0  0  2     ...           0          NaN   0  hal         hal
+8      3  0  0  0  2     ...           0          NaN   0  dry   Woonkamer
+9      3  0  0  0  2     ...           0          NaN   0  hal         hal
+10     3  0  0  0  2     ...           0          NaN   0  wet          WC
+11     3  0  0  0  2     ...           0          NaN   0  hal         hal
+12    10  0  0  0  2     ...           0          NaN   0  NaN         NaN
+13    10  0  0  0  2     ...           0          NaN   0  NaN         NaN
+
+[13 rows x 21 columns]
+Defining Window opening for roomSlaapkamer2
+WARNING, more than one location to define natural supply
+Choosing the first one in the list, please check your model afterwards
+Slaapkamer3
+   flags ps pc pk pl     ...     vf_type vf_node_name cfd type    function
+nr                       ...                                              
+1      3  0  0  0  3     ...           0          NaN   0  dry  Slaapkamer
+2      3  0  0  0  3     ...           0          NaN   0  wet    Badkamer
+3      3  0  0  0  3     ...           0          NaN   0  hal         hal
+4      3  0  0  0  3     ...           0          NaN   0  dry  Slaapkamer
+5      3  0  0  0  3     ...           0          NaN   0  dry  Slaapkamer
+6      3  0  0  0  2     ...           0          NaN   0  wet     OKeuken
+7      3  0  0  0  2     ...           0          NaN   0  hal         hal
+8      3  0  0  0  2     ...           0          NaN   0  dry   Woonkamer
+9      3  0  0  0  2     ...           0          NaN   0  hal         hal
+10     3  0  0  0  2     ...           0          NaN   0  wet          WC
+11     3  0  0  0  2     ...           0          NaN   0  hal         hal
+12    10  0  0  0  2     ...           0          NaN   0  NaN         NaN
+13    10  0  0  0  2     ...           0          NaN   0  NaN         NaN
+
+[13 rows x 21 columns]
+Defining Window opening for roomSlaapkamer3
+OKeuken
+   flags ps pc pk pl     ...     vf_type vf_node_name cfd type    function
+nr                       ...                                              
+1      3  0  0  0  3     ...           0          NaN   0  dry  Slaapkamer
+2      3  0  0  0  3     ...           0          NaN   0  wet    Badkamer
+3      3  0  0  0  3     ...           0          NaN   0  hal         hal
+4      3  0  0  0  3     ...           0          NaN   0  dry  Slaapkamer
+5      3  0  0  0  3     ...           0          NaN   0  dry  Slaapkamer
+6      3  0  0  0  2     ...           0          NaN   0  wet     OKeuken
+7      3  0  0  0  2     ...           0          NaN   0  hal         hal
+8      3  0  0  0  2     ...           0          NaN   0  dry   Woonkamer
+9      3  0  0  0  2     ...           0          NaN   0  hal         hal
+10     3  0  0  0  2     ...           0          NaN   0  wet          WC
+11     3  0  0  0  2     ...           0          NaN   0  hal         hal
+12    10  0  0  0  2     ...           0          NaN   0  NaN         NaN
+13    10  0  0  0  2     ...           0          NaN   0  NaN         NaN
+
+[13 rows x 21 columns]
+Defining Window opening for roomOKeuken
+Woonkamer
+   flags ps pc pk pl     ...     vf_type vf_node_name cfd type    function
+nr                       ...                                              
+1      3  0  0  0  3     ...           0          NaN   0  dry  Slaapkamer
+2      3  0  0  0  3     ...           0          NaN   0  wet    Badkamer
+3      3  0  0  0  3     ...           0          NaN   0  hal         hal
+4      3  0  0  0  3     ...           0          NaN   0  dry  Slaapkamer
+5      3  0  0  0  3     ...           0          NaN   0  dry  Slaapkamer
+6      3  0  0  0  2     ...           0          NaN   0  wet     OKeuken
+7      3  0  0  0  2     ...           0          NaN   0  hal         hal
+8      3  0  0  0  2     ...           0          NaN   0  dry   Woonkamer
+9      3  0  0  0  2     ...           0          NaN   0  hal         hal
+10     3  0  0  0  2     ...           0          NaN   0  wet          WC
+11     3  0  0  0  2     ...           0          NaN   0  hal         hal
+12    10  0  0  0  2     ...           0          NaN   0  NaN         NaN
+13    10  0  0  0  2     ...           0          NaN   0  NaN         NaN
+
+[13 rows x 21 columns]
+Defining Window opening for roomWoonkamer
+WARNING, more than one location to define natural supply
+Choosing the first one in the list, please check your model afterwards
+WC
+   flags ps pc pk pl     ...     vf_type vf_node_name cfd type    function
+nr                       ...                                              
+1      3  0  0  0  3     ...           0          NaN   0  dry  Slaapkamer
+2      3  0  0  0  3     ...           0          NaN   0  wet    Badkamer
+3      3  0  0  0  3     ...           0          NaN   0  hal         hal
+4      3  0  0  0  3     ...           0          NaN   0  dry  Slaapkamer
+5      3  0  0  0  3     ...           0          NaN   0  dry  Slaapkamer
+6      3  0  0  0  2     ...           0          NaN   0  wet     OKeuken
+7      3  0  0  0  2     ...           0          NaN   0  hal         hal
+8      3  0  0  0  2     ...           0          NaN   0  dry   Woonkamer
+9      3  0  0  0  2     ...           0          NaN   0  hal         hal
+10     3  0  0  0  2     ...           0          NaN   0  wet          WC
+11     3  0  0  0  2     ...           0          NaN   0  hal         hal
+12    10  0  0  0  2     ...           0          NaN   0  NaN         NaN
+13    10  0  0  0  2     ...           0          NaN   0  NaN         NaN
+
+[13 rows x 21 columns]
+Defining Window opening for roomWC
+WARNING, more than one location to define natural supply
+Choosing the first one in the list, please check your model afterwards
+C:\Users\spec\Documents\Projects\RESEARCH\COMISVENT\ForSVNFirstCommit\contamPy\..\comisventData\0-TemplatesAndLibs\occupancyProfiles\profile_Occupant1_Away.csv does not exist, skipping
+C:\Users\spec\Documents\Projects\RESEARCH\COMISVENT\ForSVNFirstCommit\contamPy\..\comisventData\0-TemplatesAndLibs\occupancyProfiles\profile_Occupant2_Away.csv does not exist, skipping
+C:\Users\spec\Documents\Projects\RESEARCH\COMISVENT\ForSVNFirstCommit\contamPy\..\comisventData\0-TemplatesAndLibs\occupancyProfiles\profile_Occupant3_Away.csv does not exist, skipping
+C:\Users\spec\Documents\Projects\RESEARCH\COMISVENT\ForSVNFirstCommit\contamPy\..\comisventData\0-TemplatesAndLibs\occupancyProfiles\profile_Occupant4_Away.csv does not exist, skipping
+Testing  {'building': 'COVL-REN-VRIJ1', 'orientation': 35, 'v50': 6, 'system': 'CNBN', 'control': 'fulllocal', 'occupancy': 'default-active'}
+WARNING, more than one location to define natural supply
+Choosing the first one in the list, please check your model afterwards
+WARNING, more than one location to define natural supply
+Choosing the first one in the list, please check your model afterwards
+NT_2Pa element does not exist yet, adding it
+C:\Users\spec\Documents\Projects\RESEARCH\COMISVENT\ForSVNFirstCommit\contamPy\..\comisventData\0-TemplatesAndLibs\occupancyProfiles\profile_Occupant1_Away.csv does not exist, skipping
+C:\Users\spec\Documents\Projects\RESEARCH\COMISVENT\ForSVNFirstCommit\contamPy\..\comisventData\0-TemplatesAndLibs\occupancyProfiles\profile_Occupant2_Away.csv does not exist, skipping
+C:\Users\spec\Documents\Projects\RESEARCH\COMISVENT\ForSVNFirstCommit\contamPy\..\comisventData\0-TemplatesAndLibs\occupancyProfiles\profile_Occupant3_Away.csv does not exist, skipping
+C:\Users\spec\Documents\Projects\RESEARCH\COMISVENT\ForSVNFirstCommit\contamPy\..\comisventData\0-TemplatesAndLibs\occupancyProfiles\profile_Occupant4_Away.csv does not exist, skipping
+Testing  {'building': 'COVL-REN-VRIJ1', 'orientation': 35, 'v50': 6, 'system': 'DNBN', 'control': 'fulllocal', 'occupancy': 'default-active'}
+NT_2Pa element does not exist yet, adding it
+C:\Users\spec\Documents\Projects\RESEARCH\COMISVENT\ForSVNFirstCommit\contamPy\..\comisventData\0-TemplatesAndLibs\occupancyProfiles\profile_Occupant1_Away.csv does not exist, skipping
+C:\Users\spec\Documents\Projects\RESEARCH\COMISVENT\ForSVNFirstCommit\contamPy\..\comisventData\0-TemplatesAndLibs\occupancyProfiles\profile_Occupant2_Away.csv does not exist, skipping
+C:\Users\spec\Documents\Projects\RESEARCH\COMISVENT\ForSVNFirstCommit\contamPy\..\comisventData\0-TemplatesAndLibs\occupancyProfiles\profile_Occupant3_Away.csv does not exist, skipping
+C:\Users\spec\Documents\Projects\RESEARCH\COMISVENT\ForSVNFirstCommit\contamPy\..\comisventData\0-TemplatesAndLibs\occupancyProfiles\profile_Occupant4_Away.csv does not exist, skipping
+Testing  {'building': 'COVL-REN-VRIJ1', 'orientation': 35, 'v50': 6, 'system': 'CNBNSLAAP', 'control': 'fulllocal', 'occupancy': 'default-active'}
+WARNING, more than one location to define natural supply
+Choosing the first one in the list, please check your model afterwards
+WARNING, more than one location to define natural supply
+Choosing the first one in the list, please check your model afterwards
+NT_2Pa element does not exist yet, adding it
+C:\Users\spec\Documents\Projects\RESEARCH\COMISVENT\ForSVNFirstCommit\contamPy\..\comisventData\0-TemplatesAndLibs\occupancyProfiles\profile_Occupant1_Away.csv does not exist, skipping
+C:\Users\spec\Documents\Projects\RESEARCH\COMISVENT\ForSVNFirstCommit\contamPy\..\comisventData\0-TemplatesAndLibs\occupancyProfiles\profile_Occupant2_Away.csv does not exist, skipping
+C:\Users\spec\Documents\Projects\RESEARCH\COMISVENT\ForSVNFirstCommit\contamPy\..\comisventData\0-TemplatesAndLibs\occupancyProfiles\profile_Occupant3_Away.csv does not exist, skipping
+C:\Users\spec\Documents\Projects\RESEARCH\COMISVENT\ForSVNFirstCommit\contamPy\..\comisventData\0-TemplatesAndLibs\occupancyProfiles\profile_Occupant4_Away.csv does not exist, skipping
+Testing  {'building': 'COVL-REN-VRIJ1', 'orientation': 35, 'v50': 6, 'system': 'CPREVENT', 'control': 'fulllocal', 'occupancy': 'default-active'}
+in unbal WK
+WARNING, more than one location to define natural supply
+Choosing the first one in the list, please check your model afterwards
+WARNING, more than one location to define natural supply
+Choosing the first one in the list, please check your model afterwards
+NT_2Pa element does not exist yet, adding it
+C:\Users\spec\Documents\Projects\RESEARCH\COMISVENT\ForSVNFirstCommit\contamPy\..\comisventData\0-TemplatesAndLibs\occupancyProfiles\profile_Occupant1_Away.csv does not exist, skipping
+C:\Users\spec\Documents\Projects\RESEARCH\COMISVENT\ForSVNFirstCommit\contamPy\..\comisventData\0-TemplatesAndLibs\occupancyProfiles\profile_Occupant2_Away.csv does not exist, skipping
+C:\Users\spec\Documents\Projects\RESEARCH\COMISVENT\ForSVNFirstCommit\contamPy\..\comisventData\0-TemplatesAndLibs\occupancyProfiles\profile_Occupant3_Away.csv does not exist, skipping
+C:\Users\spec\Documents\Projects\RESEARCH\COMISVENT\ForSVNFirstCommit\contamPy\..\comisventData\0-TemplatesAndLibs\occupancyProfiles\profile_Occupant4_Away.csv does not exist, skipping
+Testing  {'building': 'COVL-REN-VRIJ1', 'orientation': 35, 'v50': 6, 'system': 'DPREVENT', 'control': 'fulllocal', 'occupancy': 'default-active'}
+in unbal WK
+NT_2Pa element does not exist yet, adding it
+C:\Users\spec\Documents\Projects\RESEARCH\COMISVENT\ForSVNFirstCommit\contamPy\..\comisventData\0-TemplatesAndLibs\occupancyProfiles\profile_Occupant1_Away.csv does not exist, skipping
+C:\Users\spec\Documents\Projects\RESEARCH\COMISVENT\ForSVNFirstCommit\contamPy\..\comisventData\0-TemplatesAndLibs\occupancyProfiles\profile_Occupant2_Away.csv does not exist, skipping
+C:\Users\spec\Documents\Projects\RESEARCH\COMISVENT\ForSVNFirstCommit\contamPy\..\comisventData\0-TemplatesAndLibs\occupancyProfiles\profile_Occupant3_Away.csv does not exist, skipping
+C:\Users\spec\Documents\Projects\RESEARCH\COMISVENT\ForSVNFirstCommit\contamPy\..\comisventData\0-TemplatesAndLibs\occupancyProfiles\profile_Occupant4_Away.csv does not exist, skipping
+Testing  {'building': 'COVL-REN-VRIJ1', 'orientation': 35, 'v50': 6, 'system': 'CSLAAPPREVENT', 'control': 'fulllocal', 'occupancy': 'default-active'}
+Only one unbalanced zone, impossible to perfectly balance natural transfers
+WARNING, more than one location to define natural supply
+Choosing the first one in the list, please check your model afterwards
+WARNING, more than one location to define natural supply
+Choosing the first one in the list, please check your model afterwards
+NT_2Pa element does not exist yet, adding it
+C:\Users\spec\Documents\Projects\RESEARCH\COMISVENT\ForSVNFirstCommit\contamPy\..\comisventData\0-TemplatesAndLibs\occupancyProfiles\profile_Occupant1_Away.csv does not exist, skipping
+C:\Users\spec\Documents\Projects\RESEARCH\COMISVENT\ForSVNFirstCommit\contamPy\..\comisventData\0-TemplatesAndLibs\occupancyProfiles\profile_Occupant2_Away.csv does not exist, skipping
+C:\Users\spec\Documents\Projects\RESEARCH\COMISVENT\ForSVNFirstCommit\contamPy\..\comisventData\0-TemplatesAndLibs\occupancyProfiles\profile_Occupant3_Away.csv does not exist, skipping
+C:\Users\spec\Documents\Projects\RESEARCH\COMISVENT\ForSVNFirstCommit\contamPy\..\comisventData\0-TemplatesAndLibs\occupancyProfiles\profile_Occupant4_Away.csv does not exist, skipping
+Testing  {'building': 'COVL-REN-VRIJ1', 'orientation': 35, 'v50': 6, 'system': 'CSupplyHall', 'control': 'fulllocal', 'occupancy': 'default-active'}
+in unbal WK
+Only one unbalanced zone, impossible to perfectly balance natural transfers
+WARNING, more than one location to define natural supply
+Choosing the first one in the list, please check your model afterwards
+NT_2Pa element does not exist yet, adding it
+C:\Users\spec\Documents\Projects\RESEARCH\COMISVENT\ForSVNFirstCommit\contamPy\..\comisventData\0-TemplatesAndLibs\occupancyProfiles\profile_Occupant1_Away.csv does not exist, skipping
+C:\Users\spec\Documents\Projects\RESEARCH\COMISVENT\ForSVNFirstCommit\contamPy\..\comisventData\0-TemplatesAndLibs\occupancyProfiles\profile_Occupant2_Away.csv does not exist, skipping
+C:\Users\spec\Documents\Projects\RESEARCH\COMISVENT\ForSVNFirstCommit\contamPy\..\comisventData\0-TemplatesAndLibs\occupancyProfiles\profile_Occupant3_Away.csv does not exist, skipping
+C:\Users\spec\Documents\Projects\RESEARCH\COMISVENT\ForSVNFirstCommit\contamPy\..\comisventData\0-TemplatesAndLibs\occupancyProfiles\profile_Occupant4_Away.csv does not exist, skipping
+Testing  {'building': 'COVL-REN-VRIJ1', 'orientation': 35, 'v50': 6, 'system': 'Windows', 'control': 'fulllocal', 'occupancy': 'default-active'}
+Woonkamer
+   flags ps pc pk pl     ...     vf_type vf_node_name cfd type    function
+nr                       ...                                              
+1      3  0  0  0  2     ...           0          NaN   0  dry   Woonkamer
+2      3  0  0  0  2     ...           0          NaN   0  wet     OKeuken
+3      3  0  0  0  2     ...           0          NaN   0  wet    Badkamer
+4      3  0  0  0  2     ...           0          NaN   0  dry  Slaapkamer
+5      3  0  0  0  2     ...           0          NaN   0  dry  Slaapkamer
+6      3  0  0  0  2     ...           0          NaN   0  dry  Slaapkamer
+7      3  0  0  0  2     ...           0          NaN   0  hal         hal
+8      3  0  0  0  2     ...           0          NaN   0  wet          WC
+9      3  0  0  0  2     ...           0          NaN   0  hal         hal
+10    10  0  0  0  2     ...           0          NaN   0  NaN         NaN
+11    10  0  0  0  2     ...           0          NaN   0  NaN         NaN
+
+[11 rows x 21 columns]
+Defining Window opening for roomWoonkamer
+WARNING, more than one location to define natural supply
+Choosing the first one in the list, please check your model afterwards
+OKeuken
+   flags ps pc pk pl     ...     vf_type vf_node_name cfd type    function
+nr                       ...                                              
+1      3  0  0  0  2     ...           0          NaN   0  dry   Woonkamer
+2      3  0  0  0  2     ...           0          NaN   0  wet     OKeuken
+3      3  0  0  0  2     ...           0          NaN   0  wet    Badkamer
+4      3  0  0  0  2     ...           0          NaN   0  dry  Slaapkamer
+5      3  0  0  0  2     ...           0          NaN   0  dry  Slaapkamer
+6      3  0  0  0  2     ...           0          NaN   0  dry  Slaapkamer
+7      3  0  0  0  2     ...           0          NaN   0  hal         hal
+8      3  0  0  0  2     ...           0          NaN   0  wet          WC
+9      3  0  0  0  2     ...           0          NaN   0  hal         hal
+10    10  0  0  0  2     ...           0          NaN   0  NaN         NaN
+11    10  0  0  0  2     ...           0          NaN   0  NaN         NaN
+
+[11 rows x 21 columns]
+Defining Window opening for roomOKeuken
+Badkamer
+   flags ps pc pk pl     ...     vf_type vf_node_name cfd type    function
+nr                       ...                                              
+1      3  0  0  0  2     ...           0          NaN   0  dry   Woonkamer
+2      3  0  0  0  2     ...           0          NaN   0  wet     OKeuken
+3      3  0  0  0  2     ...           0          NaN   0  wet    Badkamer
+4      3  0  0  0  2     ...           0          NaN   0  dry  Slaapkamer
+5      3  0  0  0  2     ...           0          NaN   0  dry  Slaapkamer
+6      3  0  0  0  2     ...           0          NaN   0  dry  Slaapkamer
+7      3  0  0  0  2     ...           0          NaN   0  hal         hal
+8      3  0  0  0  2     ...           0          NaN   0  wet          WC
+9      3  0  0  0  2     ...           0          NaN   0  hal         hal
+10    10  0  0  0  2     ...           0          NaN   0  NaN         NaN
+11    10  0  0  0  2     ...           0          NaN   0  NaN         NaN
+
+[11 rows x 21 columns]
+Defining Window opening for roomBadkamer
+Slaapkamer3
+   flags ps pc pk pl     ...     vf_type vf_node_name cfd type    function
+nr                       ...                                              
+1      3  0  0  0  2     ...           0          NaN   0  dry   Woonkamer
+2      3  0  0  0  2     ...           0          NaN   0  wet     OKeuken
+3      3  0  0  0  2     ...           0          NaN   0  wet    Badkamer
+4      3  0  0  0  2     ...           0          NaN   0  dry  Slaapkamer
+5      3  0  0  0  2     ...           0          NaN   0  dry  Slaapkamer
+6      3  0  0  0  2     ...           0          NaN   0  dry  Slaapkamer
+7      3  0  0  0  2     ...           0          NaN   0  hal         hal
+8      3  0  0  0  2     ...           0          NaN   0  wet          WC
+9      3  0  0  0  2     ...           0          NaN   0  hal         hal
+10    10  0  0  0  2     ...           0          NaN   0  NaN         NaN
+11    10  0  0  0  2     ...           0          NaN   0  NaN         NaN
+
+[11 rows x 21 columns]
+Defining Window opening for roomSlaapkamer3
+Slaapkamer2
+   flags ps pc pk pl     ...     vf_type vf_node_name cfd type    function
+nr                       ...                                              
+1      3  0  0  0  2     ...           0          NaN   0  dry   Woonkamer
+2      3  0  0  0  2     ...           0          NaN   0  wet     OKeuken
+3      3  0  0  0  2     ...           0          NaN   0  wet    Badkamer
+4      3  0  0  0  2     ...           0          NaN   0  dry  Slaapkamer
+5      3  0  0  0  2     ...           0          NaN   0  dry  Slaapkamer
+6      3  0  0  0  2     ...           0          NaN   0  dry  Slaapkamer
+7      3  0  0  0  2     ...           0          NaN   0  hal         hal
+8      3  0  0  0  2     ...           0          NaN   0  wet          WC
+9      3  0  0  0  2     ...           0          NaN   0  hal         hal
+10    10  0  0  0  2     ...           0          NaN   0  NaN         NaN
+11    10  0  0  0  2     ...           0          NaN   0  NaN         NaN
+
+[11 rows x 21 columns]
+Defining Window opening for roomSlaapkamer2
+Slaapkamer1
+   flags ps pc pk pl     ...     vf_type vf_node_name cfd type    function
+nr                       ...                                              
+1      3  0  0  0  2     ...           0          NaN   0  dry   Woonkamer
+2      3  0  0  0  2     ...           0          NaN   0  wet     OKeuken
+3      3  0  0  0  2     ...           0          NaN   0  wet    Badkamer
+4      3  0  0  0  2     ...           0          NaN   0  dry  Slaapkamer
+5      3  0  0  0  2     ...           0          NaN   0  dry  Slaapkamer
+6      3  0  0  0  2     ...           0          NaN   0  dry  Slaapkamer
+7      3  0  0  0  2     ...           0          NaN   0  hal         hal
+8      3  0  0  0  2     ...           0          NaN   0  wet          WC
+9      3  0  0  0  2     ...           0          NaN   0  hal         hal
+10    10  0  0  0  2     ...           0          NaN   0  NaN         NaN
+11    10  0  0  0  2     ...           0          NaN   0  NaN         NaN
+
+[11 rows x 21 columns]
+Defining Window opening for roomSlaapkamer1
+WARNING, more than one location to define natural supply
+Choosing the first one in the list, please check your model afterwards
+WC
+   flags ps pc pk pl     ...     vf_type vf_node_name cfd type    function
+nr                       ...                                              
+1      3  0  0  0  2     ...           0          NaN   0  dry   Woonkamer
+2      3  0  0  0  2     ...           0          NaN   0  wet     OKeuken
+3      3  0  0  0  2     ...           0          NaN   0  wet    Badkamer
+4      3  0  0  0  2     ...           0          NaN   0  dry  Slaapkamer
+5      3  0  0  0  2     ...           0          NaN   0  dry  Slaapkamer
+6      3  0  0  0  2     ...           0          NaN   0  dry  Slaapkamer
+7      3  0  0  0  2     ...           0          NaN   0  hal         hal
+8      3  0  0  0  2     ...           0          NaN   0  wet          WC
+9      3  0  0  0  2     ...           0          NaN   0  hal         hal
+10    10  0  0  0  2     ...           0          NaN   0  NaN         NaN
+11    10  0  0  0  2     ...           0          NaN   0  NaN         NaN
+
+[11 rows x 21 columns]
+Defining Window opening for roomWC
+WARINING: No natural supply could be defined !
+No existing path between  WC and outside
+Warning ! Control  C_NS_WC does not exist!
+C:\Users\spec\Documents\Projects\RESEARCH\COMISVENT\ForSVNFirstCommit\contamPy\..\comisventData\0-TemplatesAndLibs\occupancyProfiles\profile_Occupant1_Away.csv does not exist, skipping
+C:\Users\spec\Documents\Projects\RESEARCH\COMISVENT\ForSVNFirstCommit\contamPy\..\comisventData\0-TemplatesAndLibs\occupancyProfiles\profile_Occupant2_Away.csv does not exist, skipping
+C:\Users\spec\Documents\Projects\RESEARCH\COMISVENT\ForSVNFirstCommit\contamPy\..\comisventData\0-TemplatesAndLibs\occupancyProfiles\profile_Occupant3_Away.csv does not exist, skipping
+C:\Users\spec\Documents\Projects\RESEARCH\COMISVENT\ForSVNFirstCommit\contamPy\..\comisventData\0-TemplatesAndLibs\occupancyProfiles\profile_Occupant4_Away.csv does not exist, skipping
+Testing  {'building': 'COVL-REN-VRIJ2', 'orientation': 35, 'v50': 6, 'system': 'CNBN', 'control': 'fulllocal', 'occupancy': 'default-active'}
+WARNING, more than one location to define natural supply
+Choosing the first one in the list, please check your model afterwards
+WARNING, more than one location to define natural supply
+Choosing the first one in the list, please check your model afterwards
+WARNING, more than one location to define natural supply
+Choosing the first one in the list, please check your model afterwards
+WARNING, more than one location to define natural supply
+Choosing the first one in the list, please check your model afterwards
+NT_2Pa element does not exist yet, adding it
+C:\Users\spec\Documents\Projects\RESEARCH\COMISVENT\ForSVNFirstCommit\contamPy\..\comisventData\0-TemplatesAndLibs\occupancyProfiles\profile_Occupant1_Away.csv does not exist, skipping
+C:\Users\spec\Documents\Projects\RESEARCH\COMISVENT\ForSVNFirstCommit\contamPy\..\comisventData\0-TemplatesAndLibs\occupancyProfiles\profile_Occupant2_Away.csv does not exist, skipping
+C:\Users\spec\Documents\Projects\RESEARCH\COMISVENT\ForSVNFirstCommit\contamPy\..\comisventData\0-TemplatesAndLibs\occupancyProfiles\profile_Occupant3_Away.csv does not exist, skipping
+C:\Users\spec\Documents\Projects\RESEARCH\COMISVENT\ForSVNFirstCommit\contamPy\..\comisventData\0-TemplatesAndLibs\occupancyProfiles\profile_Occupant4_Away.csv does not exist, skipping
+Testing  {'building': 'COVL-REN-VRIJ2', 'orientation': 35, 'v50': 6, 'system': 'DNBN', 'control': 'fulllocal', 'occupancy': 'default-active'}
+NT_2Pa element does not exist yet, adding it
+C:\Users\spec\Documents\Projects\RESEARCH\COMISVENT\ForSVNFirstCommit\contamPy\..\comisventData\0-TemplatesAndLibs\occupancyProfiles\profile_Occupant1_Away.csv does not exist, skipping
+C:\Users\spec\Documents\Projects\RESEARCH\COMISVENT\ForSVNFirstCommit\contamPy\..\comisventData\0-TemplatesAndLibs\occupancyProfiles\profile_Occupant2_Away.csv does not exist, skipping
+C:\Users\spec\Documents\Projects\RESEARCH\COMISVENT\ForSVNFirstCommit\contamPy\..\comisventData\0-TemplatesAndLibs\occupancyProfiles\profile_Occupant3_Away.csv does not exist, skipping
+C:\Users\spec\Documents\Projects\RESEARCH\COMISVENT\ForSVNFirstCommit\contamPy\..\comisventData\0-TemplatesAndLibs\occupancyProfiles\profile_Occupant4_Away.csv does not exist, skipping
+Testing  {'building': 'COVL-REN-VRIJ2', 'orientation': 35, 'v50': 6, 'system': 'CNBNSLAAP', 'control': 'fulllocal', 'occupancy': 'default-active'}
+WARNING, more than one location to define natural supply
+Choosing the first one in the list, please check your model afterwards
+WARNING, more than one location to define natural supply
+Choosing the first one in the list, please check your model afterwards
+WARNING, more than one location to define natural supply
+Choosing the first one in the list, please check your model afterwards
+WARNING, more than one location to define natural supply
+Choosing the first one in the list, please check your model afterwards
+NT_2Pa element does not exist yet, adding it
+C:\Users\spec\Documents\Projects\RESEARCH\COMISVENT\ForSVNFirstCommit\contamPy\..\comisventData\0-TemplatesAndLibs\occupancyProfiles\profile_Occupant1_Away.csv does not exist, skipping
+C:\Users\spec\Documents\Projects\RESEARCH\COMISVENT\ForSVNFirstCommit\contamPy\..\comisventData\0-TemplatesAndLibs\occupancyProfiles\profile_Occupant2_Away.csv does not exist, skipping
+C:\Users\spec\Documents\Projects\RESEARCH\COMISVENT\ForSVNFirstCommit\contamPy\..\comisventData\0-TemplatesAndLibs\occupancyProfiles\profile_Occupant3_Away.csv does not exist, skipping
+Test failed for parameter set  {'building': 'COVL-REN-VRIJ2', 'orientation': 35, 'v50': 6, 'system': 'CNBNSLAAP', 'control': 'fulllocal', 'occupancy': 'default-active'}
+Testing  {'building': 'COVL-REN-VRIJ2', 'orientation': 35, 'v50': 6, 'system': 'CPREVENT', 'control': 'fulllocal', 'occupancy': 'default-active'}
+in unbal WK
+WARNING, more than one location to define natural supply
+Choosing the first one in the list, please check your model afterwards
+WARNING, more than one location to define natural supply
+Choosing the first one in the list, please check your model afterwards
+WARNING, more than one location to define natural supply
+Choosing the first one in the list, please check your model afterwards
+WARNING, more than one location to define natural supply
+Choosing the first one in the list, please check your model afterwards
+NT_2Pa element does not exist yet, adding it
+Test failed for parameter set  {'building': 'COVL-REN-VRIJ2', 'orientation': 35, 'v50': 6, 'system': 'CPREVENT', 'control': 'fulllocal', 'occupancy': 'default-active'}
+Testing  {'building': 'COVL-REN-VRIJ2', 'orientation': 35, 'v50': 6, 'system': 'DPREVENT', 'control': 'fulllocal', 'occupancy': 'default-active'}
+in unbal WK
+NT_2Pa element does not exist yet, adding it
+C:\Users\spec\Documents\Projects\RESEARCH\COMISVENT\ForSVNFirstCommit\contamPy\..\comisventData\0-TemplatesAndLibs\occupancyProfiles\profile_Occupant1_Away.csv does not exist, skipping
+C:\Users\spec\Documents\Projects\RESEARCH\COMISVENT\ForSVNFirstCommit\contamPy\..\comisventData\0-TemplatesAndLibs\occupancyProfiles\profile_Occupant2_Away.csv does not exist, skipping
+C:\Users\spec\Documents\Projects\RESEARCH\COMISVENT\ForSVNFirstCommit\contamPy\..\comisventData\0-TemplatesAndLibs\occupancyProfiles\profile_Occupant3_Away.csv does not exist, skipping
+C:\Users\spec\Documents\Projects\RESEARCH\COMISVENT\ForSVNFirstCommit\contamPy\..\comisventData\0-TemplatesAndLibs\occupancyProfiles\profile_Occupant4_Away.csv does not exist, skipping
+Testing  {'building': 'COVL-REN-VRIJ2', 'orientation': 35, 'v50': 6, 'system': 'CSLAAPPREVENT', 'control': 'fulllocal', 'occupancy': 'default-active'}
+WARNING, more than one location to define natural supply
+Choosing the first one in the list, please check your model afterwards
+WARNING, more than one location to define natural supply
+Choosing the first one in the list, please check your model afterwards
