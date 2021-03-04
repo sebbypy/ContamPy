@@ -1,5 +1,10 @@
 import sys
-sys.path.append('/home/spec/Documents/Projects/RESEARCH/COMISVENT/2.Work/Python')
+import os
+#sys.path.append('/home/spec/Documents/Projects/RESEARCH/COMISVENT/2.Work/Python')
+dirPath = os.path.dirname(os.path.realpath(__file__))
+sys.path.append(os.path.join(dirPath,'..','contamFunctions'))
+
+
 
 import contam_functions
 import numpy as np

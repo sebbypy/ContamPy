@@ -142,6 +142,60 @@ class zones:
         g.write(str(self.nzones)+' !'+self.comment)
         g.write(self.contamheader)
         self.df.to_csv(g,header=False,sep=' ')
+
+
+
+class initialZonesConcentrations():
+    
+    def __init__(self):
+               
+        self.df = pd.DataFrame()
+        self.headers = []
+        
+        
+    def read(self,fileReader,currentLine):
+
+        nConcentrations, self.comment = currentLine.split('!')
+        self.nConcentrations = int(nConcentrations)
+
+        if (self.nConcentrations != 0):
+        
+            self.headers = fileReader.readline().split()
+            self.headers.remove('!')
+        
+            ncols = len(self.headers)-1
+            nlines = int(self.nConcentrations/ncols)
+            
+            self.df = pd.DataFrame(columns=self.headers[1:])
+            self.df.index.name = self.headers[0]
+
+            
+            for i in range(nlines):
+                
+                values = fileReader.readline().split()
+                index = values[0]
+                self.df.loc[index,:] = values[1:]
+        
+    def write(self,g):
+
+        g.write(str(self.nConcentrations)+' ! '+self.comment)
+        
+        g.write('! '+self.df.index.name+' ')
+        [ g.write(c+' ') for c in self.df.columns]
+        g.write('\n')
+
+        self.df.to_csv(g,header=False,sep=' ')
+               
+        
+        #to write
+        return
+        
+    def addInitConcentration(self,pollutantName,value):
+        
+        self.df.loc[:,pollutantName] = value
+        self.nConcentrations = len(self.df.columns)*len(self.df.index)
+    
+    
         
 class ahs:
 
@@ -299,7 +353,165 @@ class flowelements:
             
             [g.write(str(v)+' ') for v in self.df.loc[i,'values']]
             g.write('\n')
-      
+
+
+class filterElements:
+
+    def __init__(self):
+        self.headers=['id','ftype','area','depth','density','ual','ud','name']
+        self.df=pd.DataFrame()
+        self.description=''
+        self.efficiencies={}
+        self.nelems=0
+
+    def read(self,filereader,currentline):
+    
+        nelems,self.comment=currentline.split('!')
+        self.nelems=int(nelems)
+        
+        if (self.nelems==0):
+            return
+        
+        for n in range(self.nelems):
+            fields=filereader.readline().split()
+            mydict={self.headers[i]:fields[i] for i in range(len(fields))}
+
+            description=filereader.readline()       
+            mydict['description']=description
+            
+            nLines = int(filereader.readline())
+            efficiencyDict = {}
+            
+            for line in range(nLines):
+                specie,efficiency = filereader.readline().split()
+                efficiencyDict[specie] = float(efficiency)
+            
+            mydict['efficiencies']=efficiencyDict
+            
+            self.df=self.df.append(mydict,ignore_index=True)
+            
+        self.df.index=self.df['id'].astype(int)
+        self.df.drop(['id'],axis=1,inplace=True)
+
+        self.df=convert_cols(self.df)
+ 
+    
+    def write(self,g):
+    
+        g.write(str(self.nelems)+' !'+self.comment)
+        
+        if ('id' in self.headers):
+            self.headers.remove('id')
+        
+        for i in self.df.index:
+            g.write(str(i)+' ')
+            [g.write(str(self.df.loc[i,c])+' ') for c in self.headers]
+            g.write('\n')
+            g.write(self.df.loc[i,'description'])
+            if ('\n' not in self.df.loc[i,'description']):
+                g.write('\n')
+            
+            g.write(str(len(self.df.loc[i,'efficiencies']))+'\n')
+             
+            for key,value in self.df.loc[i,'efficiencies'].items() :
+                g.write(key+' '+str(value)+'\n')
+
+
+    def add(self,paramsDict):
+    
+        #expected paramsDict {'name':'shortName','description':'long description',efficiencies{'specie1':'Efficiency1','specie2':efficiency2}
+        
+        self.nelems+=1
+        
+        self.df.loc[self.nelems,'name']=paramsDict['Name']
+        self.df.loc[self.nelems,'description']=paramsDict['Description']
+
+        
+        self.df.loc[self.nelems,'efficiencies']= [paramsDict['Efficiencies']]
+        # paramsDict[Efficiencies] is a dictionnary
+        # assigning a diciotnnary "as is" a DataFrame cell does not work properly
+        # putting it between [] does the trick
+        
+        
+        #Default values for constant efficiency filters
+        fields=['ftype','area','depth','density','ual','ud']
+        values=['cef', 1, 0.1, 100, 0, 0]
+        
+        for field,value in zip(fields,values):
+            self.df.loc[self.nelems,field]=value
+
+
+        self.df=convert_cols(self.df)
+
+
+class filters:
+
+    def __init__(self):
+    
+        #self.nelems = 0
+        self.df = pd.DataFrame()
+
+        self.headers=['nr','fe','sub']
+
+    def read(self,filereader,currentline):
+
+        nelems,self.comment=currentline.split('!')
+        self.nelems=int(nelems)
+        
+        if (self.nelems==0):
+            return
+        
+        for n in range(self.nelems):
+            fields=filereader.readline().split()
+            myDict = { header:field for header,field in zip(self.headers,fields) }
+            values=filereader.readline().split()
+            myDict['values']=values
+            self.df=self.df.append(myDict,ignore_index=True)
+            
+            
+        self.df.index=self.df['nr'].astype(int)
+        self.df.drop(['nr'],axis=1,inplace=True)
+
+        self.df=convert_cols(self.df)
+ 
+            
+    def write(self,g):
+
+        if ('nr' in self.headers):
+            self.headers.remove('nr')
+
+    
+        g.write(str(self.nelems)+' !'+self.comment)
+        
+        for i in self.df.index:
+            g.write(str(i)+' ')
+            [g.write(str(self.df.loc[i,c])+' ') for c in self.headers]
+            g.write('\n')
+            
+            [ g.write(v+' ') for v in self.df.loc[i,'values']]
+            g.write('\n')
+          
+
+    def add(self,filterElementName,filterElementsObject):
+        
+        filterElementIndex = filterElementsObject.df[ filterElementsObject.df['name'] == filterElementName ].index[0]
+        
+        self.nelems += 1
+        serie = pd.Series({'fe':filterElementIndex , 'sub' : 1 , 'values':['0','0']})
+        serie.name = self.nelems
+        
+        
+        self.df = self.df.append(serie)
+        
+        #self.df.loc[self.nelems,'fe'] = filterElementIndex
+        #self.df.loc[self.nelems,'sub'] = 1
+        #self.df.loc[self.nelems,'values'] = (['0','0'])
+        self.df=convert_cols(self.df)
+        
+        
+        return self.nelems
+        
+          
 class contaminants:
 
     def __init__(self):
@@ -351,7 +563,38 @@ class contaminants:
             g.write(str(i)+' ')
             [g.write(str(self.df.loc[i,c])+' ') for c in towrite]
             g.write('\n')
-            g.write(self.df.loc[i,'description']) #'\n' already included in description
+            g.write(self.df.loc[i,'description']) 
+            
+            if ('\n' not in self.df.loc[i,'description']):
+                g.write('\n')
+
+    def addSpecie(self,specieName,defaultConcentration):
+      
+        self.nspecies += 1
+        specieID = self.nspecies
+        
+        nonNullDefaultsValues={'s':1,'Dm':2e-5,'Cp':1000}
+
+
+        self.df.loc[specieID,'name'] = specieName
+        self.df.loc[specieID,'CCdef'] = defaultConcentration
+        self.df.loc[specieID,'description'] = specieName+' - added by Python'
+        
+        
+        for key,value in nonNullDefaultsValues.items():
+            print("in if")
+            self.df.loc[specieID,key] = value
+            
+        self.df.fillna(0,inplace=True)
+        
+        self.df=convert_cols(self.df)
+
+        self.nctm += 1              
+        self.ctmlist.append(str(specieID))        
+
+        return
+
+
         
 
 class sourceElements:
@@ -1471,11 +1714,18 @@ class daySchedules:
         nschedules,self.comment = currentline.split('!')
         self.nschedules=int(nschedules)
         
+        print(self.nschedules)
+        
         for i in range(self.nschedules):
         
             sdict={}
         
             fields=filereader.readline().split()
+            
+            if (fields[0] == '!'):
+                #in case of header --> it seems CONTAMW write it, while it is ignored up to now when I generate myself
+                # temporary trick= I repead the readline...
+                fields=filereader.readline().split()
 
             sid=int(fields[0])
             npoints=int(fields[1])
@@ -1823,7 +2073,8 @@ class flowpaths:
         
         self.headers=['nr','flags','pzn','pzm','pe','pf','pw','pa','ps','pc','pld','X','Y','relHt',
         'mult','wPset','wPmod','wazm','Fahs','Xmax','Xmin','icon','dir','u_Ht','u_XY','u_dP','u_F',
-        'vf_type','vf_node_name','cfd','name','cfd_ptype','cfd_btype','cfd_capp'] 
+        'vf_type','vf_node_name','cfd','name','cfd_ptype','cfd_btype','cfd_capp'] 
+
         self.df=pd.DataFrame(columns=self.headers)
         
     

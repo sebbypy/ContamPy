@@ -36,6 +36,10 @@ def apply(contam_data,occupancy_profile,templateDir):
     nslaap = len(slaaplist) 
     
 
+    if len(zoneslist) == 3 :
+        print("Only a single zone in the model, skipping occupancy and sources definition")
+        return 
+
     ###########################
     # DAY SCHEDULES/OCCUPANCY #
     ###########################
@@ -64,6 +68,7 @@ def apply(contam_data,occupancy_profile,templateDir):
 
             sortedbedrooms=list(zones.df[zones.df['name'].str.contains('Slaapkamer')].sort_values(by='Vol',ascending=False)['name'])
 
+
             biggestbedroom=sortedbedrooms[0]
             sortedbedrooms.remove(biggestbedroom)
 
@@ -73,8 +78,8 @@ def apply(contam_data,occupancy_profile,templateDir):
 
             elif (oid>2):
                 slaapkamerName=sortedbedrooms[oid-3]
-            
-            #else : oid<3 and Slaapkamer1 not in slaaplist ) --> do nothing
+                
+                #else : oid<3 and Slaapkamer1 not in slaaplist ) --> do nothing
 
             df.replace('Slaapkamer',slaapkamerName,inplace=True)
 

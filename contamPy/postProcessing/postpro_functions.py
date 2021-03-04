@@ -1,38 +1,35 @@
 import sys
-sys.path.append('/home/spec/Documents/Projects/RESEARCH/COMISVENT/2.Work/Python')
-sys.path.append('/home/spec/Documents/Softs/PyGUI/WorkingCopy/trunk/guicore_files')
-sys.path.append('/home/spec/Documents/Softs/PyGUI/WorkingCopy/trunk/readers_files')
+import os
 
-import contam_functions
+postproDir = os.path.dirname(os.path.realpath(__file__))
+externalsDir = os.path.join(postproDir,'..','externals')
+
+sys.path.append(externalsDir)
+
 import pandas as pd
-import json
 
-import matplotlib.pyplot as plt
-import numpy as np
-
-from CONTAMReader import *
+from CONTAMReader import loadCONTAMlog
 from dfIO import dropperiod
+import matplotlib.pyplot as plt
+import matplotlib.dates as mdates
 
+import numpy as np
+import datetime
 
 pd.set_option('mode.chained_assignment', None)
 
-def exposure(df,threshold,etype='mean'):
 
-    #assuming 1 columns per occupant
-    #etype = 'mean' or 'max' or 'cumulated'
+def exposure(df,threshold,etype='mean'):
 
     freq=df.index[1]-df.index[0]
 
-
     df=df-threshold
-
 
     exp=df[df>0].sum()* (freq/datetime.timedelta(hours=1))
 
     
     if (exp.describe()['count']==0):
         return 0
-
 
     if (etype=='mean'):
     
@@ -44,166 +41,302 @@ def exposure(df,threshold,etype='mean'):
     elif(etype=='cumulated'):
         return exp.sum()
     
+def maxHoursAboveThreshold(df,threshold):
 
-def flowexposure(df,Qmin,percentile):
+    maxHours=0
 
-    #Qmin = min flow per person #typically 15 to 20 m3/h
+    freq=df.index[1]-df.index[0]
+    oneh=datetime.timedelta(hours=1)
 
-    odf=df.filter(regex='^O_',axis=1) # ^ means "starting with"
+    for c in df.columns:
+    
+        hoursAboveThreshold = int(df[c][df[c]>threshold].count()*(freq/oneh))
 
-    rooms=[ x.split('_')[1] for x in odf.columns ]
+        maxHours=max(maxHours,hoursAboveThreshold)
 
-    for room in rooms:
 
-        if ('Slaapkamer' in room):
-            shortroom=room.replace('kamer','')
-        else:
-            shortroom=room
+    return maxHours
 
-        #total supply in space
-        odf['QS_'+room]=df.filter(regex='^Q_[M-N]S_'+shortroom,axis=1).sum(axis=1)
 
-        #total exract in space
-        odf['QE_'+room]=df.filter(regex='^Q_[M-N]E_'+shortroom,axis=1).sum(axis=1)
-           
-        #Maximum of extract of supply in the room --> suppose that it's ok if extracted air instead of supply
-        odf['QM_'+room]=odf[['QE_'+room,'QS_'+room]].max(axis=1)
+def getIaqIndicators(df):
+
+    year = df.index[0].year
+    
+    dropperiod(df,datetime.datetime(year,4,1),datetime.datetime(year,9,30),inplace=True)
+    
+    occupantsCO2 = df.filter(regex='CO2_O[0-9]', axis=1)
+    co2Exposure = exposure(occupantsCO2,1000,'max')
+
+    occupantsVOC = df.filter(regex='VOC_O[0-9]', axis=1)
+    vocExposure = exposure(occupantsVOC*1e3,15,'max')
+
+    h2oRooms = df.filter(regex="H2O_",axis=1)
+    h2oHours = maxHoursAboveThreshold(h2oRooms,0.7)
+
+
+
+    return {'CO2 Exposure':co2Exposure,
+            'VOC Exposure':vocExposure,
+            'H2O Hours':h2oHours
+            }
+
+
+
+def renameduplicates(df):
+    cols=pd.Series(df.columns)
+    for dup in cols[cols.duplicated()].unique(): 
+        cols[cols[cols == dup].index.values.tolist()] = [dup + '.' + str(i) if i != 0 else dup for i in range(sum(cols == dup))]
+    # rename the columns with the cols list.
+    df.columns=cols
+    return(df)
+
+
+def readDataBaseFromFile(dataBase):
+    
+    if os.path.exists(dataBase):
+        df = pd.read_csv(dataBase,index_col=0)
+        return df
+        
+    else:
+        print("Could not read database")
+        return
+     
+
+def readContamLog(contamlog):
+
+    parameters={
+        'Year to assign':2020,
+        'Filters':'Q_*;CO2_*;H2O_*;^O_*;VOC_*',
+        'Load ach file?':False,
+    }
+
+    df=loadCONTAMlog().execute(contamlog,parameters)
+    df=renameduplicates(df)
+    
+    return df
+    
+
+def selectOneDay(df,date):
+    
+    #date in d/M format
+    day,month=date.split('/')
+    day=int(day)
+    month=int(month)
+    
+    #retainin gonly the wanted day
+    df=df.loc[[ (x.month==month and x.day==day) for x in df.index ],:]
+
+    return df
+    
+    
+def setOneDayPlots(df,caseID,caseParameters):
+    
+    figures = {}  # dict  { name: figure_object }
+    
+    options=['dry','wet']
+    
+    for o in options:
+    
+        if (o=='dry'):
+    
+            dry=df.filter(regex=r'(Woon|Slaap|Bureau|OKeu)')
+    
+            rooms=list(set([ x.split('_')[-1] for x in dry.filter(regex='^O_').columns] ))
+            rooms.sort()
+            
+            mainspecie='CO2'
+            mainunit='ppm'
+    
+        if (o=='wet'):
+        
+            wet=df.filter(regex=r'(Keu|OKeu|WC|Was|Bad|Slaap)')
+    
+            rooms=list(set([ x.split('_')[-1] for x in wet.filter(regex='^O_').columns] ))
+            rooms.sort()
+    
+            mainspecie='H2O'
+            mainunit='-'
+    
+        fig, axes = plt.subplots(nrows=4,ncols=len(rooms),sharey='row',figsize=(18,8))
+        
+        plt.subplots_adjust(left=0.05,right=0.85,bottom=0.05)
+        
+        fig.suptitle('Characteristic evolution in "'+o+'" spaces',fontsize=16)
+    
+        #hfmt=mdates.DateFormatter('%H')
+    
+        for i in range(len(rooms)):
+    
+            if (len(rooms[i])>10):
+                shortroom=rooms[i].replace('kamer','')
+            else:
+                shortroom=rooms[i]
+    
+            axes[0,i].plot(df.index,df['O_'+rooms[i]])
+            axes[0,i].set_title(rooms[i])
+                
+            axes[1,i].plot(df.index,df[mainspecie+'_'+rooms[i]])
+    
+            axes[2,i].plot(df.index,df['VOC_'+rooms[i]]*1e3 )
+            
+            
+            flow=df.filter(regex='Q_[M,N][S,E]_'+shortroom,axis=1) #.plot(ax=axes[2,i])
+    
+    
+            for col in flow.columns:
+                lab=col.split('_')[0]+'_'+col.split('_')[1]
+    
+                if(len(col.split('.'))>1):
+                    lab+=col.split('.')[-1]
+    
+                if(df[col].mean() != 0):
+                    
+                    axes[3,i].plot(df.index,df[col],label=lab)
+    
+    
+    
+        axes[0,0].set_ylabel('Occupancy [-]')
+        axes[1,0].set_ylabel(mainspecie+'['+mainunit+']')
+        axes[2,0].set_ylabel('VOC')
+    
+        axes[3,0].set_ylabel('Flow rate [m3/h]')
+    
+    
+        for i in range(4):
+            for j in range(len(rooms)):
+                
+                if (not len(axes[i,j].lines)):
+                    axes[i,j].plot(df.index,np.zeros(len(df)),ls='')
+                
+                axes[i,j].grid(True)
+                
+                myFmt = mdates.DateFormatter('%H')
+                axes[i,j].xaxis.set_major_formatter(myFmt)
+                        
+                if (j>0):
+                
+                    axes[i,j].yaxis.set_tick_params(labelleft=True)
+                    
+                if (i==3):
+                    axes[i,j].legend()
+    
+    
+    
+        createParametersLegendBox(caseParameters)
+    
+        figures[str(caseID)+'-singleDay-'+o]= fig
         
         
-        #computing flow deficit PER CAPITA
-        odf['E_'+room]=(odf['QM_'+room]/odf['O_'+room]-Qmin)  # *odf['O_'+room] --> per capita : no need to sum
-        odf['E_'+room].replace([np.inf, -np.inf], np.nan,inplace=True)   
-        ##!!! Warning: there can be deficit in one room, and excess in other --> could compensate if simple sum
-        ## to avoid this compensation effect, one should sum separately negative values
+    return figures
+        
 
-    #odf['TotalFlowExposureDeficit']=odf.filter(regex='^E_').sum(axis=1)
-    #odf['TotalOccupants']=odf.filter(regex='^O_',axis=1).sum(axis=1)
-    #odf['SpecificFlowExposureDeficit']=odf['TotalFlowExposureDeficit']/odf['TotalOccupants']
-    #print(odf[['TotalFlowExposureDeficit','TotalOccupants','SpecificFlowExposureDeficit']])
-    #odf['SpecificFlowExposureDeficit'].hist(bins=100,histtype='step',density='True',figsize=(10,6),cumulative=True) 
+def createParametersLegendBox(parametersDict):
 
-    #odf.filter(regex='^E_').hist(bins=100,histtype='step',density=True,figsize=(10,6))
-    #odf.filter(regex='^QM_').hist(bins=100,histtype='step',density=True,figsize=(10,6))
-    #plt.show(block=False)
-    #input('...')
+    #original fuction
+    #def paramsannotate(simid,paramsdf,parameters_in_legend):
 
-    #current choice: take the wost deficit at each time step --> not necessarly always the same occupant, but difficult to distinguish them
-    odf['WorstFlowDeficit']=odf.filter(regex='^E_').min(axis=1)
 
-    #print(odf['WorstFlowDeficit'].describe())
-    #print(odf['WorstFlowDeficit'].isna().sum())
-    
-    
-    fractionoftime= len(odf[odf['WorstFlowDeficit']<0])/len(odf['WorstFlowDeficit'].dropna())
+    bbox_props = dict(boxstyle="square", fc="w", ec='black', alpha=1.0)
 
-    pflow=odf['WorstFlowDeficit'].quantile(percentile/100).min()+Qmin  #+ Qmin car le deficit est le débit < Qmin --> on revient à des valeurs absolures
-    
-   
-    """print("Fraction of time with too low flow rate ",fractionoftime)
-    print("P5 flow",p5flow)
-   
-    odf['WorstFlowDeficit'].hist(bins=100,histtype='step',density='True',figsize=(10,6),cumulative=True) 
-    plt.xlabel('Flow rate exposure above threshold (0 = threshold)')
-    #odf['WorstFlowDeficit'].hist(bins=100,histtype='step',density='True',figsize=(10,6),cumulative=False) 
-    
+    if (len(parametersDict)>0):
+
+        annotation_text='Main parameters\n\n'
+        
+        maxlen=np.max([len(x) for x in parametersDict.keys()])
+        #maxlen=np.min([10,maxlen])
+
+
+        for paramName,paramValue in parametersDict.items():  
+
+            annotation_text+=paramName.ljust(maxlen)+' : '+str(paramValue)+'\n'
+          
+        
+        annotation_text=annotation_text.strip('\n')
+        plt.annotate(annotation_text,(.865,.60),xycoords='figure fraction',bbox=bbox_props,fontsize=10,family='monospace',horizontalalignment='left', verticalalignment='top')
+
+
+
+
+def showInteractive():
     
     plt.show(block=False)
     input('...')
-    """
+
+
+def getOneDayFiguresDict(db,logNameWithPath,fullDataFrame,date):
+
+    df = selectOneDay(fullDataFrame,date)
+
+    dirName = os.path.dirname(logNameWithPath)    
+    shortLogName = os.path.basename(logNameWithPath)
+    caseID = int(shortLogName.split('.')[0])
+
+    caseParameters = db.loc[caseID,:].to_dict()
     
-    return fractionoftime,pflow
+    figures = setOneDayPlots(df,caseID,caseParameters)
+
+    figuresWithFullPath = { os.path.join(dirName,k):v for k,v in figures.items() } # same containter structure, but figure name with full path
+
+    return figuresWithFullPath
 
 
-parameters={
-    'Year to assign':2020,
-    'Filters':'^Q_*;^CO2_*;^H2O_*;^VOC_*;^O_*',
-    'Load ach file?':False,
-}
-
-contamlog=sys.argv[1]
-
-
-print("contamlog",contamlog)
-
-df=loadCONTAMlog().execute(contamlog,parameters)
-
-dropperiod(df,datetime.datetime(2020,4,1),datetime.datetime(2020,9,30),inplace=True)
-
-
-
-if (os.path.exists('Allres.csv')):
-    rdf=pd.read_csv('AllRes.csv',index_col=0)
-else:
-    rdf=pd.DataFrame()
-
-# 1. Exposure above a certain threshold or percentiles
-######################################################
-
-expodf=df.filter(regex='CO2_O[0-9]', axis=1)
-
-#expodf.hist(bins=100,cumulative=True,histtype='step',density=True)
-#plt.show(block=False)
-#input('...')
-
-#print("Mean exposure above 1000: ",exposure(expodf,1000), 'ppm.h')
-#print("Max exposure above 1000: ",exposure(expodf,1000,'max'), 'ppm.h')
-#print("Max p95 :",expodf.quantile(.95).max(),'ppm.h')
-
-rdf.loc[contamlog,'e1000-mean [ppm.h]']=exposure(expodf,1000)
-rdf.loc[contamlog,'e1000-max [ppm.h]']=exposure(expodf,1000,'max')
-rdf.loc[contamlog,'p95-max [ppm]']=expodf.quantile(.95).max()
-
-
-
-# 1.1 VOC (= polluant fictif)
-vocdf=df.filter(regex='VOC_O[0-9]', axis=1)
-
-#(vocdf*1000).plot()
-#plt.show(block=False)
-#input('...')
-#exit()
-
-rdf.loc[contamlog,'VOC-15-max [g/kg.h]']=exposure(vocdf*1e3,15,'max')
-
-
-
-print(exposure(vocdf*1e3,15,'max'))
-
-
-
-# 2. Exposure to flow rate
-##########################
-
-#ftime=flowexposure(df,15)
-qmin=15
-percentile=10
-f,p=flowexposure(df,qmin,percentile)
-
-rdf.loc[contamlog,'Time fratction Qocc<'+str(qmin)+' m3/h [-]']=f
-rdf.loc[contamlog,'p'+str(percentile)+' of flow rate exposure [m3/h]']=p
-
-
-#3. H2O criteria
-#################
-
-maxhours=0
-
-freq=df.index[1]-df.index[0]
-oneh=datetime.timedelta(hours=1)
-
-
-for c in df.filter(regex="H2O_",axis=1).columns:
+def saveFiguresToFiles(figures,fileFormat):
     
-    habove70 = int(df[c][df[c]>0.7].count()*(freq/oneh))
+    for name,figure in figures.items():
+        
+        figFileName = name+'.'+fileFormat
+                    
+        figure.savefig(os.path.join(figFileName))
 
-    maxhours=max(maxhours,habove70)
+        plt.close(figure)
+
+
+
+def plotAndSaveOneDayFigures(db,logNameWithPath,fullDataFrame,date,fileFormat):
+       
+    figures=getOneDayFiguresDict(db,logNameWithPath,fullDataFrame,date)
+    saveFiguresToFiles(figures,fileFormat)
+ 
+
+
+if __name__ == '__main__':
     
-    print(c,habove70)
 
-rdf.loc[contamlog,'Hours above 70pc RH - max']=maxhours
+    if (len(sys.argv)<2):
+        print("Usage ")
+        print("")
+        print("python postpro_functions.py contamLog")
+        exit()
+
+    action = sys.argv[1]  # IAQ or plot1Day
+    logNameWithPath = sys.argv[2]
+
+    fullDataFrame = readContamLog(logNameWithPath)
+
+    if (action == 'plot1Day'):
+      
+        date,fileFormat = sys.argv[3:5]
+
+        db = readDataBaseFromFile('SimulationDataBase.csv')
+
+        figuresDict = getOneDayFiguresDict(db,logNameWithPath,fullDataFrame,date)
+    
+        if (fileFormat == 'interactive'):
+            showInteractive()    
+        else:
+            saveFiguresToFiles(figuresDict,fileFormat)
 
 
-rdf.to_csv('Allres.csv')
+    elif (action =='IAQ'):
 
+ 
+        indicators = getIaqIndicators(fullDataFrame)
+    
+        print("CO2 exposure",indicators['CO2 Exposure'],"ppm.h")
+        print("VOC exposure",indicators['VOC Exposure']*1e3,"g/kg . h")
+        print("Hours above 70% RH",indicators['H2O Hours'],"hours")
+    
 
-
+    else:
+        print("First argument should be 'IAQ' or 'plot1Day'")
+        

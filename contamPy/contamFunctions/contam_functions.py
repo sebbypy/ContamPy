@@ -31,6 +31,12 @@ def loadcontamfile(fname):
             zones=contam_objects_new.zones()
             zones.readCONTAMzones(f,line)          
                 
+            
+        if ('initial zone concentrations' in line):
+            print("in read")
+            initZonesConc = contam_objects_new.initialZonesConcentrations()
+            initZonesConc.read(f,line)
+            
         if ('flow path' in line):
 
             flowpaths=contam_objects_new.flowpaths()
@@ -85,10 +91,19 @@ def loadcontamfile(fname):
             siminputs=contam_objects_new.SimInputs()
             siminputs.read(f,line)
 
+        if ('filter elements' in line):
+            filterElements=contam_objects_new.filterElements()
+            filterElements.read(f,line)
+
+        if ('filters:' in line):
+            filters=contam_objects_new.filters()
+            filters.read(f,line)
+
 
 
     datadict={'levels':levels,
             'zones':zones,
+            'initConc':initZonesConc,
             'flowpaths':flowpaths,
             'flowelems':flowelems,
             'contaminants':contaminants,
@@ -101,7 +116,9 @@ def loadcontamfile(fname):
             'exposures':exposures,
             'sourceelems':sourceselements,
             'sources':sources,
-            'siminputs':siminputs
+            'siminputs':siminputs,
+            'filterelements':filterElements,
+            'filters':filters
             }
        
     return datadict
@@ -134,6 +151,10 @@ def writecontamfile(reffile,newname,datadict):
             #zones=contam_objects_new.zones()
             #zones.readCONTAMzones(f,line)
             datadict['zones'].writeCONTAMzones(g)
+
+        if ('initial zone concentrations' in line):
+            block=True
+            datadict['initConc'].write(g)
                
         if ('flow path' in line):
             block=True
@@ -183,6 +204,14 @@ def writecontamfile(reffile,newname,datadict):
         if ('ContamW' in line):
             block=True
             datadict['siminputs'].write(g)
+
+        if ('filter elements' in line):
+            block=True
+            datadict['filterelements'].write(g)
+
+        if ('filters:' in line):
+            block=True
+            datadict['filters'].write(g)
 
         
         if (block==False):

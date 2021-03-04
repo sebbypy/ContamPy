@@ -1,7 +1,10 @@
 import sys
-sys.path.append('/home/spec/Documents/Projects/RESEARCH/COMISVENT/2.Work/Python')
-
 import os
+
+dirPath = os.path.dirname(os.path.realpath(__file__))
+sys.path.append(os.path.join(dirPath,'..','contamFunctions'))
+
+
 import contam_functions
 import numpy as np
 import pandas as pd
@@ -22,7 +25,9 @@ rootwithpath=fname.replace('.prj','')
 root=os.path.basename(fname).replace('.prj','')  # name of contam file without path and without extension
 
 
-setdir='/home/spec/Documents/Projects/RESEARCH/COMISVENT/2.Work/Task1/Models/2-DimBuildings'
+#setdir='/home/spec/Documents/Projects/RESEARCH/COMISVENT/2.Work/Task1/Models/2-DimBuildings'
+
+setdir = os.path.join(os.getcwd(),'2-DimBuildings')
 
 
 

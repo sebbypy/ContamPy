@@ -207,13 +207,26 @@ def compute(args):
             
         
         if (autobalanceprop):
-            
-            factor=totalsup/totalexh
-            
-            for MEdict in jsondict['Mechanical exhaust']:
-                MEdict['Nominal flow rate']=MEdict['Nominal flow rate']*factor
-                
 
+            if (totalexh != 0):            
+                factor=totalsup/totalexh
+                
+                for MEdict in jsondict['Mechanical exhaust']:
+                    MEdict['Nominal flow rate']=MEdict['Nominal flow rate']*factor
+                    
+            else:
+                print("No existing extraction")
+                
+                if (len(zones.df[zones.df['flags']==3])==1):
+                    print("Only one zone")
+                    zoneName = zones.df[zones.df['flags']==3]['name'].iloc[0]
+                    MEdict={'Room':zoneName,'Nominal flow rate':totalsup}
+                    jsondict['Mechanical exhaust'].append(MEdict)
+                
+                else:
+                    print("Impossible case")
+                    return
+                
             break
 
         print("")

@@ -2,7 +2,7 @@ import os
 import sys
 import importlib
 import subprocess
-
+import json
 
 dirPath = os.path.dirname(os.path.realpath(__file__))
 
@@ -15,7 +15,7 @@ sys.path.append(os.path.join(dirPath,'tools'))
 
 
 import contam_functions
-import setSystem,setControls,setOccupancyAndSources,setBCS,setWeatherAndOutputs
+import setSystem,setControls,setOccupancyAndSources,setBCS,setWeather,setNumericalParameters,setFilters
 import computeControls
 
 
@@ -41,8 +41,18 @@ class caseConfigurator:
         self.ContamModel = None
 
 
+    def configureSimulation(self,outputFileName,parametersDict,numericalParameters=None):
+        
+        self.setPhysicalParameters(parametersDict)
 
-    def configureSimulation(self,parametersDict,outputFileName):
+        if (numericalParameters != None):
+            self.setNumericalParameters(numericalParameters)
+            
+        self.writeContamFile(outputFileName)
+
+
+
+    def setPhysicalParameters(self,parametersDict):
 
         self.areParametersValid(parametersDict)
 
@@ -57,10 +67,8 @@ class caseConfigurator:
         self.setOccupancyAndSources()
 
         self.setAirtightnessOrientation()
+        self.setWeather()
         
-        self.setWeatherAndOuputs()
-        
-        self.writeContamFile(outputFileName)
         
 
     def areParametersValid(self,parametersDict):
@@ -138,13 +146,39 @@ class caseConfigurator:
         
         setBCS.apply(self.ContamModel,v50,orientation)
         
-    def setWeatherAndOuputs(self):
-        
+    
+    def setWeather(self):
+
         weather = self.actualParameters['weather']        
         weatherFile = os.path.join(self.templatesDir,'Weather',weather+'.wth')
         
-        setWeatherAndOutputs.apply(self.ContamModel,weatherFile)
+        setWeather.apply(self.ContamModel,weatherFile)
 
+
+    def setNumericalParameters(self,numericalParameters):
+               
+        setNumericalParameters.apply(self.ContamModel,numericalParameters)
+
+
+    def writeControlJSON(self,outputFileName):
+    
+        systemJSON = self.computeSystem()        
+        controlJSON = self.computeControl(systemJSON)     
+        
+        with open(outputFileName, 'w') as outfile:
+            json.dump(controlJSON, outfile)
+        
+
+    def setFilters(self,filterJSON):
+
+        
+        setFilters.setFilters(self.ContamModel,filterJSON)
+        
+        
+    def addContaminant(self,name,defaultOutsideConcentration,insideInitialConcentration):
+        
+        self.ContamModel['contaminants'].addSpecie(name,defaultOutsideConcentration)
+        self.ContamModel['initConc'].addInitConcentration(name,insideInitialConcentration)
 
 
 
@@ -230,8 +264,6 @@ class existingSystems:
 
 
 
-
-
         
 
 class ClassConfiguratorTester():
@@ -283,7 +315,8 @@ class ClassConfiguratorTester():
         sys.stderr = self.originalStderr
 
         self.logfile.close()
-        
+
+
     
     def testSingleParameterVariations(self):
         
@@ -301,7 +334,7 @@ class ClassConfiguratorTester():
             
                 try:
                     print("Testing ",caseParameters)
-                    caseConfigurator(self.templatesDir,self.buildingsDir).configureSimulation(caseParameters,'test.prj')
+                    caseConfigurator(self.templatesDir,self.buildingsDir).configureSimulation('test.prj',caseParameters)
                     os.remove('test.prj')
 
                 except:
@@ -335,7 +368,7 @@ class ClassConfiguratorTester():
         
                 try:
                     print("Testing ",caseParameters)
-                    caseConfigurator(self.templatesDir,self.buildingsDir).configureSimulation(caseParameters,'test.prj')
+                    caseConfigurator(self.templatesDir,self.buildingsDir).configureSimulation('test.prj',caseParameters)
                     os.remove('test.prj')
 
                 except:
@@ -356,31 +389,39 @@ if __name__ == "__main__":
     templatesDir = os.path.join(dirPath,'..','comisventData','0-TemplatesAndLibs')
     dimBuildingsDir = os.path.join(dirPath,'..','comisventData','2-DimBuildings')
 
-   
-    #check that one by one variaton of all parameters works
+    
+    # Test Single Case
+    parameters={'building': 'COVL-REN-HO1', 'orientation': 35, 'v50': 6, 'system': 'Windows', 'control': 'fulllocal', 'occupancy': 'default-active'}
+    caseConfigurator(templatesDir,dimBuildingsDir).configureSimulation('test.prj',parameters)
+
+    # Test all variations of a single parameter
     ClassConfiguratorTester('singleVar.log',templatesDir,dimBuildingsDir).testSingleParameterVariations()
 
-    # testing compbination of buildings and systems, that are strongly dependent and may reveal issues
+    # Test all combinations of building/system since there are strong interactions
     ClassConfiguratorTester('SystemAndBuilding.log',templatesDir,dimBuildingsDir).testTwoParametersCombinations('building','system')
 
 
 
-    
-    #parameters={'building': 'COVL-REN-HO1', 'orientation': 35, 'v50': 6, 'system': 'Windows', 'control': 'fulllocal', 'occupancy': 'default-active'}
-    #caseConfigurator().configureSimulation(parameters,'test.prj')
 
-    
-    
-    """parameters={'building':'COVL-REN-HO2',
-                'orientation':35,
-                'v50':6,
-                'system':'CNBNSLAAP',
-                'control':'fulllocal',
-                'occupancy':'default-active'
-                }
-    
 
-    caseConfigurator(templatesDir,dimBuildingsDir).configureSimulation(parameters,'test.prj')
-    """
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     
 
