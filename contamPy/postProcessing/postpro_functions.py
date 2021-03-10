@@ -19,7 +19,7 @@ import datetime
 pd.set_option('mode.chained_assignment', None)
 
 
-def exposure(df,threshold,etype='mean'):
+def exposure(df,threshold,etype='max',debug=False):
 
     freq=df.index[1]-df.index[0]
 
@@ -41,7 +41,7 @@ def exposure(df,threshold,etype='mean'):
     elif(etype=='cumulated'):
         return exp.sum()
     
-def maxHoursAboveThreshold(df,threshold):
+def maxHoursAboveThreshold(df,threshold,debug=False):
 
     maxHours=0
 
@@ -52,26 +52,29 @@ def maxHoursAboveThreshold(df,threshold):
     
         hoursAboveThreshold = int(df[c][df[c]>threshold].count()*(freq/oneh))
 
+        if (debug):
+            print(c,hoursAboveThreshold)
+
         maxHours=max(maxHours,hoursAboveThreshold)
 
 
     return maxHours
 
 
-def getIaqIndicators(df):
+def getIaqIndicators(df,debug=False):
 
     year = df.index[0].year
     
     dropperiod(df,datetime.datetime(year,4,1),datetime.datetime(year,9,30),inplace=True)
     
     occupantsCO2 = df.filter(regex='CO2_O[0-9]', axis=1)
-    co2Exposure = exposure(occupantsCO2,1000,'max')
+    co2Exposure = exposure(occupantsCO2,1000,'max',debug)
 
     occupantsVOC = df.filter(regex='VOC_O[0-9]', axis=1)
-    vocExposure = exposure(occupantsVOC*1e3,15,'max')
+    vocExposure = exposure(occupantsVOC*1e3,15,'max',debug)
 
     h2oRooms = df.filter(regex="H2O_",axis=1)
-    h2oHours = maxHoursAboveThreshold(h2oRooms,0.7)
+    h2oHours = maxHoursAboveThreshold(h2oRooms,0.7,debug)
 
 
 
@@ -330,7 +333,7 @@ if __name__ == '__main__':
     elif (action =='IAQ'):
 
  
-        indicators = getIaqIndicators(fullDataFrame)
+        indicators = getIaqIndicators(fullDataFrame,True)
     
         print("CO2 exposure",indicators['CO2 Exposure'],"ppm.h")
         print("VOC exposure",indicators['VOC Exposure']*1e3,"g/kg . h")

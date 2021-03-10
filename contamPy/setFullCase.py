@@ -43,7 +43,7 @@ class caseConfigurator:
 
     def configureSimulation(self,outputFileName,parametersDict,numericalParameters=None):
         
-        self.setPhysicalParameters(parametersDict)
+        self.setAllPhysicalParameters(parametersDict)
 
         if (numericalParameters != None):
             self.setNumericalParameters(numericalParameters)
@@ -51,8 +51,7 @@ class caseConfigurator:
         self.writeContamFile(outputFileName)
 
 
-
-    def setPhysicalParameters(self,parametersDict):
+    def setAllPhysicalParameters(self,parametersDict):
 
         self.areParametersValid(parametersDict)
 
@@ -68,7 +67,42 @@ class caseConfigurator:
 
         self.setAirtightnessOrientation()
         self.setWeather()
+    
+
+    def setSystemFromParameters(self,systemParameters):
+
+        self.areParametersValid(systemParameters)
+
         
+        systemJSON = self.computeSystem()        
+        self.setSystem(systemJSON)
+        
+        controlJSON = self.computeControl(systemJSON)     
+        self.setControls(controlJSON)
+
+    def setSystemFromJSON(self,systemJSONFile):
+        
+        with open(systemJSONFile, 'r') as inputFile:
+            systemJSON = json.load(inputFile)
+        
+        self.setSystem(systemJSON)       
+        self.setControls(systemJSON)
+        self.setFilters(systemJSON)
+
+
+    def setBuildingParameters(self,parametersDict):
+
+        self.areParametersValid(parametersDict)
+
+        self.getBuildingModel()
+        self.setAirtightnessOrientation()
+        self.setWeather()
+        
+        
+    def setOccupancyParameters(self,occupancyParametersDict):
+        
+        self.areParametersValid(occupancyParametersDict)
+        self.setOccupancyAndSources()
         
 
     def areParametersValid(self,parametersDict):
@@ -151,6 +185,11 @@ class caseConfigurator:
 
         weather = self.actualParameters['weather']        
         weatherFile = os.path.join(self.templatesDir,'Weather',weather+'.wth')
+
+        #
+        if (os.name == 'posix'):
+            weatherFile = os.path.relpath(weatherFile)
+            
         
         setWeather.apply(self.ContamModel,weatherFile)
 
@@ -179,6 +218,24 @@ class caseConfigurator:
         
         self.ContamModel['contaminants'].addSpecie(name,defaultOutsideConcentration)
         self.ContamModel['initConc'].addInitConcentration(name,insideInitialConcentration)
+        self.addContaminantSensors(name)
+
+
+    def addContaminantSensors(self,contaminantName):
+
+        zones = self.ContamModel['zones']
+        controls = self.ContamModel['controls']
+        
+        for zoneid in zones.df.index:
+            if ('AHS' not in zones.df.loc[zoneid,'name']):
+
+                controls.addspeciesensor(zones.df,zoneid,contaminantName,contaminantName+'-sensor') #add sensor and report directly
+
+
+        controls.addspeciesensor(zones.df,-1,contaminantName,contaminantName+'-sensor') # for EXT 
+        
+  
+
 
 
 
@@ -194,6 +251,7 @@ class contamRunner:
             
             prjFileRelative = os.path.relpath(prjFile)
 
+    
 
             #seems the file name should not be too long otherwise contam do noting --> should use relative path  for the file! 
             #I dont know why but the output of contam is on stderr and not stdout --> catching stderr

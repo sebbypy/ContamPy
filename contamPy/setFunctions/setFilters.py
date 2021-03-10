@@ -27,6 +27,7 @@ def setFilters(contam_data,fullJSON):
         if "Filter" in MS.keys():
             
             filterName = MS["Filter"]
+
             
             filterID = filters.add(filterName,filterElements) #adding in list of actual filters in CTM
             

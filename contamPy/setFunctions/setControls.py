@@ -85,100 +85,103 @@ def setControls(contam_data,controlJSON):
 
 
     sensordict={}  #sensor key:contamid
-    for Sname,Sdescription in controlJSON['Signals'].items():
     
+    if 'Signals' in controlJSON.keys():
     
-        if (Sdescription["Type"]=="Single-Sensor"):
-            sensor_name=Sdescription['Specie']+'_'+Sdescription['Room']
-            sensor_id=controls.df[controls.df['name']==sensor_name].index[0]
-            sensordict[Sname]=sensor_id
+        for Sname,Sdescription in controlJSON['Signals'].items():
         
-        elif (Sdescription['Type']=="Max-Sensors"):
+        
+            if (Sdescription["Type"]=="Single-Sensor"):
+                sensor_name=Sdescription['Specie']+'_'+Sdescription['Room']
+                sensor_id=controls.df[controls.df['name']==sensor_name].index[0]
+                sensordict[Sname]=sensor_id
             
-            print("in max")
-            sensors_ids=[]
-            desc=''
+            elif (Sdescription['Type']=="Max-Sensors"):
                 
-            for room in Sdescription["Rooms"]:
-                desc+=' '+room
-                sensor_name=Sdescription['Specie']+'_'+room
-                sensors_ids.append(controls.df[controls.df['name']==sensor_name].index[0])
-        
-            #def addMinMax(self,otype,name,inputs,description=''):
-            controls.addMinMax('max','<none>',sensors_ids,"Max CO2 of rooms")
-            sensor_id=controls.nctrl
-            sensordict[Sname]=sensor_id
-        
-        elif (Sdescription['Type']=="Collector"):
+                print("in max")
+                sensors_ids=[]
+                desc=''
+                    
+                for room in Sdescription["Rooms"]:
+                    desc+=' '+room
+                    sensor_name=Sdescription['Specie']+'_'+room
+                    sensors_ids.append(controls.df[controls.df['name']==sensor_name].index[0])
             
-            specie_sensors_ids=[]
-            flow_sensors_ids=[]
-                
-            for room in Sdescription["Rooms"]:
-                #species
-                sensor_name=Sdescription['Specie']+'_'+room
-                specie_sensors_ids.append(controls.df[controls.df['name']==sensor_name].index[0])
-
-                print("Specie sensor",sensor_name)
-
-                #extraction
-                sensor_name='Q_ME_'+room
-                
-                print("Flow sensor",sensor_name)
-                
-                if (len(sensor_name)>15):
-                    sensor_name=sensor_name.replace('kamer','')
- 
-                flow_sensors_ids.append(controls.df[controls.df['name']==sensor_name].index[0])
-
-        
-            #def addMinMax(self,otype,name,inputs,description=''):
-            print(flow_sensors_ids,specie_sensors_ids)
-            controls.addCollector(flow_sensors_ids,specie_sensors_ids,'Collector')
-            sensor_id=controls.nctrl
-            sensordict[Sname]=sensor_id
-
-        elif (Sdescription['Type']=="Presence"):
-        
-            #print("Adding presence sensor")
-        
-            room=Sdescription['Room']
-            occupancy_name='O_'+room
-            occupancy_id=controls.df[controls.df['name']==occupancy_name].index[0]
-            sensor_name="P_"+Sdescription["Room"]
-            controls.addPresenceSensor(room,occupancy_id)
+                #def addMinMax(self,otype,name,inputs,description=''):
+                controls.addMinMax('max','<none>',sensors_ids,"Max CO2 of rooms")
+                sensor_id=controls.nctrl
+                sensordict[Sname]=sensor_id
             
-            sensordict[Sname]=controls.nctrl
-
-               
-    #print(sensordict)
-        
-    actuatorscid={}
-        
-    for A in usedActuatorsNames:
-        
-        Aobject=controlJSON["Actuators"][A]
-        algoname=Aobject["ControlAlgorithmName"]
-
-        AlgoObject=controlJSON["ControlAlgorithms"][algoname]
-
-        if (AlgoObject["Type"]=="Linear"):
-            controls.addLinearControl(sensordict[Aobject['SignalName']],AlgoObject["Qmin"],AlgoObject["Qmax"],AlgoObject["Vmin"],AlgoObject["Vmax"])
-            
-        elif (AlgoObject["Type"]=="Timer"):
-            #print("Adding timer")
-            controls.addTimerControl(schedules,sensordict[Aobject['SignalName']],AlgoObject["Qmin"],AlgoObject["Qmax"],AlgoObject["Duration"])
-
-        elif (AlgoObject["Type"]=="Clock"):
-            #print("Adding timer")
-            controls.addClockControl(schedules,weekschedules,AlgoObject["Schedule"],algoname)
+            elif (Sdescription['Type']=="Collector"):
                 
+                specie_sensors_ids=[]
+                flow_sensors_ids=[]
+                    
+                for room in Sdescription["Rooms"]:
+                    #species
+                    sensor_name=Sdescription['Specie']+'_'+room
+                    specie_sensors_ids.append(controls.df[controls.df['name']==sensor_name].index[0])
+    
+                    print("Specie sensor",sensor_name)
+    
+                    #extraction
+                    sensor_name='Q_ME_'+room
+                    
+                    print("Flow sensor",sensor_name)
+                    
+                    if (len(sensor_name)>15):
+                        sensor_name=sensor_name.replace('kamer','')
+     
+                    flow_sensors_ids.append(controls.df[controls.df['name']==sensor_name].index[0])
+    
             
-        else:
-            print(AlgoObject["Type"]+" does not exist yet")
-            exit()
-        
-        actuatorscid[A]=controls.nctrl
+                #def addMinMax(self,otype,name,inputs,description=''):
+                print(flow_sensors_ids,specie_sensors_ids)
+                controls.addCollector(flow_sensors_ids,specie_sensors_ids,'Collector')
+                sensor_id=controls.nctrl
+                sensordict[Sname]=sensor_id
+    
+            elif (Sdescription['Type']=="Presence"):
+            
+                #print("Adding presence sensor")
+            
+                room=Sdescription['Room']
+                occupancy_name='O_'+room
+                occupancy_id=controls.df[controls.df['name']==occupancy_name].index[0]
+                sensor_name="P_"+Sdescription["Room"]
+                controls.addPresenceSensor(room,occupancy_id)
+                
+                sensordict[Sname]=controls.nctrl
+    
+                   
+        #print(sensordict)
+            
+        actuatorscid={}
+            
+        for A in usedActuatorsNames:
+            
+            Aobject=controlJSON["Actuators"][A]
+            algoname=Aobject["ControlAlgorithmName"]
+    
+            AlgoObject=controlJSON["ControlAlgorithms"][algoname]
+    
+            if (AlgoObject["Type"]=="Linear"):
+                controls.addLinearControl(sensordict[Aobject['SignalName']],AlgoObject["Qmin"],AlgoObject["Qmax"],AlgoObject["Vmin"],AlgoObject["Vmax"])
+                
+            elif (AlgoObject["Type"]=="Timer"):
+                #print("Adding timer")
+                controls.addTimerControl(schedules,sensordict[Aobject['SignalName']],AlgoObject["Qmin"],AlgoObject["Qmax"],AlgoObject["Duration"])
+    
+            elif (AlgoObject["Type"]=="Clock"):
+                #print("Adding timer")
+                controls.addClockControl(schedules,weekschedules,AlgoObject["Schedule"],algoname)
+                    
+                
+            else:
+                print(AlgoObject["Type"]+" does not exist yet")
+                exit()
+            
+            actuatorscid[A]=controls.nctrl
             
 
     

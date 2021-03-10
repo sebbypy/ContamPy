@@ -493,6 +493,7 @@ class filters:
           
 
     def add(self,filterElementName,filterElementsObject):
+
         
         filterElementIndex = filterElementsObject.df[ filterElementsObject.df['name'] == filterElementName ].index[0]
         
@@ -800,7 +801,11 @@ class controlnodes:
             name=name.replace('kamer','')
 
         
-        roomname=zonesdf.loc[roomid,'name']
+        if (roomid != -1):       
+            roomname=zonesdf.loc[roomid,'name']
+        else:
+            roomname = 'EXT'
+
     
         self.nctrl+=1
         
