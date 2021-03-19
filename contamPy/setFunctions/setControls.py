@@ -70,6 +70,22 @@ def setControls(contam_data,controlJSON):
                 controlname_actuator_map[controlname]=W['Actuator']
 
 
+    if ('Natural supply' in controlJSON.keys()):
+        for NS in controlJSON['Natural supply']:
+        
+            if "Actuator" in NS.keys():
+                usedActuatorsNames.append(NS["Actuator"])
+
+                controlname='C_NS_'+NS['Room']
+                
+                if (len(controlname)>15):
+                    controlname=controlname.replace('kamer','')
+
+                controlname_actuator_map[controlname]=NS['Actuator']
+                nflows[controlname]=NS["Capacity"]
+
+
+
     usedControlSignals=[]
     
 

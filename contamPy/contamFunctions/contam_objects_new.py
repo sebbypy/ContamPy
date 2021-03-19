@@ -2188,6 +2188,13 @@ class SimInputs:
                 self.weatherfile,self.wcomment=lastline.split('!')
                 self.otherlines.append(lastline)  #je sauve la ligne tel quel, mais modifiee dynamiquement a l'ecriture
                 continue
+
+            if ('contaminant file' in lastline):
+                print("HELLO",lastline)
+                self.contaminantfile,self.contaminantcomment=lastline.split('!')
+                self.otherlines.append(lastline)  #je sauve la ligne tel quel, mais modifiee dynamiquement a l'ecriture
+                continue
+
                 
             if ('!date_st' in lastline):
                 self.otherlines.append(lastline)  #je sauve cette ligne pour la reecrire tel quel
@@ -2253,6 +2260,12 @@ class SimInputs:
     
         self.weatherfile=weatherfilepath
 
+    def setcontaminantFile(self,contaminantsfilepath):
+    
+        print("IN SET CONTAM")
+        self.contaminantfile = contaminantsfilepath
+
+
     def setoutputfreq(self,freq):
     
         #format HH:MM:SS
@@ -2312,10 +2325,17 @@ class SimInputs:
 
         for line in self.otherlines:
         
+            
             if ('weather file' in line):
                 g.write(self.weatherfile+' ! '+self.wcomment)
                 continue
                 
+            if ('contaminant file' in line):
+                print("CONTAMINANT FILE",self.contaminantfile)
+                g.write(self.contaminantfile+' ! '+self.contaminantcomment)
+                continue
+            
+            
             if ('!date_st' in line):
                 g.write(line)
                 [ g.write(x+' ') for x in self.times.values() ]

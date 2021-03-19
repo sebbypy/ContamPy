@@ -16,6 +16,8 @@ def setFilters(contam_data,fullJSON):
 
     #expected paramsDict {'name':'shortName','description':'long description',efficiencies{'specie1':'Efficiency1','specie2':efficiency2}
 
+    
+
 
     for filterElem in fullJSON['Filters']:
         

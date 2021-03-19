@@ -20,6 +20,8 @@ def compute(args):
     
     controlJson = copy.deepcopy(systemJson)
 
+    print(args)
+
 
     balance=False
     
@@ -68,13 +70,18 @@ def compute(args):
     supplyrooms=[ x["Room"] for x in controlJson["Mechanical supply"] ]
     exhaustrooms=[ x["Room"] for x in controlJson["Mechanical exhaust"] ]
 
+    if ('Natural supply' in controlJson.keys()):
+        naturalsupplyrooms=[ x["Room"] for x in controlJson["Natural supply"] ]
+    else:
+        naturalsupplyrooms = []
+
     if ('Windows' in controlJson.keys()):
         windowrooms=[ x["Room"] for x in controlJson["Windows"] ]
     else:
         controlJson["Windows"]=[]
         windowrooms=[]
     #print(supplyrooms,exhaustrooms)
-    allrooms=supplyrooms+exhaustrooms+windowrooms
+    allrooms=supplyrooms+exhaustrooms+windowrooms+naturalsupplyrooms
 
     # 3. Adding signals
 
@@ -82,7 +89,7 @@ def compute(args):
     controlJson["Actuators"]={}
    
       
-    if (strategy=='fulllocal'):
+    if (strategy=='fulllocal' or strategy=='fulllocalRTOs' or strategy=='fulllocalRTOsBal'):
     
         wet.remove('OKeuken')
         dry.append('OKeuken')
@@ -107,6 +114,15 @@ def compute(args):
                     for x in controlJson["Mechanical supply"]+controlJson["Mechanical exhaust"]+controlJson["Windows"]:
                         if (x["Room"]==r):
                             x["Actuator"]="CO2-"+r+"-linear"
+                    
+                    
+                    if (strategy=='fulllocalRTOs' or strategy=='fulllocalRTOsBal'):
+                        for x in controlJson["Natural supply"]:
+                            if (x["Room"]==r):
+                                x["Actuator"]="CO2-"+r+"-linear"
+                                
+                    
+                    
                     
                     break
             

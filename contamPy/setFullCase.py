@@ -9,14 +9,15 @@ dirPath = os.path.dirname(os.path.realpath(__file__))
 sys.path.append(os.path.join(dirPath,'contamFunctions'))
 sys.path.append(os.path.join(dirPath,'computeFunctions/systems'))
 sys.path.append(os.path.join(dirPath,'computeFunctions/controls'))
+sys.path.append(os.path.join(dirPath,'computeFunctions/filters'))
 sys.path.append(os.path.join(dirPath,'setFunctions'))
 sys.path.append(os.path.join(dirPath,'tools'))
 
 
 
 import contam_functions
-import setSystem,setControls,setOccupancyAndSources,setBCS,setWeather,setNumericalParameters,setFilters
-import computeControls
+import setSystem,setControls,setOccupancyAndSources,setBCS,setWeather,setNumericalParameters,setFilters,setContaminants
+import computeControls,computeFilters
 
 
 class caseConfigurator:
@@ -30,7 +31,9 @@ class caseConfigurator:
                                 'system':'DPREVENT',
                                 'control':'constant',
                                 'occupancy':'default-home',
-                                'weather':'Uccle'
+                                'weather':'Uccle',
+                                'filters':None,
+                                'contaminantsFile':None
                                 }
         
         self.actualParameters=self.defaultParameters.copy()
@@ -62,13 +65,16 @@ class caseConfigurator:
         
         controlJSON = self.computeControl(systemJSON)     
         self.setControls(controlJSON)
+        
+        filterJSON = self.computeFilters(controlJSON)
+        self.setFilters(filterJSON)
 
         self.setOccupancyAndSources()
 
         self.setAirtightnessOrientation()
         self.setWeather()
     
-
+    
     def setSystemFromParameters(self,systemParameters):
 
         self.areParametersValid(systemParameters)
@@ -79,6 +85,17 @@ class caseConfigurator:
         
         controlJSON = self.computeControl(systemJSON)     
         self.setControls(controlJSON)
+
+        filterJSON = self.computeFilters(controlJSON)
+        self.setFilters(filterJSON)
+
+    
+    def setBoundaryParameters(self,boundaryParameters):
+        
+        self.areParametersValid(boundaryParameters)
+        self.setWeather()
+        self.setContaminantsFile()
+
 
     def setSystemFromJSON(self,systemJSONFile):
         
@@ -96,7 +113,6 @@ class caseConfigurator:
 
         self.getBuildingModel()
         self.setAirtightnessOrientation()
-        self.setWeather()
         
         
     def setOccupancyParameters(self,occupancyParametersDict):
@@ -141,7 +157,6 @@ class caseConfigurator:
 
         allArguments = [self.ContamModel] + systemArgs
 
-   
         json = systemComputeFunction(allArguments)
 
         return json
@@ -152,11 +167,39 @@ class caseConfigurator:
         setSystem.apply(self.ContamModel,systemJson)
         
 
+    def computeFilters(self,systemJson):
+        
+
+        allArguments = [systemJson,self.actualParameters['filters']]
+
+        jsonData = computeFilters.compute(allArguments)
+
+
+        return jsonData
+
+    def setFilters(self,filterJSON):
+
+        
+        setFilters.setFilters(self.ContamModel,filterJSON)
+        
+        
+
+
     def computeControl(self,systemJson):
         
         controlStrategy=self.actualParameters['control']
 
-        controlJson = computeControls.compute([systemJson,controlStrategy])
+        arguments = [systemJson,controlStrategy]
+        
+        if (self.actualParameters['system'][0] == 'D' and controlStrategy == 'fulllocal'):
+            arguments.append('balanced')
+
+        if (self.actualParameters['system'] == 'CPREVENT' and controlStrategy in ['fulllocalRTOsBal','fulllocalBal']):
+            arguments.append('balanced')
+
+
+        controlJson = computeControls.compute(arguments)
+
 
         return controlJson
 
@@ -193,6 +236,25 @@ class caseConfigurator:
         
         setWeather.apply(self.ContamModel,weatherFile)
 
+    
+    def setContaminantsFile(self):
+        
+        contaminants = self.actualParameters['contaminantsFile']        
+        
+        if (contaminants==None):
+            print("I WILL NOT SET")
+            return
+        
+        
+        contaminantsFile = os.path.join(self.templatesDir,'Weather',contaminants+'.CTM')
+
+        #
+        if (os.name == 'posix'):
+            contaminantsFile = os.path.relpath(contaminantsFile)
+            
+        print("I WILL SET")
+        setContaminants.apply(self.ContamModel,contaminantsFile)
+
 
     def setNumericalParameters(self,numericalParameters):
                
@@ -201,6 +263,7 @@ class caseConfigurator:
 
     def writeControlJSON(self,outputFileName):
     
+        
         systemJSON = self.computeSystem()        
         controlJSON = self.computeControl(systemJSON)     
         
@@ -208,12 +271,7 @@ class caseConfigurator:
             json.dump(controlJSON, outfile)
         
 
-    def setFilters(self,filterJSON):
 
-        
-        setFilters.setFilters(self.ContamModel,filterJSON)
-        
-        
     def addContaminant(self,name,defaultOutsideConcentration,insideInitialConcentration):
         
         self.ContamModel['contaminants'].addSpecie(name,defaultOutsideConcentration)
