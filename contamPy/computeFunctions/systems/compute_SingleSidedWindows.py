@@ -1,8 +1,8 @@
-
+import copy
     
 def compute(args):
 
-    contam_data = args[0]
+    contam_data = copy.deepcopy(args[0])
     
     #--------------------------------------------
     # Defining types (wet/dry/hal) and functions

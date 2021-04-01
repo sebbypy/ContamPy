@@ -43,6 +43,8 @@ class caseConfigurator:
     
         self.ContamModel = None
 
+        self.fullJSON = None
+
 
     def configureSimulation(self,outputFileName,parametersDict,numericalParameters=None):
         
@@ -89,6 +91,9 @@ class caseConfigurator:
         filterJSON = self.computeFilters(controlJSON)
         self.setFilters(filterJSON)
 
+        self.fullJSON = filterJSON
+        
+
     
     def setBoundaryParameters(self,boundaryParameters):
         
@@ -113,6 +118,7 @@ class caseConfigurator:
 
         self.getBuildingModel()
         self.setAirtightnessOrientation()
+        self.setWeather()
         
         
     def setOccupancyParameters(self,occupancyParametersDict):
@@ -148,6 +154,14 @@ class caseConfigurator:
        
         contam_functions.writecontamfile(self.baseFileName,finalFileName,self.ContamModel)
 
+    def writeCurrentJSON(self,jsonFileName):
+        
+        with open(jsonFileName, 'w') as outfile:
+            json.dump(self.fullJSON, outfile,indent=2)
+
+        
+        
+
 
     def computeSystem(self):
         
@@ -169,7 +183,9 @@ class caseConfigurator:
 
     def computeFilters(self,systemJson):
         
-
+        if (self.actualParameters['filters']==None):
+            return systemJson
+        
         allArguments = [systemJson,self.actualParameters['filters']]
 
         jsonData = computeFilters.compute(allArguments)
@@ -179,6 +195,8 @@ class caseConfigurator:
 
     def setFilters(self,filterJSON):
 
+        if ("Filters" not in filterJSON.keys()):
+            return
         
         setFilters.setFilters(self.ContamModel,filterJSON)
         

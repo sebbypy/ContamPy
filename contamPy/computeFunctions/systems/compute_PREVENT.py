@@ -1,12 +1,12 @@
 
 import contam_functions
 import pandas as pd
-
+import copy
  
     
 def compute(args):
 
-    contam_data=args[0]
+    contam_data=copy.deepcopy(args[0])
     system=args[1]
 
 
@@ -98,8 +98,14 @@ def compute(args):
     # Checking contact with outside
 
     #computing biggest bedroom (2 occupants)
-    biggestbedroom=zones.df[zones.df['name'].str.contains('Slaapkamer')].sort_values(by='Vol',ascending=False)['name'].iloc[0]
+    try:
+        biggestbedroom=zones.df[zones.df['name'].str.contains('Slaapkamer')].sort_values(by='Vol',ascending=False)['name'].iloc[0]
+    except:
+        biggestbedroom=None
     nbedrooms=len(zones.df[zones.df['name'].str.contains('Slaapkamer')])
+
+    numberOfZones = len(zones.df[zones.df['flags']==3])
+ 
 
     for zoneindex in zones.df.index:
         
@@ -163,6 +169,10 @@ def compute(args):
     # ----------------------------
     for zoneindex in zones.df.index:
         
+        if (zones.df.loc[zoneindex,'flags'] != 3):
+            #ignore AHS
+            continue 
+
         area=float(zones.df.loc[zoneindex,'Vol'])/3.0
 
         boolbiggest=False
@@ -181,6 +191,15 @@ def compute(args):
          
             totalexh+=flow
          
+      
+        if (numberOfZones==1 and system in ['C','D']):
+ 
+            flow=75
+            MEdict={'Room':zones.df.loc[zoneindex,'name'],'Nominal flow rate':flow}
+            jsondict['Mechanical exhaust'].append(MEdict)            
+            totalexh+=flow
+            
+            
         # MS 
         if (system in ['B','D'] and zones.df.loc[zoneindex,'type'] in ['dry']):
 
@@ -450,6 +469,8 @@ def compute(args):
         
     if (len(unbaldf)>0):
         allbalanced=False
+    else:
+        allbalanced=True
     
     nloops=0
     

@@ -1,12 +1,12 @@
 
 import pandas as pd
 import numpy as np
-
+import copy
    
     
 def compute(args):
 
-    contam_data=args[0]
+    contam_data=copy.deepcopy(args[0])
     system=args[1]
      
     if (system not in ['A','B','C','D']):
@@ -78,7 +78,6 @@ def compute(args):
     # Read CONTAM model
     #------------------
     #contam_data=contam_functions.loadcontamfile(contamfile)
-    levels=contam_data['levels']
     zones=contam_data['zones']
     flowpaths=contam_data['flowpaths']
 
@@ -123,11 +122,18 @@ def compute(args):
     totalsup=0.
     totalexh=0.
 
+
+    numberOfZones = len(zones.df[zones.df['flags']==3])
+                
          
     # ----------------------------
     # Defining supply and extract
     # ----------------------------
     for zoneindex in zones.df.index:
+        
+        if (zones.df.loc[zoneindex,'flags'] != 3):
+            #ignore AHS
+            continue 
         
         area=float(zones.df.loc[zoneindex,'Vol'])/3.0
 
@@ -153,7 +159,10 @@ def compute(args):
         
             totalexh+=flow
 
-
+        if (numberOfZones==1 and system =='C'):
+            
+            MEdict={'Room':zones.df.loc[zoneindex,'name'],'Nominal flow rate':75}
+            jsondict['Mechanical exhaust'].append(MEdict)            
          
         if (system in ['B','D'] and zones.df.loc[zoneindex,'type'] in ['dry']):
 
@@ -217,7 +226,7 @@ def compute(args):
             else:
                 print("No existing extraction")
                 
-                if (len(zones.df[zones.df['flags']==3])==1):
+                if numberOfZones == 1 :
                     print("Only one zone")
                     zoneName = zones.df[zones.df['flags']==3]['name'].iloc[0]
                     MEdict={'Room':zoneName,'Nominal flow rate':totalsup}

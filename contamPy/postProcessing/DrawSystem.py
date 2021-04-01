@@ -1,5 +1,6 @@
 import sys
 sys.path.append('/home/spec/Documents/Projects/RESEARCH/COMISVENT/2.Work/Python')
+sys.path.append('../contamPy/contamFunctions/')
 
 import contam_functions
 import pandas as pd

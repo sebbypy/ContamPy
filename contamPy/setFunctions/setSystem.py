@@ -17,6 +17,7 @@ def apply(contam_data,systemJson):
     # Load SYSTEM file
     # ----------------
 
+    print(zones.df)
 
     #-------------------------------------------------------------
     # Editing CONTAM model as a function of the system description
@@ -29,11 +30,10 @@ def apply(contam_data,systemJson):
         ahsreturn=ahs.df.loc[1,'zr#']
         zoneid=zones.df[zones.df['name']==ME['Room']].index[0] # find ID of zone which has the same name
 
-        #print(zoneid,zones.df.loc[zoneid,'name'])
-        
+        print("ezone id",zoneid)
         #flowpath index
         fpid=flowpaths.df[ (flowpaths.df['pzn']==zoneid) & (flowpaths.df['pzm'] == ahsreturn) ].index[0]
-
+        
         flowpaths.df.loc[fpid,'Fahs']=float(ME['Nominal flow rate'])/3600*1.2041
 
     # Mechanical supply

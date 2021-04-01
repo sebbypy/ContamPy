@@ -120,7 +120,10 @@ class zones:
 
         for n in range(self.nzones):
             fields=filereader.readline().split()
-            mydict={self.headers[i]:fields[i] for i in range(len(fields))}
+            
+            minlen = min(len(fields),len(self.headers))
+            
+            mydict={self.headers[i]:fields[i] for i in range(minlen)}
     
             if mydict['vf_type']=='0':
                 mydict['cfd']=mydict['vf_node_name']
