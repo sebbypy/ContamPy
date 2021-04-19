@@ -295,6 +295,7 @@ class caseConfigurator:
         self.ContamModel['contaminants'].addSpecie(name,defaultOutsideConcentration)
         self.ContamModel['initConc'].addInitConcentration(name,insideInitialConcentration)
         self.addContaminantSensors(name)
+        self.addContaminantExposure(name)
 
 
     def addContaminantSensors(self,contaminantName):
@@ -311,6 +312,14 @@ class caseConfigurator:
         controls.addspeciesensor(zones.df,-1,contaminantName,contaminantName+'-sensor') # for EXT 
         
   
+    def addContaminantExposure(self,contaminantName):
+
+        occupants = self.ContamModel['exposures']
+        controls = self.ContamModel['controls']
+
+        for oid in range(1,occupants.nexposures+1):
+        
+            controls.addexposuresensor(oid,contaminantName,description=contaminantName+'-'+str(oid))
 
 
 
