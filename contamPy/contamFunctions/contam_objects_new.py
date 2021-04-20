@@ -2173,7 +2173,6 @@ class windpressureprofiles:
     
 
 class SimInputs:
-
     def read(self,filereader,currentline):
 
         self.otherlines=[]
@@ -2289,7 +2288,7 @@ class SimInputs:
     
     def setoutputs(self,outputslist):
     
-        alloutputs=['simflow','simconc','log','ach']
+        alloutputs=['simflow','simconc','log','ach','ebw']
         
         if 'simflow' in outputslist:
             self.saveflags[0]['pfsave']='1'
@@ -2312,6 +2311,12 @@ class SimInputs:
             self.saveflags[2]['log']='1'
         else:
             self.saveflags[2]['log']='0'
+
+        if 'ebw' in outputslist:
+            self.saveflags[1]['exp']='1'
+        else:
+            self.saveflags[1]['exp']='O'
+
 
         self.saveflags[2]['srf']='0'
         self.saveflags[2]['csm']='0'
