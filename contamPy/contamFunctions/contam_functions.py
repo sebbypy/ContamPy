@@ -33,7 +33,6 @@ def loadcontamfile(fname):
                 
             
         if ('initial zone concentrations' in line):
-            print("in read")
             initZonesConc = contam_objects_new.initialZonesConcentrations()
             initZonesConc.read(f,line)
             
@@ -682,8 +681,6 @@ def geticons(fname):
                 else:
                     leveldf.at[levelid,'polygons']=[]
                 
-                #print("Level ID",levelid)
-                #print(levelicons[levelid])
             
             f.close()
             
@@ -808,7 +805,6 @@ def readlevelicons(levelid,iconsdf):
             edgesfromstartpoint=edgesfromstartpoint[edgesfromstartpoint['from']==newstartpoint]         #retain only the ones staring by the startpoint
 
             if (edgesfromstartpoint.empty):
-                #print("No new room starting from this point")
                 break
             
             #print(poly)
@@ -829,8 +825,6 @@ def readlevelicons(levelid,iconsdf):
             nextangle=edgesfromstartpoint.loc[nextedge,'angle-variation']
             polytotalangle+=nextangle
            
-            #print("Edge",nextedge)
-            #print("Nextpoint ",nextpoint)
 
             previousangle=edges.loc[nextedge,'angle']   
 

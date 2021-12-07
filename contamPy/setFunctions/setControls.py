@@ -114,7 +114,6 @@ def setControls(contam_data,controlJSON):
             
             elif (Sdescription['Type']=="Max-Sensors"):
                 
-                print("in max")
                 sensors_ids=[]
                 desc=''
                     
@@ -138,12 +137,8 @@ def setControls(contam_data,controlJSON):
                     sensor_name=Sdescription['Specie']+'_'+room
                     specie_sensors_ids.append(controls.df[controls.df['name']==sensor_name].index[0])
     
-                    print("Specie sensor",sensor_name)
-    
                     #extraction
                     sensor_name='Q_ME_'+room
-                    
-                    print("Flow sensor",sensor_name)
                     
                     if (len(sensor_name)>15):
                         sensor_name=sensor_name.replace('kamer','')
@@ -152,7 +147,6 @@ def setControls(contam_data,controlJSON):
     
             
                 #def addMinMax(self,otype,name,inputs,description=''):
-                print(flow_sensors_ids,specie_sensors_ids)
                 controls.addCollector(flow_sensors_ids,specie_sensors_ids,'Collector')
                 sensor_id=controls.nctrl
                 sensordict[Sname]=sensor_id
@@ -205,8 +199,6 @@ def setControls(contam_data,controlJSON):
        
     if ("Balances" in controlJSON.keys()):
     
-    
-        print("Applying balances")
         for balname,balrooms in controlJSON['Balances'].items():
 
             #input parameters: nominal flow and id of the local control

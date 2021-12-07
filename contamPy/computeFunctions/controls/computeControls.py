@@ -4,7 +4,7 @@ sys.path.append('/home/spec/Documents/Projects/RESEARCH/COMISVENT/2.Work/Python'
 import copy
 
     
-def compute(args):
+def compute(**kwargs):
     
     
     #--------------------------------------------
@@ -15,39 +15,42 @@ def compute(args):
     hal=['hal','Hal','Garage','Berging','Dressing'] #existing functions for hal
 
 
-    systemJson = args[0]
-    strategy = args[1]
+    systemJson = kwargs['systemJson']
+    strategy = kwargs['strategy']
+    #systemJson = args[0]
+    #strategy = args[1]
     
     controlJson = copy.deepcopy(systemJson)
-
-    print(args)
 
 
     balance=False
     
-    if (len(args)>2):
-        if (args[2]=="balanced"):
-            balance=True
+    #if (len(args)>2):
+    #    if (args[2]=="balanced"):
+    #        balance=True
+    if 'balance' in kwargs.keys():
+        balance=kwargs['balance']
+    
+    if 'minflow' in kwargs.keys():
+        minFlow = kwargs['minflow']
+    else:
+        minFlow = 0.1
     
 
     # 1. Reference algorithms
 
     refalgos={
-        "CO2-Linear-10pc":
-            {"Type":"Linear","Qmin":0.1,"Qmax":1.0,"Vmin":500,"Vmax":1000},
-        "H2O-Linear-10pc":
-            {"Type":"Linear","Qmin":0.1,"Qmax":1.0,"Vmin":0.3,"Vmax":0.7},
-        "CO2-Linear-30pc":
-            {"Type":"Linear","Qmin":0.3,"Qmax":1.0,"Vmin":500,"Vmax":1000},
-        "H2O-Linear-30pc":
-            {"Type":"Linear","Qmin":0.3,"Qmax":1.0,"Vmin":0.3,"Vmax":0.7},
+        "CO2-Linear":
+            {"Type":"Linear","Qmin":minFlow,"Qmax":1.0,"Vmin":500,"Vmax":1000},
+        "H2O-Linear":
+            {"Type":"Linear","Qmin":minFlow,"Qmax":1.0,"Vmin":0.3,"Vmax":0.7},
         "Timer30min":
-            {"Type":"Timer","Qmin": 0.1,"Qmax": 1,"Duration": "30min"},
+            {"Type":"Timer","Qmin":minFlow,"Qmax": 1,"Duration": "30min"},
         "NightClock":{
                     "Type":"Clock",
                     "Schedule":{
                         "00:00:00":1.0,
-                        "08:00:00":0.1,
+                        "08:00:00":minFlow,
                         "20:00:00":1.0,
                         "24:00:00":1.0
                         }
@@ -55,10 +58,10 @@ def compute(args):
         "DayClock":{
                     "Type":"Clock",
                     "Schedule":{
-                        "00:00:00":0.1,
+                        "00:00:00":minFlow,
                         "08:00:00":1.0,
-                        "22:00:00":0.1,
-                        "24:00:00":0.1
+                        "22:00:00":minFlow,
+                        "24:00:00":minFlow
                         }
                     }
         }
@@ -89,7 +92,9 @@ def compute(args):
     controlJson["Actuators"]={}
    
       
-    if (strategy=='fulllocal' or strategy=='fulllocalRTOs' or strategy=='fulllocalRTOsBal'):
+    #if (strategy=='fulllocal' or strategy=='fulllocalRTOs' or strategy=='fulllocalRTOsBal'):
+    
+    if strategy in ['fulllocal','fulllocalRTOs','fulllocalRTOsBal']:
     
         wet.remove('OKeuken')
         dry.append('OKeuken')
@@ -106,7 +111,7 @@ def compute(args):
                     signaldict={"Type":"Single-Sensor","Specie":"CO2","Room":r}
                     controlJson["Signals"]["CO2-"+r]=signaldict
             
-                    actuatordict={"SignalName":"CO2-"+r,"ControlAlgorithmName":"CO2-Linear-10pc"}
+                    actuatordict={"SignalName":"CO2-"+r,"ControlAlgorithmName":"CO2-Linear"}
                     
                     controlJson["Actuators"]["CO2-"+r+"-linear"]=actuatordict
                     
@@ -152,7 +157,7 @@ def compute(args):
                     signaldict={"Type":"Single-Sensor","Specie":"H2O","Room":r}
                     controlJson["Signals"]["H2O-"+r]=signaldict
 
-                    actuatordict={"SignalName":"H2O-"+r,"ControlAlgorithmName":"H2O-Linear-10pc"}
+                    actuatordict={"SignalName":"H2O-"+r,"ControlAlgorithmName":"H2O-Linear"}
 
                     controlJson["Actuators"]["H2O-"+r+"-linear"]=actuatordict
 
@@ -166,7 +171,6 @@ def compute(args):
                     
                     
     if (balance and strategy!='constant'):
-        print("Applying balance")
         controlJson["Balances"]={}
         controlJson["Balances"]["Global"]=allrooms
                     

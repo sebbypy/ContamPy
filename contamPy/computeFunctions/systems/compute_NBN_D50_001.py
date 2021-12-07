@@ -238,11 +238,12 @@ def compute(args):
                 
             break
 
-        print("")
+        """print("")
         print("WARNING: the system is unbalanced !")
         print("")
         print("Imbalance: ",totalsup-totalexh," m3/h (supply:",totalsup,"m3/h, exhaust:",totalexh,"m3/h)")
         print("")
+        """
         
         if (totalsup > totalexh) : # most common case
             

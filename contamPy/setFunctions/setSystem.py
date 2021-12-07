@@ -17,7 +17,6 @@ def apply(contam_data,systemJson):
     # Load SYSTEM file
     # ----------------
 
-    print(zones.df)
 
     #-------------------------------------------------------------
     # Editing CONTAM model as a function of the system description
@@ -30,7 +29,6 @@ def apply(contam_data,systemJson):
         ahsreturn=ahs.df.loc[1,'zr#']
         zoneid=zones.df[zones.df['name']==ME['Room']].index[0] # find ID of zone which has the same name
 
-        print("ezone id",zoneid)
         #flowpath index
         fpid=flowpaths.df[ (flowpaths.df['pzn']==zoneid) & (flowpaths.df['pzm'] == ahsreturn) ].index[0]
         
@@ -103,15 +101,12 @@ def apply(contam_data,systemJson):
             
             generic_NSV_id = flowelems.df[flowelems.df['name']=='Gen_NSV'].index[0]  
             
-            print(W['Room'])
-            print(zones.df)
             
             zoneid=zones.df[zones.df['name']==W['Room']].index[0] # find ID of zone which has the same name
             
             #flowpath index
             fpid=flowpaths.df[ (flowpaths.df['pzm']==zoneid) & (flowpaths.df['pe']==generic_NSV_id) ].index
            
-            print("Defining Window opening for room"+W['Room'])
             
             if (len(fpid)==0):
                 print("WARINING: No natural supply could be defined !")
@@ -132,11 +127,6 @@ def apply(contam_data,systemJson):
 
     for NT in systemJson['Natural transfer']:
         
-        #print("")
-
-        #print(zones.df)
-        #print(NT)
-        #input("...")
 
         generic_NT_id = flowelems.df[flowelems.df['name']=='Gen_NT'].index[0]
 
@@ -144,8 +134,6 @@ def apply(contam_data,systemJson):
         roomid2=zones.df[zones.df['name']==NT['To room']].index[0] # find ID of zone which has the same name
         commonflowpaths=contam_functions.getcommonpaths(flowpaths,roomid1,roomid2)    
 
-        #print("")
-        #print("Defining Natural Transfer from "+NT['From room']+' to '+NT['To room']+'('+str(NT['Capacity'])+' m3/h at '+str(NT['Design pressure'])+' Pa)')
       
 
         if (len(commonflowpaths[commonflowpaths['pe']==generic_NT_id].index)==1):
@@ -159,7 +147,6 @@ def apply(contam_data,systemJson):
         NT_name='NT_'+str(NT['Design pressure'])+'Pa'
 
         if (flowelems.df['name'].isin([NT_name]).max() == False):
-            print(NT_name+' element does not exist yet, adding it')
             flowelems.addflowelem('NT',{'dp':int(NT['Design pressure'])})
 
         flowpaths.df.loc[fpid,'pe']=flowelems.df[flowelems.df['name']==NT_name].index[0]
@@ -167,4 +154,41 @@ def apply(contam_data,systemJson):
         
 
         flowpaths.df.loc[fpid,'pe']
+
+
+
+    # comes after NT: if already NT existing, the NT is replaced by OD
+    if ('Open doors' in systemJson.keys()):
+        for OD in systemJson['Open doors']:
+            
+            roomid1=zones.df[zones.df['name']==OD['From room']].index[0] # find ID of zone which has the same name
+            roomid2=zones.df[zones.df['name']==OD['To room']].index[0] # find ID of zone which has the same name
+            commonflowpaths=contam_functions.getcommonpaths(flowpaths,roomid1,roomid2)    
+         
+    
+            if (len(commonflowpaths) > 0):
+                fpid=commonflowpaths.index[0] #NT is index 0 if exists - anyway, I use index 0 
+            else:
+                print("Error")
+                print("No path detected between "+OD['From room']+' and '+OD['To room']+' to define a transfer opening')
+                return
+    
+            if (flowelems.df['name'].isin(['OD']).max() == False):
+                flowelems.addflowelem('OD',{})
+    
+            flowpaths.df.loc[fpid,'pe']=flowelems.df[flowelems.df['name']=='OD'].index[0]
+            flowpaths.df.loc[fpid,'mult']=float(1.0)
+        
+
+        
+
+
+
+
+
+
+
+
+
+
 

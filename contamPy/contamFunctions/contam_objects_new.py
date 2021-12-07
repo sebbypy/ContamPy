@@ -147,6 +147,16 @@ class zones:
         self.df.to_csv(g,header=False,sep=' ')
 
 
+    def getZonesDataFrame(self):
+        
+        return self.df
+    
+    
+    def replaceZonesDataFrame(self,newzonesdf):
+        
+        self.df = newzonesdf
+
+
 
 class initialZonesConcentrations():
     
@@ -263,7 +273,9 @@ class flowelements:
         # elemtype: NSV, NT
         comment={'NSV':'Natural supply vent',
                  'NT':'Natural transfer opening',
-                 'SR_NSV':'Self regulating Natural Supply Vent'}
+                 'SR_NSV':'Self regulating Natural Supply Vent',
+                 'OD':'Open Door',
+                 'IL':'InternalLeak'}
         
     
         if (elemtype in ['NSV','NT','SR_NSV']):
@@ -287,6 +299,7 @@ class flowelements:
                 self.df.loc[self.nelems,'dtype']='plr_qcn'
                 #self.df.loc[self.nelems,'values']=[Clam,Cturb,n]
                 self.df.at[self.nelems,'values']=[Clam,Cturb,n]
+
 
             elif (elemtype in ['SR_NSV']):
             
@@ -320,6 +333,64 @@ class flowelements:
             self.df.loc[self.nelems,'comment']=comment[elemtype]+' 1m3/h at '+str(dp)+'Pa - by Python'
 
             self.df=convert_cols(self.df)
+            
+            
+        if elemtype == 'IL':
+            #internal leak
+            #per default : 10 m3/h at 2Pa
+            
+            qv=10/3600 #1 m3/h²
+            dp=2
+            n=0.66
+            
+            Cturb=qv/(dp**n)
+            Clam=self.Clam(Cturb,n)
+            
+            self.nelems+=1
+
+            self.df.loc[self.nelems,'icon']=int(23)
+            self.df['icon']=self.df['icon'].astype(int)
+
+            self.df.loc[self.nelems,'dtype']='plr_qcn'
+            self.df.at[self.nelems,'values']=[Clam,Cturb,0.66]
+            self.df.loc[self.nelems,'name']=elemtype
+            self.df.loc[self.nelems,'comment']='Internal leak - by default: 10 m3/h at 2Pa - by Python'
+            self.df=convert_cols(self.df)
+
+
+
+        if elemtype == 'OD':
+            
+            # Power law 
+            #   Qv [m3/s]  = C*(dp)**0.5
+            
+            # discharge coefficient
+            #   m_dot = Cd*A*sqrt(2*rho*dp)
+            #  m_dot/rho =  Cd*A * sqrt(2/rho) * sqrt(dp)
+            # Qv [m3/s] = Cd*A*sqrt(2/rho) * (dp)**0.5
+            
+            
+            #   C  = Cd*A*sqr(2/rho)
+
+            
+            Cd = 0.6
+            Area = 2.0
+            rho = 1.2
+
+            n=0.5            
+            Cturb = Cd*Area*np.sqrt(2/rho)
+            Clam=self.Clam(Cturb,n)
+       
+            self.nelems+=1
+
+            self.df.loc[self.nelems,'icon']=int(25)
+            self.df['icon']=self.df['icon'].astype(int)
+            self.df.loc[self.nelems,'dtype']='plr_qcn'
+            self.df.at[self.nelems,'values']=[Clam,Cturb,n]
+            self.df.loc[self.nelems,'name']=elemtype
+            self.df.loc[self.nelems,'comment']='Open door - by Python'
+            self.df=convert_cols(self.df)
+
 
 
             
@@ -586,7 +657,6 @@ class contaminants:
         
         
         for key,value in nonNullDefaultsValues.items():
-            print("in if")
             self.df.loc[specieID,key] = value
             
         self.df.fillna(0,inplace=True)
@@ -1317,9 +1387,6 @@ class controlnodes:
                 cid=ids[unbal_ctrls_dict[c]]
                 returndict[c]=self.addBasicOperation('mul','<none>',mult,cid)
                 
-                       
-        print(returndict)       
-        
         
         return(returndict)
 
@@ -1721,8 +1788,6 @@ class daySchedules:
     
         nschedules,self.comment = currentline.split('!')
         self.nschedules=int(nschedules)
-        
-        print(self.nschedules)
         
         for i in range(self.nschedules):
         
@@ -2171,6 +2236,23 @@ class windpressureprofiles:
                 
         return
     
+    def add(self,otherdf):
+    
+        self.nprofiles = self.nprofiles+len(otherdf)
+    
+        self.df = self.df.append(otherdf,ignore_index = True)
+        self.df.index = [ i+1 for i in range(self.nprofiles)]
+    
+        return
+    
+    def replaceFromLibrary(self,librarydf):
+    
+        self.nprofiles = len(librarydf)
+        self.df = librarydf
+    
+        return
+    
+    
 
 class SimInputs:
     def read(self,filereader,currentline):
@@ -2192,7 +2274,6 @@ class SimInputs:
                 continue
 
             if ('contaminant file' in lastline):
-                print("HELLO",lastline)
                 self.contaminantfile,self.contaminantcomment=lastline.split('!')
                 self.otherlines.append(lastline)  #je sauve la ligne tel quel, mais modifiee dynamiquement a l'ecriture
                 continue
@@ -2264,7 +2345,6 @@ class SimInputs:
 
     def setcontaminantFile(self,contaminantsfilepath):
     
-        print("IN SET CONTAM")
         self.contaminantfile = contaminantsfilepath
 
 
@@ -2315,7 +2395,7 @@ class SimInputs:
         if 'ebw' in outputslist:
             self.saveflags[1]['exp']='1'
         else:
-            self.saveflags[1]['exp']='O'
+            self.saveflags[1]['exp']='0'
 
 
         self.saveflags[2]['srf']='0'
@@ -2339,7 +2419,6 @@ class SimInputs:
                 continue
                 
             if ('contaminant file' in line):
-                print("CONTAMINANT FILE",self.contaminantfile)
                 g.write(self.contaminantfile+' ! '+self.contaminantcomment)
                 continue
             

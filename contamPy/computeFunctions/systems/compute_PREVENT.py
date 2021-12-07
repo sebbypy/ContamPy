@@ -33,6 +33,10 @@ def compute(args):
             autobalanceprop=True
 
 
+    if len(args)>3:
+        supplyPressure = int(args[3])
+    else:
+        supplyPressure = 2
 
     #system='D'
     #system='C'
@@ -216,7 +220,7 @@ def compute(args):
         
             flow=computeflow(zones.df.loc[zoneindex,'function'],boolbiggest,nbedrooms)
 
-            NSdict={'Room':zones.df.loc[zoneindex,'name'],'Capacity':flow,'Design pressure':2,'Self-Regulating':'No'}
+            NSdict={'Room':zones.df.loc[zoneindex,'name'],'Capacity':flow,'Design pressure':supplyPressure,'Self-Regulating':'No'}
             jsondict['Natural supply'].append(NSdict)
 
             totalsup+=flow
@@ -260,7 +264,7 @@ def compute(args):
     
                 flow=totalexh/nhals
         
-                NSdict={'Room':zones.df.loc[zoneindex,'name'],'Capacity':flow,'Design pressure':2,'Self-Regulating':'No'}
+                NSdict={'Room':zones.df.loc[zoneindex,'name'],'Capacity':flow,'Design pressure':supplyPressure,'Self-Regulating':'No'}
                 jsondict['Natural supply'].append(NSdict)
 
 
@@ -340,22 +344,22 @@ def compute(args):
                 
                     totalexh+=flow
                 
-                    print("")
+                    """print("")
                     print("Imbalance: ",totalsup-totalexh," m3/h (supply:",totalsup,"m3/h, exhaust:",totalexh,"m3/h)")
                     print("")
-     
+                    """
 
             changeflowrate=input("Change flow rate of existing extractions ? (y/n) ")
         
             if (changeflowrate in ['y','Y']):
 
-                print('{:3}'.format('id'), '{:12}'.format('Room'), '{:10}'.format('Flow rate') )
+                #print('{:3}'.format('id'), '{:12}'.format('Room'), '{:10}'.format('Flow rate') )
                 
                 for item in jsondict['Mechanical exhaust']:
                 
                     roomid=zones.df[zones.df['name']==item['Room']].index[0]
                 
-                    print('{:3}'.format(str(roomid)), '{:12}'.format(item['Room']), '{:10}'.format(str(item['Nominal flow rate'])))
+                    #print('{:3}'.format(str(roomid)), '{:12}'.format(item['Room']), '{:10}'.format(str(item['Nominal flow rate'])))
 
                 ids=input("Choose rooms for wich to change the flow rate (roomid, separated by commas, e.g. 1,2,3) :  " )
                     
@@ -371,9 +375,9 @@ def compute(args):
                             item['Nominal flow rate']=flow
                             totalexh+= item['Nominal flow rate']
                             
-                            print("")
+                            """print("")
                             print("Imbalance: ",totalsup-totalexh," m3/h (supply:",totalsup,"m3/h, exhaust:",totalexh,"m3/h)")
-                            print("")
+                            print("")"""
         #print("Dry spaces")
         #print(zones.df[zones.df['type']=='dry']['name'].to_string())
         
@@ -385,9 +389,9 @@ def compute(args):
         if ( abs(totalsup - totalexh) > 1):
             balance=False
         else:
-            print("")
+            """print("")
             print("Sufficient balance (<1 m3/h) is reached")
-            print("")
+            print("")"""
             balance=True
 
 
@@ -560,7 +564,6 @@ def compute(args):
 
         if ('WoonKeuken' in unbaldf.index):
 
-            print ("in unbal WK")
             woonNeighbours=contam_functions.getNeighboursNamesWithNT('Woonkamer',zones.df,flowpaths.df,flowelems.df)
             keukenNeighbours=contam_functions.getNeighboursNamesWithNT('OKeuken',zones.df,flowpaths.df,flowelems.df)
             
@@ -695,7 +698,7 @@ def compute(args):
 
             
             else:
-                print("Try forcing balance")
+                #print("Try forcing balance")
                 # take the worst, and force it to transfer to an unbalanced neighbour. wz stands for Worst zone
                 
                 wzName=unbaldf['Balance'].abs().idxmax()

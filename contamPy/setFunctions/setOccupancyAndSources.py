@@ -6,7 +6,7 @@ import datetime
 
 import os
 
-def apply(contam_data,occupancy_profile,templateDir):
+def apply(contam_data,occupancy_profile,profilesDir):
 
     
     #options: default = NSlaapkamers + 1 occupant
@@ -55,10 +55,10 @@ def apply(contam_data,occupancy_profile,templateDir):
         
         for ptype in ['Home','Busy','Away']:
 
-            fname=os.path.join(templateDir,'occupancyProfiles','profile_Occupant'+str(oid)+'_'+ptype+'.csv')
+            fname=os.path.join(profilesDir,'profile_Occupant'+str(oid)+'_'+ptype+'.csv')
         
             if (not os.path.exists(fname)):
-                print(fname+" does not exist, skipping")
+                #print(fname+" does not exist, skipping")
                 continue
         
             #Reading standard profile 
@@ -133,7 +133,7 @@ def apply(contam_data,occupancy_profile,templateDir):
             textschedulelist= [ 'O'+str(oid)+'_'+'Home' if i in [0,6] else 'O'+str(oid)+'_Busy' for i in range(12) ] #full text list of 12 day schedules 
         
         else:
-            print("Wrong occupatin type ",occupancy_profile)
+            print("Wrong occupation type ",occupancy_profile)
             print("Exiting")
             return
         

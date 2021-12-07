@@ -1,4 +1,3 @@
-import wsm
 
 
 def apply(contam_data,v50,rot):
@@ -21,8 +20,11 @@ def apply(contam_data,v50,rot):
     # Defaults parameters for now
     #def wsm(building_height,building_terrain_category,meteo_terrain_category):
 
-    wsmValue=wsm.wsm(6,'II','II')
+    """print("hello, world")
+    print(roughnessWeatherStation,roughnessBuilding)
 
+    wsmValue=wsm.wsm(6,'II','II')
+    """
     for index in flowpaths.df.index:
         
         if (flowpaths.df.loc[index,'pe']==crackelemid):
@@ -33,6 +35,6 @@ def apply(contam_data,v50,rot):
         if (flowpaths.df.loc[index,'pw']>0):
             
             flowpaths.df.loc[index,'wazm']+=int(rot)
-            flowpaths.df.loc[index,'wPmod']=wsmValue
+            #flowpaths.df.loc[index,'wPmod']=wsmValue
 
 

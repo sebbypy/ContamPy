@@ -8,7 +8,7 @@ sys.path.append(externalsDir)
 
 import pandas as pd
 
-from CONTAMReader import loadCONTAMlog
+from CONTAMReader import loadCONTAMlog,readCONTAMAch
 from dfIO import dropperiod
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
@@ -19,14 +19,17 @@ import datetime
 pd.set_option('mode.chained_assignment', None)
 
 
-def exposure(df,threshold,etype='max',debug=False):
-
+def exposure(df,threshold,etype='max',debug=False,scalingFactors=None):
+    #scalingFactors = scaling factor to take into account an occupancy period that is not the same for all
+    
     freq=df.index[1]-df.index[0]
 
     df=df-threshold
 
     exp=df[df>0].sum()* (freq/datetime.timedelta(hours=1))
-
+    
+    if (scalingFactors != None):
+        exp = exp*scalingFactors
     
     if (exp.describe()['count']==0):
         return 0
@@ -61,20 +64,23 @@ def maxHoursAboveThreshold(df,threshold,debug=False):
     return maxHours
 
 
-def getIaqIndicators(df,debug=False):
+def getIaqIndicators(df,debug=False,CO2Limit=1000,VOCLimit=20,H2OLimit=0.7):
 
     year = df.index[0].year
     
     dropperiod(df,datetime.datetime(year,4,1),datetime.datetime(year,9,30),inplace=True)
+
     
     occupantsCO2 = df.filter(regex='CO2_O[0-9]', axis=1)
-    co2Exposure = exposure(occupantsCO2,1000,'max',debug)
+    occupancyScaling = scaleForOccupancy(occupantsCO2,401)   #single occupancy scaling for CO2 and VOC
+    co2Exposure = exposure(occupantsCO2,CO2Limit,'max',debug,occupancyScaling)
+
 
     occupantsVOC = df.filter(regex='VOC_O[0-9]', axis=1)
-    vocExposure = exposure(occupantsVOC*1e3,15,'max',debug)
+    vocExposure = exposure(occupantsVOC*1e3,VOCLimit,'max',debug,occupancyScaling)
 
     h2oRooms = df.filter(regex="H2O_",axis=1)
-    h2oHours = maxHoursAboveThreshold(h2oRooms,0.7,debug)
+    h2oHours = maxHoursAboveThreshold(h2oRooms,H2OLimit,debug)
 
 
 
@@ -82,6 +88,58 @@ def getIaqIndicators(df,debug=False):
             'VOC Exposure':vocExposure,
             'H2O Hours':h2oHours
             }
+
+
+def scaleForOccupancy(df,outsideValue):
+    # scale the exposure value to take into account only occupied periods
+    #rationale: if the value is lower or equal to outside value (e.g. 401 ppm), it measn the occupant is outside
+    
+    scalingFactors=[]
+    
+    totalTimeSteps = len(df)
+    
+    for col in df.columns:
+    
+        
+        insideTimeSteps = len(df[df[col]>outsideValue])
+        scalingFactors.append(totalTimeSteps/insideTimeSteps)
+
+    #no error handling to be warned if there is an issue. Should never be 0!
+        
+    return scalingFactors
+
+
+def getMeanFlowRate(df):
+    
+    year = df.index[0].year
+    
+    dropperiod(df,datetime.datetime(year,4,1),datetime.datetime(year,9,30),inplace=True)
+    
+    meanFlow = df.mean().values[0]
+
+    return meanFlow
+    
+
+def getCriteria():
+    
+    nbhours = (datetime.datetime(2021,4,1)-datetime.datetime(2020,10,1)).total_seconds()/3600
+
+    
+    CO2Criteria = (1500-1000)*0.1*nbhours #10% of time at 1500 ppm
+    VOCCriteria = (40-20)*0.1*nbhours #10% of time at 25
+    H2OCriteria = 800
+    
+    return {'CO2 Criteria':CO2Criteria,
+            'VOC Criteria':VOCCriteria,
+            'H2O Criteria':H2OCriteria}
+
+def checkIAQ(indicatorsDict):
+
+    criteria = getCriteria()
+    
+    return {'CO2': indicatorsDict['CO2 Exposure'] < criteria['CO2 Criteria'],
+            'VOC': indicatorsDict['VOC Exposure'] < criteria['VOC Criteria'],
+            'H2O': indicatorsDict['H2O Hours']    < criteria['H2O Criteria']}
 
 
 
@@ -118,6 +176,14 @@ def readContamLog(contamlog):
     
     return df
     
+    
+def readAch(contamAch):
+    
+    df = readCONTAMAch(contamAch,2020)
+    
+    return df
+
+
 
 def selectOneDay(df,date):
     
@@ -302,7 +368,7 @@ def plotAndSaveOneDayFigures(db,logNameWithPath,fullDataFrame,date,fileFormat):
  
 
 
-if __name__ == '__main__':
+"""if __name__ == '__main__':
     
 
     if (len(sys.argv)<2):
@@ -342,4 +408,4 @@ if __name__ == '__main__':
 
     else:
         print("First argument should be 'IAQ' or 'plot1Day'")
-        
+   """     

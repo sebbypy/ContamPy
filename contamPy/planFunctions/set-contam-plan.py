@@ -187,8 +187,16 @@ for roomid1,roomid2 in room_pairs:
                     flowpaths.df.loc[index,'relHt']=0.25
                     contam_functions.reversepath(flowpaths,index)
                     flowpaths.df.loc[index,'mult']=1
+
+            else:
+                if (i==1):
+                    flowpaths.df.loc[index,'pe']=large_opening_id
+                    flowpaths.df.loc[index,'relHt']=1.0
+                    flowpaths.df.loc[index,'mult']=0
+
+
         
-            if (i<1):
+            if (i==0):
                 flowpaths.df.loc[index,'pe']=nat_transfer_id
                 flowpaths.df.loc[index,'relHt']=0.25
 
