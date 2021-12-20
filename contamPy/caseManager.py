@@ -16,7 +16,7 @@ sys.path.append(os.path.join(dirPath,'tools'))
 
 
 import contam_functions
-import setSystem,setControls,setOccupancyAndSources,setBCS,setWeather,setNumericalParameters,setFilters,setContaminants,setWindPressureProfile,setWindSpeedMultiplier,scalePlan,setLeaks
+import setSystem,setControls,setOccupancyAndSources,setBCS,setWeather,setNumericalParameters,setFilters,setContaminants,setWindPressureProfile,setWindSpeedMultiplier,scalePlan,setLeaks,setOpenstairs
 import computeControls,computeFilters,computeOpenDoors
 
 
@@ -48,7 +48,8 @@ class caseConfigurator:
                                 'outputTimeStep':'00:05:00',
                                 'outputFiles':['log','ach'],
                                 'openDoors':False,
-                                'internalLeaks':False
+                                'internalLeaks':False,
+                                'openStairs':False
                                 }
         
         self.actualParameters=self.defaultParameters.copy()
@@ -61,7 +62,7 @@ class caseConfigurator:
     
         self.ContamModel = None
 
-        self.fullJSON = None
+        self.full     = None
 
 
     def applyParameters(self):
@@ -75,6 +76,7 @@ class caseConfigurator:
         self.setSystem(systemJSON)
 
         self.setLeaks()
+        self.setOpenStairs()
         
         controlJSON = self.computeControl(systemJSON)     
         self.setControls(controlJSON)
@@ -448,6 +450,12 @@ class caseConfigurator:
             setLeaks.apply(self.ContamModel)
 
 
+    def setOpenStairs(self):
+        
+        if self.actualParameters['openStairs']:
+            setOpenstairs.apply(self.ContamModel)
+
+
 class contamRunner:
     
         def __init__(self,contamExeDir):
@@ -510,9 +518,18 @@ class existingSystems:
                             'file':'compute_PREVENT',
                             'arguments':['C','auto-balance-prop','10']
                             },
+                    'CCascadePREVENT':{
+                            'file':'compute_PREVENT',
+                            'arguments':['CRecyclage','auto-balance-prop']
+                            },
+
                     'DPREVENT':{
                             'file':'compute_PREVENT',
                             'arguments':['D','auto-balance-prop']
+                            },
+                    'DCascadePREVENT':{
+                            'file':'compute_PREVENT',
+                            'arguments':['DRecyclage','auto-balance-prop']
                             },
                     'CSLAAPPREVENT':{
                             'file':'compute_PREVENT',
@@ -520,7 +537,7 @@ class existingSystems:
                             },
                     'CSupplyHall':{
                             'file':'compute_PREVENT',
-                            'arguments':['CsupplyHall']
+                            'arguments':['CsupplyHall','xx','10']
                             },
                     'Windows':{
                             'file':'compute_SingleSidedWindows',
@@ -549,7 +566,43 @@ class existingControls:
                     'constant':{
                                 'file':'computeControls',
                                 'arguments':
-                                    {'strategy':'constant'}
+                                    {'strategy':'constant','flowFraction':1.0}
+                                },
+                    'constant70':{
+                                'file':'computeControls',
+                                'arguments':
+                                {'strategy':'constant','flowFraction':0.7}
+                                },
+                    'constant50':{
+                                'file':'computeControls',
+                                'arguments':
+                                {'strategy':'constant','flowFraction':0.5}
+                                },
+                    'singleNightClock':{
+                                'file':'computeControls',
+                                'arguments':
+                                {'strategy':'singleClock','schedule':'nightClock','minFlow':0.3,'maxFlow':1.0},
+                                },
+                    'CentralCO2Living':{
+                                'file':'computeControls',
+                                'arguments':
+                                {'strategy':'CO2Central','minFlow':0.65,'maxFlow':1.0,'balance':True},
+                                },
+                    'CentralCO2Hall':{
+                                'file':'computeControls',
+                                'arguments':
+                                {'strategy':'CO2CentralHall','minFlow':0.3,'maxFlow':1.0,'balance':True},
+                                },
+
+                    'CentralCO2LivingAndNightClock':{
+                                'file':'computeControls',
+                                'arguments':
+                                {'strategy':'NightClockCO2Central','minFlow':0.3,'maxFlow':1.0,'nightFlow':0.7,'balance':True},
+                                },
+                    'LocalCO2LivingAndNightClock':{
+                                'file':'computeControls',
+                                'arguments':
+                                {'strategy':'NightClockCO2Local','minFlow':0.3,'maxFlow':1.0,'nightFlow':0.7,'balance':True},
                                 },
                     'fulllocal':{
                                 'file':'computeControls',
@@ -566,19 +619,30 @@ class existingControls:
                                 'arguments':
                                     {'strategy':'fulllocalRTOs','balance':True}
                                 },
-
+                    'allMotRTOAndGlobalExtract':{
+                            'file':'computeControls',
+                            'arguments':
+                                {'strategy':'allMotRTOAndGlobalExtract'}
+                            },
+                    'oneMotRTOAndGlobalExtract':{
+                            'file':'computeControls',
+                            'arguments':
+                                {'strategy':'oneMotRTOAndGlobalExtract'}
+                            },
+                    
                     'fulllocal30pc':{
                                 'file':'computeControls',
                                 'arguments':
                                     {
                                     'strategy':'fulllocal',
-                                    'minflow':0.3
+                                    'minFlow':0.3
                                      }
                                 },                          
                           
                     }
         
     def functionAndArguments(self,controlName):
+        
                        
         controlModule = importlib.import_module(self.controlsDict[controlName]['file'])        
         

@@ -50,7 +50,9 @@ class levels:
         iconsdf=pd.DataFrame(columns=['icn','col','row','#'])
         
         for ico in range(int(nicons)):
-            line=filereader.readline()
+            line=filereader.readline().replace('\r','')
+            
+            
             icn,col,row,elemid=line.split()
             iconsdf.loc[ico,'icn']=icn
             iconsdf.loc[ico,'col']=col
@@ -58,7 +60,6 @@ class levels:
             iconsdf.loc[ico,'#']=elemid
         
         iconsdf=convert_cols(iconsdf)
-
         
         return iconsdf
         
@@ -80,8 +81,11 @@ class levels:
             
     def writelevelicons(self,g,levelid):
         
+        
         g.write(self.iconheader)
-        self.icons[levelid].to_csv(g,header=False,sep=' ',index=False)
+        self.icons[levelid].to_csv(g,mode='a',header=False,sep=' ',index=False,line_terminator='\n')
+
+
 
 class zones:
 
@@ -144,7 +148,7 @@ class zones:
         
         g.write(str(self.nzones)+' !'+self.comment)
         g.write(self.contamheader)
-        self.df.to_csv(g,header=False,sep=' ')
+        self.df.to_csv(g,header=False,sep=' ',line_terminator='\n')
 
 
     def getZonesDataFrame(self):
@@ -197,7 +201,7 @@ class initialZonesConcentrations():
         [ g.write(c+' ') for c in self.df.columns]
         g.write('\n')
 
-        self.df.to_csv(g,header=False,sep=' ')
+        self.df.to_csv(g,header=False,sep=' ',line_terminator='\n')
                
         
         #to write
@@ -339,9 +343,11 @@ class flowelements:
             #internal leak
             #per default : 10 m3/h at 2Pa
             
-            qv=10/3600 #1 m3/h²
-            dp=2
-            n=0.66
+            dp=valuesdict['dp']
+            flow=valuesdict['flowRate']
+            n=valuesdict['exponent']
+            
+            qv=flow/3600 #1 m3/h²
             
             Cturb=qv/(dp**n)
             Clam=self.Clam(Cturb,n)
@@ -352,9 +358,9 @@ class flowelements:
             self.df['icon']=self.df['icon'].astype(int)
 
             self.df.loc[self.nelems,'dtype']='plr_qcn'
-            self.df.at[self.nelems,'values']=[Clam,Cturb,0.66]
+            self.df.at[self.nelems,'values']=[Clam,Cturb,n]
             self.df.loc[self.nelems,'name']=elemtype
-            self.df.loc[self.nelems,'comment']='Internal leak - by default: 10 m3/h at 2Pa - by Python'
+            self.df.loc[self.nelems,'comment']='Internal leak - '+str(flow)+' m3/h at '+str(dp)+'Pa - by Python'
             self.df=convert_cols(self.df)
 
 
@@ -776,7 +782,7 @@ class sources:
         [ g.write(x+' ') for x in self.headers ]
         g.write('\n')
         
-        self.df.to_csv(g,header=False,sep=' ')
+        self.df.to_csv(g,header=False,sep=' ',line_terminator='\n')
         
         
     def addSource(self,roomid,sourceElemid,scheduleid,ctrlid,mult,CC0=0):
@@ -1530,7 +1536,7 @@ class controlnodes:
  
         list_of_day_schedules=[ schedules.nschedules for i in range(12) ]
  
-        weekschedules.addSchedule('Week'+name,'Week schedule for clock control',list_of_day_schedules)
+        weekschedules.addSchedule('W'+name,'Week schedule for clock control',list_of_day_schedules)
         
         ctrlid=self.addScheduleControl(weekschedules.nschedules,'ScControl','Schedule control for '+name)
         
@@ -1690,10 +1696,10 @@ class occupancy_schedules:
             
             
             if 'douche' in v['dataframe'].columns:
-                v['dataframe'].drop(['douche'],axis=1).to_csv(g,header=False,index=False,sep=' ')
+                v['dataframe'].drop(['douche'],axis=1).to_csv(g,header=False,index=False,sep=' ',line_terminator='\n')
 
             else:
-                v['dataframe'].to_csv(g,header=False,index=False,sep=' ')
+                v['dataframe'].to_csv(g,header=False,index=False,sep=' ',line_terminator='\n')
             
 
     def addSchedule(self,name,description,profiledf):
@@ -1834,7 +1840,7 @@ class daySchedules:
             if ('\n' not in v['description']):
                 g.write('\n')
             
-            v['dataframe'].to_csv(g,header=False,index=False,sep=' ')
+            v['dataframe'].to_csv(g,header=False,index=False,sep=' ',line_terminator='\n')
             
 
     def addSchedule(self,name,description,profiledf,shape=0):
@@ -2176,7 +2182,7 @@ class flowpaths:
         
         g.write(str(self.nfp)+' !'+self.comment)
         g.write(self.contamheader)
-        self.df.to_csv(g,header=False,sep=' ')
+        self.df.to_csv(g,header=False,sep=' ',line_terminator='\n')
         
 
 class windpressureprofiles:

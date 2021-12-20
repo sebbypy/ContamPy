@@ -21,7 +21,7 @@ contam_data=contam_functions.loadcontamfile(fname)
 levels=contam_data['levels']
 zones=contam_data['zones']
 flowpaths=contam_data['flowpaths']
-rooms=zones.df[zones.df['flags']==3]
+rooms=zones.df[zones.df['flags']!=10]
 
 
 
@@ -81,11 +81,11 @@ for roomid1,roomid2 in room_pairs:
                 exit()
 
         else:
-            if ( len(commonflowpaths) > 0 and len(commonflowpaths) !=1 ):
+            if ( len(commonflowpaths) > 0 and len(commonflowpaths) !=4 ):
             
-                if (3 in commonflowpaths['dir'] or 6 in commonflowpaths['dir']):  #3 or 6 are vertical paths! 
+                if (3 in commonflowpaths['dir'].values or 6 in commonflowpaths['dir'].values):  #3 or 6 are vertical paths! 
             
-                    print("Wrong number of flow paths between ",rooms.loc[roomid1,'name'],"and",rooms.loc[roomid2,'name'],". There should be at maximulm one VERTICAL connection between two spaces at differnt levels")
+                    print("Wrong number of flow paths between ",rooms.loc[roomid1,'name'],"and",rooms.loc[roomid2,'name'],". There should be FOUR VERTICAL connection between two spaces at different levels")
                     print("")
                     print(commonflowpaths)
                     exit()

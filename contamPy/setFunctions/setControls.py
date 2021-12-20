@@ -1,11 +1,21 @@
+#import json
+import sys
+sys.path.append('../../')
+
+import customExceptions
 
 
 def setControls(contam_data,controlJSON):
+
+    
+    #with open('test.json', 'w') as outfile:
+    #    json.dump(controlJSON, outfile)
 
     # ----------------------------------
     # Load CONTAM FILE and various parts
     # ----------------------------------
 
+    zones=contam_data['zones']
     flowpaths=contam_data['flowpaths']
     controls=contam_data['controls']
     schedules=contam_data['dayschedules']
@@ -95,8 +105,11 @@ def setControls(contam_data,controlJSON):
     
         if (A not in controlJSON["Actuators"].keys()):
             print("Error, the actuator '",A,"' is used to control some devices but is not defined")
+
     
-        usedControlSignals.append(controlJSON["Actuators"][A]["SignalName"])
+        if ("SignalName" in controlJSON["Actuators"][A].keys()):
+    
+            usedControlSignals.append(controlJSON["Actuators"][A]["SignalName"])
 
 
 
@@ -108,6 +121,9 @@ def setControls(contam_data,controlJSON):
         
         
             if (Sdescription["Type"]=="Single-Sensor"):
+                
+                checkZoneExist(zones,Sdescription['Room'])
+                
                 sensor_name=Sdescription['Specie']+'_'+Sdescription['Room']
                 sensor_id=controls.df[controls.df['name']==sensor_name].index[0]
                 sensordict[Sname]=sensor_id
@@ -162,13 +178,23 @@ def setControls(contam_data,controlJSON):
                 controls.addPresenceSensor(room,occupancy_id)
                 
                 sensordict[Sname]=controls.nctrl
+
+            elif (Sdescription["Type"]=="Clock"):
+                #print("Adding timer")
+                controls.addClockControl(schedules,weekschedules,Sdescription["Schedule"],'nightClockSignal')
+
+    
+        
+                
     
                    
         #print(sensordict)
             
         actuatorscid={}
             
-        for A in usedActuatorsNames:
+        #for A in usedActuatorsNames:
+        for A in controlJSON["Actuators"].keys():
+            
             
             Aobject=controlJSON["Actuators"][A]
             algoname=Aobject["ControlAlgorithmName"]
@@ -186,13 +212,30 @@ def setControls(contam_data,controlJSON):
                 #print("Adding timer")
                 controls.addClockControl(schedules,weekschedules,AlgoObject["Schedule"],algoname)
                     
+
+            elif (AlgoObject['Type']=='Max'):
+
+                signalsIdsList = []
+                
+                for actuatorName in Aobject["Actuators"]:
+                    
+                    try:
+                        actuatorID = actuatorscid[actuatorName]
+                        signalsIdsList.append(actuatorID)
+                    except:
+                        print("error, The actuator",actuatorName,"does not exist")
+                        input('...')
+                        exit()
+                        
+                controls.addMinMax('max','<none>',signalsIdsList,A)
+
+
                 
             else:
                 print(AlgoObject["Type"]+" does not exist yet")
                 exit()
             
             actuatorscid[A]=controls.nctrl
-            
 
     
     #Creating balance control
@@ -228,3 +271,19 @@ def setControls(contam_data,controlJSON):
         flowpaths.df.loc[flowpaths.df['pc'].astype(int)==oldCid,'pc']=newCid
         
     
+
+
+
+def doZoneExist(zones,zoneName):
+
+    return zoneName in zones.df['name'].values
+    
+
+def checkZoneExist(zones,zoneName):
+    
+    if not doZoneExist(zones,zoneName):
+        raise customExceptions.ContamPyException("Zone "+zoneName+" does not exist in the current model") 
+        
+        
+        
+        

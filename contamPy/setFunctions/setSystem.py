@@ -160,7 +160,6 @@ def apply(contam_data,systemJson):
     # comes after NT: if already NT existing, the NT is replaced by OD
     if ('Open doors' in systemJson.keys()):
         for OD in systemJson['Open doors']:
-            
             roomid1=zones.df[zones.df['name']==OD['From room']].index[0] # find ID of zone which has the same name
             roomid2=zones.df[zones.df['name']==OD['To room']].index[0] # find ID of zone which has the same name
             commonflowpaths=contam_functions.getcommonpaths(flowpaths,roomid1,roomid2)    

@@ -2,6 +2,10 @@
 import contam_functions
 import pandas as pd
 import copy
+
+
+
+
  
     
 def compute(args):
@@ -9,23 +13,12 @@ def compute(args):
     contam_data=copy.deepcopy(args[0])
     system=args[1]
 
+    checkArguments(system)
 
-    acceptablesystems=['A','B','C','D','CsupplyHall','CSLAAP']
-     
-    if (system not in acceptablesystems):
-        print("")
-        print("System ",system," does not exist")
-        sysstring=''
-        for s in acceptablesystems:
-            sysstring+=s+' '
-        print("Valid systems are "+sysstring)
-        print("")
-        exit()
-
-
+    
     autobalancehal=False
     autobalanceprop=False
-    if (system in ['C','D'] and len(args)>2):
+    if (system in ['C','D','DRecyclage','CRecyclage'] and len(args)>2):
 
         if ( args[2] == 'auto-balance-hal' ):
             autobalancehal=True
@@ -38,66 +31,82 @@ def compute(args):
     else:
         supplyPressure = 2
 
-    #system='D'
-    #system='C'
 
-
-    #--------------------------------------------
-    # Defining types (wet/dry/hal) and functions
-    #--------------------------------------------
-    wet=['Wasplaats','Badkamer','WC','Keuken','OKeuken']  # existing functions in dry spaces
-    dry=['Slaapkamer','Woonkamer','Bureau','Speelkamer']  # existing function in wet spaces
-    hal=['hal','Hal']                                     # existing functions for hal
-    others=['Garage','Berging','Dressing']                # other functions
-
-
-
-    # -----------------------------------------------
-    # Flow rate rules based on PREVENT experience
-    # -----------------------------------------------
-    def computeflow(function,biggestbedroom,nbedrooms):
-
-        flowdict={'WC':25,
-              'Badkamer':50,
-              'Keuken':50,
-              'OKeuken':50,
-              'Wasplaats':50,
-              'Slaapkamer':25,
-              'Woonkamer':25*(nbedrooms+1),
-              'Bureau':25
-              }
-
-        flow=flowdict[function]
-        
-        
-        if (biggestbedroom):
-            flow=flow*2
-
-        return flow
-
-
-    #------------------
-    # Read CONTAM model
-    #------------------
     zones=contam_data['zones']
     flowpaths=contam_data['flowpaths']
     flowelems=contam_data['flowelems']
 
+    biggestbedroom,nbedrooms,numberOfZones = assignZoneTypesAndFunctions(zones,flowpaths)
+
+    jsondict,totalsup,totalexh = setRequiredFlowRates(zones,biggestbedroom,system,numberOfZones,nbedrooms,supplyPressure)
+
+    supplyAndExhaustBalancing(jsondict,system,zones,totalsup,totalexh,autobalancehal,autobalanceprop)
+
+    jsonDict = balanceNaturalTransfers(zones,flowelems,flowpaths,jsondict)
 
 
-    #testing contam functions
-    #contam_functions.getNeighboursNamesWithNT('Woonkamer',zones.df,flowpaths.df,flowelems.df)
-    #x=contam_functions.getcommonpathsByName('WC','Inkomhal',zones.df,flowpaths)
-    #print(x)
+    return jsonDict
 
-    #x=contam_functions.getroompathsByName('Inkomhal',zones.df,flowpaths.df)
-    #print(x)
 
+
+
+def checkArguments(system):
     
+    acceptablesystems=['A','B','C','D','CsupplyHall','CSLAAP','DRecyclage','CRecyclage']
+     
+    if (system not in acceptablesystems):
+        print("")
+        print("System ",system," does not exist")
+        sysstring=''
+        for s in acceptablesystems:
+            sysstring+=s+' '
+        print("Valid systems are "+sysstring)
+        print("")
+        exit()
 
+
+
+
+
+def computeflow(function,biggestbedroom,nbedrooms):
+    # -----------------------------------------------
+    # Flow rate rules based on PREVENT experience
+    # -----------------------------------------------
+
+    flowdict={'WC':25,
+          'Badkamer':50,
+          'Douche':50,
+          'Keuken':50,
+          'OKeuken':50,
+          'Wasplaats':50,
+          'Slaapkamer':25,
+          'Woonkamer':25*(nbedrooms+1),
+          'Bureau':25
+          }
+
+    flow=flowdict[function]
+    
+    
+    if (biggestbedroom):
+        flow=flow*2
+
+    return flow
+
+
+def assignZoneTypesAndFunctions(zones,flowpaths):
+    
     # ----------------------------------------------
     # Assingning types and functions to model spaces
     # ----------------------------------------------
+
+    #--------------------------------------------
+    # Defining types (wet/dry/hal) and functions
+    #--------------------------------------------
+    wet=['Wasplaats','Badkamer','WC','Keuken','OKeuken','Douche']  # existing functions in dry spaces
+    dry=['Slaapkamer','Woonkamer','Bureau','Speelkamer']  # existing function in wet spaces
+    hal=['hal','Hal']                                     # existing functions for hal
+    others=['Garage','Berging','Dressing']                # other functions
+
 
     # Checking contact with outside
 
@@ -114,6 +123,8 @@ def compute(args):
     for zoneindex in zones.df.index:
         
         zonename=zones.df.loc[zoneindex,'name']
+
+        
 
         if (zonename==biggestbedroom):
             zones.df.loc[zoneindex,'biggestbedroom']=True
@@ -152,6 +163,12 @@ def compute(args):
             zones.df.loc[zoneindex,'outsideaccess']=False
 
 
+    return biggestbedroom,nbedrooms,numberOfZones
+
+
+
+def setRequiredFlowRates(zones,biggestbedroom,system,numberOfZones,nbedrooms,supplyPressure):
+
     #----------------------------
     # DICTIONNARY TO WRITE DOWN
     #----------------------------
@@ -177,23 +194,36 @@ def compute(args):
             #ignore AHS
             continue 
 
-        area=float(zones.df.loc[zoneindex,'Vol'])/3.0
-
         boolbiggest=False
         if (zones.df.loc[zoneindex,'name']==biggestbedroom):
             boolbiggest=True
 
         # ME
-        if (system in ['C','D'] and zones.df.loc[zoneindex,'type'] in ['wet']):
+        if (system in ['C','D','CRecyclage','DRecyclage'] and zones.df.loc[zoneindex,'type'] in ['wet']):
             
             function=zones.df.loc[zoneindex,'function']
             
             flow=computeflow(zones.df.loc[zoneindex,'function'],boolbiggest,nbedrooms)
             
+            if (zones.df.loc[zoneindex,'name']=='OKeuken' and system in ['CRecyclage','DRecyclage']):
+                flow = (nbedrooms+1)*25
+            
+            
+            MEdict={'Room':zones.df.loc[zoneindex,'name'],'Nominal flow rate':flow}
+            jsondict['Mechanical exhaust'].append(MEdict)
+         
+            
+            totalexh+=flow
+
+        if (system == 'CRecyclage' and zones.df.loc[zoneindex,'name']=='Woonkamer' and not zones.df['name'].isin(['OKeuken']).any()):
+            
+            flow = (nbedrooms+1)*25
+            
             MEdict={'Room':zones.df.loc[zoneindex,'name'],'Nominal flow rate':flow}
             jsondict['Mechanical exhaust'].append(MEdict)
          
             totalexh+=flow
+
          
       
         if (numberOfZones==1 and system in ['C','D']):
@@ -204,26 +234,33 @@ def compute(args):
             totalexh+=flow
             
             
-        # MS 
-        if (system in ['B','D'] and zones.df.loc[zoneindex,'type'] in ['dry']):
+        # Mechanical supply
+        if (system in ['B','D','DRecyclage'] and zones.df.loc[zoneindex,'type'] in ['dry']):
 
             flow=computeflow(zones.df.loc[zoneindex,'function'],boolbiggest,nbedrooms)
+
+            if system == 'DRecyclage' and zones.df.loc[zoneindex,'name']=='Woonkamer':
+                pass
+            else:
             
-            MSdict={'Room':zones.df.loc[zoneindex,'name'],'Nominal flow rate':flow}
-            jsondict['Mechanical supply'].append(MSdict)
-            
-            totalsup+=flow
+                MSdict={'Room':zones.df.loc[zoneindex,'name'],'Nominal flow rate':flow}
+                jsondict['Mechanical supply'].append(MSdict)
+                
+                totalsup+=flow
             
 
         # NATURAL SUPPLY
-        if (system in ['A','C','CSLAAP'] and zones.df.loc[zoneindex,'type'] in ['dry']):
+        if (system in ['A','C','CSLAAP','CRecyclage'] and zones.df.loc[zoneindex,'type'] in ['dry']):
         
             flow=computeflow(zones.df.loc[zoneindex,'function'],boolbiggest,nbedrooms)
 
-            NSdict={'Room':zones.df.loc[zoneindex,'name'],'Capacity':flow,'Design pressure':supplyPressure,'Self-Regulating':'No'}
-            jsondict['Natural supply'].append(NSdict)
+            if system == 'CRecyclage' and zones.df.loc[zoneindex,'name']=='Woonkamer':
+                pass
+            else:
+                NSdict={'Room':zones.df.loc[zoneindex,'name'],'Capacity':flow,'Design pressure':supplyPressure,'Self-Regulating':'No'}
+                jsondict['Natural supply'].append(NSdict)
 
-            totalsup+=flow
+                totalsup+=flow
     
     
         # ME for C supply
@@ -249,7 +286,7 @@ def compute(args):
              
                 totalexh+=flow
 
-
+            
     # --------------------------------------------
     # Defining natural supply after all mechanical
     # --------------------------------------------
@@ -268,9 +305,17 @@ def compute(args):
                 jsondict['Natural supply'].append(NSdict)
 
 
-    
-    
 
+    return jsondict,totalsup,totalexh
+
+
+
+
+
+
+
+def supplyAndExhaustBalancing(jsondict,system,zones,totalsup,totalexh,autobalancehal,autobalanceprop):
+    
     #--------------
     # BALANCE
     #--------------
@@ -282,7 +327,8 @@ def compute(args):
     else:
         balance = True
 
-    while (system in ['C','D'] and not balance):
+
+    while (system in ['C','D','CRecyclage','DRecyclage'] and not balance):
 
         imbalance=totalsup-totalexh
 
@@ -293,10 +339,22 @@ def compute(args):
             
             nhal=len(halzonesindex)
 
+            factor=totalsup/totalexh
+
+
             if (nhal>0):
                 for zoneid in halzonesindex:
-                    MEdict={'Room':zones.df.loc[zoneid,'name'],'Nominal flow rate':abs(imbalance)/nhal}
-                    jsondict['Mechanical exhaust'].append(MEdict)
+                    
+                    if factor > 1.0:
+
+                        MEdict={'Room':zones.df.loc[zoneid,'name'],'Nominal flow rate':abs(imbalance)/nhal}
+                        jsondict['Mechanical exhaust'].append(MEdict)
+                        
+                    else:
+                        MSdict={'Room':zones.df.loc[zoneid,'name'],'Nominal flow rate':abs(imbalance)/nhal}
+                        jsondict['Mechanical supply'].append(MSdict)
+                        
+                        
                 totalexh+=abs(imbalance)
 
                 break
@@ -307,11 +365,19 @@ def compute(args):
             
         
         if (autobalanceprop):
+
+            print("Automatic balancing")            
             
             factor=totalsup/totalexh
+
+            if factor > 1.0:
             
-            for MEdict in jsondict['Mechanical exhaust']:
-                MEdict['Nominal flow rate']=MEdict['Nominal flow rate']*factor
+                for MEdict in jsondict['Mechanical exhaust']:
+                    MEdict['Nominal flow rate']=MEdict['Nominal flow rate']*factor
+
+            else:
+                for MSdict in jsondict['Mechanical supply']:
+                    MSdict['Nominal flow rate']=MSdict['Nominal flow rate']/factor
                 
 
             break
@@ -323,6 +389,7 @@ def compute(args):
         #print("")
         
         if (totalsup > totalexh) : # most common case
+        
             
             #Adding extra exhaust in hal or dry spaces
             
@@ -394,20 +461,150 @@ def compute(args):
             print("")"""
             balance=True
 
+    
+    return
 
-    #---------------------------------------------------------
-    # Defining natural transfers (should be balanced by room)
-    #----------------------------- ---------------------------
 
-    # for PREVENT: should be balanced by room
 
+
+def balanceNaturalTransfers(zones,flowelems,flowpaths,jsondict):    
+
+    roombaldf = createRoomsBalanceTable(zones,jsondict)
+    
+    
+    balanceDeadEndRooms(zones,flowpaths,flowelems,roombaldf)
+ 
+    unbaldf=roombaldf[roombaldf['Balance'].abs() >1.0 ] #remaining unbalanced zones
+        
+    if (len(unbaldf)>0):
+        allbalanced=False
+    else:
+        allbalanced=True
+    
+    nloops=0
+    
+    while (not allbalanced):
+        
+        nloops+=1
+
+        allbalance,unbaldf = tryBalanceDryAndWetSpaces(zones,flowpaths,flowelems,roombaldf,unbaldf)
+
+        #print("unbal df after drywet")
+        #print(unbaldf)
+
+
+        if ('WoonKeuken' in unbaldf.index):
+
+            allbalanced,unbaldf = tryBalanceLivingAndOpenKitchen(zones,flowpaths,flowelems,roombaldf,unbaldf)
+            #print("unbal df after wk",unbaldf)
+      
+        if (len(unbaldf)==2):
+                   
+            allbalanced,unbaldf = tryBalanceTwoLastZones(zones,flowpaths,flowelems,roombaldf,unbaldf)
+            #print("unbal df after tow zones",unbaldf)
+            
+        else:
+        
+            
+                    
+            
+            #print("More than two zones are unbalanced, cannot easily find a solution")
+            
+            
+            # one or more than two
+            if (len(unbaldf)==1):
+                print("Only one unbalanced zone, impossible to perfectly balance natural transfers")
+                break
+
+     
+            if nloops<3:
+                #print("Loop once more to see if it solves by itself")                
+                continue
+
+            
+            else:
+                #print("Try forcing balance")
+                # take the worst, and force it to transfer to an unbalanced neighbour. wz stands for Worst zone
+                
+                
+                # we'll take them in the logical order: first solve the ones with only 1 trivial solution
+                """remainingZones = list(unbaldf.index)
+
+                print(remainingZones)
+
+                unbalancedNeighbours={}
+                
+                for zoneName in remainingZones:
+
+                    zNeighbours=contam_functions.getNeighboursNamesWithNT(zoneName,zones.df,flowpaths.df,flowelems.df)
+                    unbalancedZoneNeighbours=[ x for x in zNeighbours if x in unbaldf.index ] #on les garde seulement si pas balancees
+                    
+                
+                    unbalancedNeighbours[zoneName] = unbalancedZoneNeighbours
+                """
+                wzName=unbaldf['Balance'].abs().idxmax()
+                
+                wzNeighbours=contam_functions.getNeighboursNamesWithNT(wzName,zones.df,flowpaths.df,flowelems.df)
+                wzNeighbours=[ x for x in wzNeighbours if x in unbaldf.index ] #on les garde seulement si pas balancees
+
+
+
+                #print(wzName,wzNeighbours)
+
+                try:
+                    otherzone=wzNeighbours[0]
+                except:
+                    pass
+                    # print(wzName)
+                    #print(roombaldf.to_string())                        
+                                  
+                if (not pd.isna(roombaldf.loc[wzName,otherzone]) ):
+                    roombaldf.loc[wzName,otherzone]+=-roombaldf.loc[wzName,'Balance']
+                    roombaldf.loc[otherzone,wzName]+=roombaldf.loc[wzName,'Balance']
+
+                else:
+                    roombaldf.loc[wzName,otherzone]=-roombaldf.loc[wzName,'Balance']
+                    roombaldf.loc[otherzone,wzName]=roombaldf.loc[wzName,'Balance']
+
+
+                unbaldf = updateUnbalance(roombaldf,zones)
+
+                
+                if (len(unbaldf)==0):
+                    allbalanced=True
+                    break
+
+    #when the table is full, apply the flows
+
+
+    if ('WoonKeuken' in list(roombaldf.index)):
+        roombaldf.drop(['WoonKeuken'],axis=0,inplace=True)
+    
+            
+    for i in roombaldf.index:
+        for c in roombaldf.drop(['Supply','Exhaust','Balance'],axis=1).columns:   #dropping balance, because if openkeukeun, balance per room is not 0
+        
+            if roombaldf.loc[i,c]>0:
+            
+                NTdict={'From room':i,
+                        'To room':c,
+                        'Capacity':roombaldf.loc[i,c],
+                        'Design pressure':2
+                        }   
+                jsondict['Natural transfer'].append(NTdict)
+      
+            
+    return jsondict
+
+
+
+def createRoomsBalanceTable(zones,jsondict):
+    
     cols=['Supply','Exhaust','Balance']+list(zones.df['name'])
     roombaldf=pd.DataFrame(index=zones.df['name'],columns=cols)
 
     roombaldf.loc[:,['Supply','Exhaust','Balance']]=0
 
-    # Step 1 Computing the balance of flow per room
-    #print("Step 1: computing room (un)balance")
 
     for network,devicelist in jsondict.items():
     
@@ -425,28 +622,32 @@ def compute(args):
                     roombaldf.loc[zonename,'Supply']+=flow
                 if ('exhaust' in network):
                 
-                    if ('Slaap' in zonename):
+                    #if ('Slaap' in zonename):
                         #one ignores mechanical exhaust in slaapkamers
-                        continue
+                        #NO ! 
+                    #    continue
                 
                     roombaldf.loc[zonename,'Exhaust']+=flow*-1
                 
 
     roombaldf['Balance']=roombaldf['Supply']+roombaldf['Exhaust']
 
-    excludedid=zones.df[zones.df['name'].str.contains('AHS')].index
-    excludedid=list(excludedid)+[-1]
+    return roombaldf
 
-    elemid=flowelems.df[flowelems.df['name']=='Gen_NT'].index[0]
 
-    # Step 2 : balancing for rooms that only have one single Natural transfer path
-    #print("Step 2: foor room having a single Natural Transfer: balancing immediately")
 
-    for zonename in zones.df['name']:
+def balanceDeadEndRooms(zones,flowpaths,flowelems,roombaldf):
     
+    #for rooms with only one neighbouring zone, the natural transfer sizing is trivial
+    # the only transfer possible is to the neighbouring room
+    
+    for zonename in zones.df['name']:
+
+        
         neighbours=contam_functions.getNeighboursNamesWithNT(zonename,zones.df,flowpaths.df,flowelems.df)
 
         if (len(neighbours)==1):  # si une seule jonction, on peut équilibrer directement
+            
             
             otherzonename=neighbours[0]
 
@@ -455,287 +656,205 @@ def compute(args):
 
             roombaldf['Balance']=roombaldf.drop(['Balance'],axis=1).sum(axis=1)
 
+
     # Considering Open Keuken & Woonkamer together --> duplicate them so that they have the same balance
     if ('OKeuken' in roombaldf.index):
         roombaldf.loc['WoonKeuken',:]=roombaldf.loc['Woonkamer',:]+roombaldf.loc['OKeuken',:]
 
 
-    #print(roombaldf)
-    #input('...')
 
+def tryBalanceDryAndWetSpaces(zones,flowpaths,flowelems,roombaldf,unbaldf):
+    
+    
+    allbalanced=False
+    
+    unbaldryzones=[ x for x in unbaldf.index if x in list(zones.df[zones.df['type']=='dry']['name'])]
+    unbalwetzones=[ x for x in unbaldf.index if x in list(zones.df[zones.df['type']=='wet']['name'])]
 
-    # Step 3 - Further work on unbalanced spaces
-    #print("Step 3 - Applying other rules")
-    #print("Room balance status at begin of step 3")
-    #print(roombaldf)
- 
-    unbaldf=roombaldf[roombaldf['Balance'].abs() >1.0 ] #remaining unbalanced zones
+    if ('OKeuken' in unbalwetzones):
+        #special case to be handled apart
+        unbalwetzones.remove('OKeuken')
+
+        if ('Woonkamer' in unbaldryzones):
+            unbaldryzones.remove('Woonkamer')
+  
+    #trying to balance dry and wet spaces with hals
+    for zonename in unbaldryzones+unbalwetzones:
         
-    if (len(unbaldf)>0):
-        allbalanced=False
-    else:
-        allbalanced=True
-    
-    nloops=0
-    
-    while (not allbalanced):
-  
-        #print("nloops",nloops)
-        #print(roombaldf)
-        #input('...')
-
-  
-        nloops+=1
-        #dry rooms
-        unbaldryzones=[ x for x in unbaldf.index if x in list(zones.df[zones.df['type']=='dry']['name'])]
-        unbalwetzones=[ x for x in unbaldf.index if x in list(zones.df[zones.df['type']=='wet']['name'])]
-
-        if ('OKeuken' in unbalwetzones):
-            #special case to be handled apart
-            unbalwetzones.remove('OKeuken')
-
-            if ('Woonkamer' in unbaldryzones):
-                unbaldryzones.remove('Woonkamer')
-  
-        #trying to balance dry and wet spaces with hals
-        for zonename in unbaldryzones+unbalwetzones:
-             
-            #print("Balancing zonename",zonename)
-            
-            roombalanced=False
+        zoneid=contam_functions.getzoneid(zonename,zones.df)
+        zoneType = zones.df.loc[zoneid,'type']
+        if zoneType=='dry':
+            othertype='wet'
+        elif zoneType=='wet':
+            othertype='dry'
+        
      
-            neighbourzones=contam_functions.getNeighboursNamesWithNT(zonename,zones.df,flowpaths.df,flowelems.df) #byname
+        neighbourzones=contam_functions.getNeighboursNamesWithNT(zonename,zones.df,flowpaths.df,flowelems.df) #byname
+        
+        neighbourhals=[ x for x in neighbourzones if x in list(zones.df[zones.df['type']=='hal']['name'])]
+        
+        if (len(neighbourhals)<1):
             
-            neighbourhals=[ x for x in neighbourzones if x in list(zones.df[zones.df['type']=='hal']['name'])]
-            
-            if (len(neighbourhals)<1):
-                zoneid=contam_functions.getzoneid(zonename,zones.df)
-                
-                if zones.df.loc[zoneid,'type']=='dry':
-                    othertype='wet'
-                elif zones.df.loc[zoneid,'type']=='wet':
-                    othertype='dry'
-                
-                otherneighbours=list(zones.df[ (zones.df['type']==othertype) & zones.df['name'].isin(neighbourzones)]['name'])
-                
-                otherzonename=otherneighbours[0]
-                #otherzonename=zones.df.loc[otherneighbours[0],'name']
+            otherTypeNeighbours=list(zones.df[ (zones.df['type']==othertype) & zones.df['name'].isin(neighbourzones)]['name'])
 
-                #if (len(otherneighbours)>1):
-                    #print("Warning, zone "+zonename+" connected to more than one "+othertype+" space")
-                    #print("Using the first one per default")
-
-
-            else: #there is a neighbouring hall
-                
-                #if (len(neighbourhals)>1):
-                #    print("Warning, space connected to more than one first hal space")
-                #    print("Using the first one per default")
-
-                #otherzonename=zones.df.loc[neighbourhals[0],'name']
-                otherzonename=neighbourhals[0]
-
-
-            if ('OKeuken' in list(zones.df['name']) and ( (zonename in ['OKeuken','Woonkamer']) or (otherzonename in ['OKeuken','Woonkamer']) ) ) :
-                roomtobalance='WoonKeuken'
+            if len(otherTypeNeighbours)==0:
+                sameTypeNeighbours = list(zones.df[ (zones.df['type']==zoneType) & zones.df['name'].isin(neighbourzones)]['name'])
+                otherzonename = sameTypeNeighbours[0]                    
             else:
-                roomtobalance=zonename
             
-            if (pd.isna(roombaldf.loc[zonename,otherzonename])):
-                roombaldf.loc[zonename,otherzonename]=-roombaldf.loc[roomtobalance,'Balance']
-                roombaldf.loc[otherzonename,zonename]=roombaldf.loc[roomtobalance,'Balance']
-            else:
-                roombaldf.loc[zonename,otherzonename]+=-roombaldf.loc[roomtobalance,'Balance']
-                roombaldf.loc[otherzonename,zonename]+=roombaldf.loc[roomtobalance,'Balance']
-            
+                otherzonename=otherTypeNeighbours[0]
 
-            roombaldf['Balance']=roombaldf.drop(['Balance'],axis=1).sum(axis=1)
-
-            #print("After balance ",zonename)
-            #print(roombaldf)
-            #input('...')
-
-            roombalanced=True
-            unbaldf=roombaldf[roombaldf['Balance'].abs() >1.0 ]
-
-            if (len(unbaldf)==0):
-                allbalanced=True
-                break
-
-        if ('WoonKeuken' in unbaldf.index):
-
-            woonNeighbours=contam_functions.getNeighboursNamesWithNT('Woonkamer',zones.df,flowpaths.df,flowelems.df)
-            keukenNeighbours=contam_functions.getNeighboursNamesWithNT('OKeuken',zones.df,flowpaths.df,flowelems.df)
-            
-            neighbourhals=[ x for x in woonNeighbours+keukenNeighbours if zones.df[zones.df['name']==x]['type'].iloc[0]=='hal']  #iloc --> otheriwse return series
-
-            #if (len(neighbourhals)>1):
-            #    print("Warning, there are two connections to neighbour hals")
-            #    print("Just using the first one")
-
+        else: #there is a neighbouring hall               
             otherzonename=neighbourhals[0]
-    
-            roomtobalance='WoonKeuken'
 
-            #par convention on va prendre le sejour is possible, sinon la cuisine
-            if (otherzonename in woonNeighbours):
-                zonename='Woonkamer'
-            else:
-                zonename='OKeuken'
-                        
-            roombaldf.loc[zonename,otherzonename]=-roombaldf.loc[roomtobalance,'Balance']
-            roombaldf.loc[otherzonename,zonename]=roombaldf.loc[roomtobalance,'Balance']
-
-            roombaldf['Balance']=roombaldf.drop(['Balance'],axis=1).sum(axis=1)
-            roombaldf.loc['WoonKeuken',:]=roombaldf.loc['Woonkamer',:]+roombaldf.loc['OKeuken',:]
-            
-            roombalanced=True
-            unbaldf=roombaldf[roombaldf['Balance'].abs() >1.0 ]
-
-            for x in ['Woonkamer','OKeuken']:
-                if (x in unbaldf.index):
-                    unbaldf=unbaldf.drop([x],axis=0)
-                    
-            
-            if (len(unbaldf)==0):
-                allbalanced=True
-                break
-            
-        #print("After balancing all main rooms, we are still unbalanced")
-        #print(unbaldf)
-      
-        if (len(unbaldf)==2):
-                   
-            #print(unbaldf)
-                   
-            zname1=unbaldf.index[0]
-            zname2=unbaldf.index[1]
-            
-            commonpaths=contam_functions.getcommonNTpathsByName(zname1,zname2,zones.df,flowpaths.df,flowelems.df)
         
-            if(len(commonpaths)==1):
-             
-                roombaldf.loc[zname1,zname2]=-roombaldf.loc[zname1,'Balance']
-                roombaldf.loc[zname2,zname1]=roombaldf.loc[zname1,'Balance']
-
-                roombaldf['Balance']=roombaldf.drop(['Balance'],axis=1).sum(axis=1)
-                
-                if ('OKeuken' in roombaldf.index):
-                    roombaldf.loc['WoonKeuken',:]=roombaldf.loc['Woonkamer',:]+roombaldf.loc['OKeuken',:]
-        
-                unbaldf=roombaldf[roombaldf['Balance'].abs() >1.0 ]
-               
-                if ('OKeuken' in unbaldf.index):
-                    unbaldf=unbaldf.drop(['Woonkamer','OKeuken'],axis=0)
-            
-                if (len(unbaldf)==0):
-                    allbalanced=True
-                    break
-            else:
-                #print("2 unbalanced zones remain, but no direct link between them")
-        
-                #we have to find if there is a common neighbour between the unbalanced spaces
-                z1neighbours=contam_functions.getNeighboursNamesWithNT(zname1,zones.df,flowpaths.df,flowelems.df)
-                z2neighbours=contam_functions.getNeighboursNamesWithNT(zname2,zones.df,flowpaths.df,flowelems.df)
-
-                commonNeighbours= list(set(z1neighbours).intersection(set(z2neighbours))) #commonneighbour id
-                
-                if (len(commonNeighbours)==1):
-                
-                    neighbourname=commonNeighbours[0]
-                    #print("Neighbour zone",neighbourname)
-                
-                    if (not pd.isna(roombaldf.loc[zname1,neighbourname]) ):
-                        roombaldf.loc[zname1,neighbourname]+=-roombaldf.loc[zname1,'Balance']
-                        roombaldf.loc[neighbourname,zname1]+=roombaldf.loc[zname1,'Balance']
-
-                    else:
-                        roombaldf.loc[zname1,neighbourname]=-roombaldf.loc[zname1,'Balance']
-                        roombaldf.loc[neighbourname,zname1]=roombaldf.loc[zname1,'Balance']
-
-                    if (not pd.isna(roombaldf.loc[neighbourname,zname2]) ):
-                        roombaldf.loc[neighbourname,zname2]+=-roombaldf.loc[zname1,'Balance']
-                        roombaldf.loc[zname2,neighbourname]+=roombaldf.loc[zname1,'Balance']
-
-                    else:
-                        roombaldf.loc[neighbourname,zname2]=-roombaldf.loc[zname1,'Balance']
-                        roombaldf.loc[zname2,neighbourname]=roombaldf.loc[zname1,'Balance']
-                        
-      
-                    # print(roombaldf)
-                    roombaldf['Balance']=roombaldf.drop(['Balance'],axis=1).sum(axis=1)
-                    #roombaldf.loc['WoonKeuken',:]=roombaldf.loc['Woonkamer',:]+roombaldf.loc['OKeuken',:]
-
-                unbaldf=roombaldf[roombaldf['Balance'].abs() >1.0 ]
-                #unbaldf.drop(['Woonkamer','OKeuken'],axis=0,inplace=True)
-            
-                if (len(unbaldf)==0):
-                    allbalanced=True
-                    break
-                
+        if (pd.isna(roombaldf.loc[zonename,otherzonename])):
+            roombaldf.loc[zonename,otherzonename] = -roombaldf.loc[zonename,'Balance']
+            roombaldf.loc[otherzonename,zonename] = roombaldf.loc[zonename,'Balance']
         else:
+            roombaldf.loc[zonename,otherzonename] += -roombaldf.loc[zonename,'Balance']
+            roombaldf.loc[otherzonename,zonename] += roombaldf.loc[zonename,'Balance']
         
-            #print("In else, len unbal",print(unbaldf))
-            
-            if ( ('OKeuken' in unbaldf) and ('WoonKeuken' not in unbaldf) ):
-                for x in ['Woonkamer','OKeuken']:
-                    if (x in unbaldf.index):
-                        unbaldf=unbaldf.drop([x],axis=0)
-                    
-            
-            
-            
-            #print("More than two zones are unbalanced, cannot easily find a solution")
-            # one or more than two
-            if (len(unbaldf)==1):
-                print("Only one unbalanced zone, impossible to perfectly balance natural transfers")
-                break
 
+        unbaldf = updateUnbalance(roombaldf,zones)
+
+
+        if (len(unbaldf)==0):
+            allbalanced=True
+            break
+
+
+    return allbalanced,unbaldf
+
+
+
+def tryBalanceLivingAndOpenKitchen(zones,flowpaths,flowelems,roombaldf,unbaldf):
+
+    
+    allbalanced=False
+    
+    woonNeighbours=contam_functions.getNeighboursNamesWithNT('Woonkamer',zones.df,flowpaths.df,flowelems.df)
+    keukenNeighbours=contam_functions.getNeighboursNamesWithNT('OKeuken',zones.df,flowpaths.df,flowelems.df)
+    
+    neighbourhals=[ x for x in woonNeighbours+keukenNeighbours if zones.df[zones.df['name']==x]['type'].iloc[0]=='hal']  #iloc --> otheriwse return series
+
+    otherzonename=neighbourhals[0]
+
+    roomtobalance='WoonKeuken'
+
+    #par convention on va prendre le sejour is possible, sinon la cuisine
+    if (otherzonename in woonNeighbours):
+        zonename='Woonkamer'
+    else:
+        zonename='OKeuken'
+                
+    roombaldf.loc[zonename,otherzonename]=-roombaldf.loc[roomtobalance,'Balance']
+    roombaldf.loc[otherzonename,zonename]=roombaldf.loc[roomtobalance,'Balance']
+
+    unbaldf = updateUnbalance(roombaldf,zones)
+        
+    
+    if (len(unbaldf)==0):
+        allbalanced=True
+       
+    return allbalanced,unbaldf
+        
+
+
+def tryBalanceTwoLastZones(zones,flowpaths,flowelems,roombaldf,unbaldf):
+    
+    
+    allbalanced=False
+    #print(unbaldf)
+           
+    zname1=unbaldf.index[0]
+    zname2=unbaldf.index[1]
+    
+    commonpaths=contam_functions.getcommonNTpathsByName(zname1,zname2,zones.df,flowpaths.df,flowelems.df)
+
+    if(len(commonpaths)==1):
      
-            if nloops<3:
-                #print("Loop once more to see if it solves by itself")                
-                continue
+        roombaldf.loc[zname1,zname2]=-roombaldf.loc[zname1,'Balance']
+        roombaldf.loc[zname2,zname1]=roombaldf.loc[zname1,'Balance']
 
+        unbaldf = updateUnbalance(roombaldf,zones)
+
+    
+        if (len(unbaldf)==0):
+            allbalanced=True
             
-            else:
-                #print("Try forcing balance")
-                # take the worst, and force it to transfer to an unbalanced neighbour. wz stands for Worst zone
-                
-                wzName=unbaldf['Balance'].abs().idxmax()
-                
-                wzNeighbours=contam_functions.getNeighboursNamesWithNT(wzName,zones.df,flowpaths.df,flowelems.df)
-                wzNeighbours=[ x for x in wzNeighbours if x in unbaldf.index ] #on les garde seulement si pas balancees
+    else:
+        #print("2 unbalanced zones remain, but no direct link between them")
 
-                otherzone=wzNeighbours[0]
-                                  
-                if (not pd.isna(roombaldf.loc[wzName,otherzone]) ):
-                    roombaldf.loc[wzName,otherzone]+=-roombaldf.loc[wzName,'Balance']
-                    roombaldf.loc[otherzone,wzName]+=roombaldf.loc[wzName,'Balance']
+        #we have to find if there is a common neighbour between the unbalanced spaces
+        z1neighbours=contam_functions.getNeighboursNamesWithNT(zname1,zones.df,flowpaths.df,flowelems.df)
+        z2neighbours=contam_functions.getNeighboursNamesWithNT(zname2,zones.df,flowpaths.df,flowelems.df)
 
-                else:
-                    roombaldf.loc[wzName,otherzone]=-roombaldf.loc[wzName,'Balance']
-                    roombaldf.loc[otherzone,wzName]=roombaldf.loc[wzName,'Balance']
-
-                roombaldf['Balance']=roombaldf.drop(['Balance'],axis=1).sum(axis=1)
-                unbaldf=roombaldf[roombaldf['Balance'].abs() >1.0 ]
-                
-                if (len(unbaldf)==0):
-                    allbalanced=True
-                    break
-
-    #when the table is full, apply the flows
-            
-    for i in roombaldf.index:
-        for c in roombaldf.drop(['Supply','Exhaust','Balance'],axis=1).columns:   #dropping balance, because if openkeukeun, balance per room is not 0
+        commonNeighbours= list(set(z1neighbours).intersection(set(z2neighbours))) #commonneighbour id
         
-            if roombaldf.loc[i,c]>0:
+        if (len(commonNeighbours)==1):
+        
+            neighbourname=commonNeighbours[0]
+            #print("Neighbour zone",neighbourname)
+        
+            if (not pd.isna(roombaldf.loc[zname1,neighbourname]) ):
+                roombaldf.loc[zname1,neighbourname]+=-roombaldf.loc[zname1,'Balance']
+                roombaldf.loc[neighbourname,zname1]+=roombaldf.loc[zname1,'Balance']
+
+            else:
+                roombaldf.loc[zname1,neighbourname]=-roombaldf.loc[zname1,'Balance']
+                roombaldf.loc[neighbourname,zname1]=roombaldf.loc[zname1,'Balance']
+
+            if (not pd.isna(roombaldf.loc[neighbourname,zname2]) ):
+                roombaldf.loc[neighbourname,zname2]+=-roombaldf.loc[zname1,'Balance']
+                roombaldf.loc[zname2,neighbourname]+=roombaldf.loc[zname1,'Balance']
+
+            else:
+                roombaldf.loc[neighbourname,zname2]=-roombaldf.loc[zname1,'Balance']
+                roombaldf.loc[zname2,neighbourname]=roombaldf.loc[zname1,'Balance']
+                
+  
+            # print(roombaldf)
+            roombaldf['Balance']=roombaldf.drop(['Balance'],axis=1).sum(axis=1)
+            #roombaldf.loc['WoonKeuken',:]=roombaldf.loc['Woonkamer',:]+roombaldf.loc['OKeuken',:]
+
+        unbaldf = updateUnbalance(roombaldf,zones)
+        #unbaldf.drop(['Woonkamer','OKeuken'],axis=0,inplace=True)
+    
+        if (len(unbaldf)==0):
+            allbalanced=True
             
-                NTdict={'From room':i,
-                        'To room':c,
-                        'Capacity':roombaldf.loc[i,c],
-                        'Design pressure':2
-                        }   
-                jsondict['Natural transfer'].append(NTdict)
-      
-            
-    return jsondict
+
+    return allbalanced,unbaldf
+
+
+
+def updateUnbalance(roombaldf,zones):
+   
+    
+    if('OKeuken' in list(zones.df['name'])):
+        roombaldf.loc['WoonKeuken'] = roombaldf.loc[['Woonkamer','OKeuken']].sum()
+        
+    roombaldf['Balance'] = roombaldf.drop(['Balance'],axis=1).sum(axis=1)
+
+    unbaldf=roombaldf[roombaldf['Balance'].abs() >1.0 ]
+ 
+    if('WoonKeuken' not in list(unbaldf.index)):
+
+        if ('OKeuken' in list(unbaldf.index)):
+            unbaldf.drop(['Woonkamer','OKeuken'],axis=0,inplace=True)
+
+
+    return unbaldf
+
+
+
+
+
+
+
+
+
+
+
+

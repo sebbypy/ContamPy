@@ -11,7 +11,7 @@ def apply(contam_data):
 
 
     if (flowelems.df['name'].isin(['IL']).max() == False):
-        flowelems.addflowelem('IL',{})
+        flowelems.addflowelem('IL',{'dp':2,'flowRate':25,'exponent':0.5})
 
     defaultelemID=flowelems.df[flowelems.df['name']=='DefaultPath'].index[0]         
 
