@@ -27,12 +27,15 @@ class caseConfigurator:
        
         self.defaultParameters={'building':'COVL-REN-HO1',
                                 'buildingDimensionsVariation':{
-                                    'volumeRatio': 0.8,
+                                    'volumeRatio': 1.0,
                                     'mode': 'uniform'
                                     },
                                 'orientation':0,
                                 'v50':3,
-                                'system':'DPREVENT',
+                                'system':{
+                                        'definition':'namedSystem',
+                                        'name':'DPREVENT'
+                                        },
                                 'control':'constant',
                                 'occupancy':'default-home',
                                 'weather':'Uccle',
@@ -46,7 +49,7 @@ class caseConfigurator:
                                 'StartDate':'Mar01',
                                 'EndDate':'Mar03',
                                 'outputTimeStep':'00:05:00',
-                                'outputFiles':['log','ach'],
+                                'outputFiles':['simflow','simconc','log','ach'],
                                 'openDoors':False,
                                 'internalLeaks':False,
                                 'openStairs':False
@@ -72,7 +75,8 @@ class caseConfigurator:
 
         self.setNumericalParameters()
 
-        systemJSON = self.computeSystem()               
+        systemJSON = self.getSystemJson()
+        #systemJSON = self.computeSystem()               
         self.setSystem(systemJSON)
 
         self.setLeaks()
@@ -157,15 +161,19 @@ class caseConfigurator:
 
     def setSystemFromJSON(self,systemJSONFile):
         
+          
         with open(systemJSONFile, 'r') as inputFile:
+            systemJSON = json.load(inputFile)
         
-            self.setSystem(systemJSON)       
-            self.setControls(systemJSON)
-            self.setFilters(systemJSON)
+        self.setSystem(systemJSON)       
+        self.setControls(systemJSON)
+        self.setFilters(systemJSON)
+        
 
 
     def setBuildingParameters(self):
 
+        
         self.getBuildingModel()
         self.setAirtightnessOrientation()
         self.setWeather()
@@ -256,12 +264,34 @@ class caseConfigurator:
         
         
 
+    def getSystemJson(self):
 
-    def computeSystem(self):
+        systemdefinition = self.actualParameters['system']['definition']
         
-        system=self.actualParameters['system']
+        if systemdefinition == 'namedSystem':
+         
+            systemName = self.actualParameters['system']['name']
+            systemJSON = self.computeSystem(systemName)
+        
+        
+        elif systemdefinition =='file':
 
-        systemComputeFunction,systemArgs = existingSystems().functionAndArguments(system)
+            systemJSONFile = self.actualParameters['system']['file']
+            with open(systemJSONFile, 'r') as inputFile:
+                systemJSON = json.load(inputFile)
+            
+        else:
+            print("Error in getSystem")
+            
+            
+        return systemJSON
+        
+
+    def computeSystem(self,systemName):
+        
+        #system=self.actualParameters['system']
+
+        systemComputeFunction,systemArgs = existingSystems().functionAndArguments(systemName)
 
         allArguments = [self.ContamModel] + systemArgs
 
@@ -314,13 +344,15 @@ class caseConfigurator:
         
         #//allArguments = [systemJson] + extraArguments
         
-        if (self.actualParameters['system'][0] == 'D' and controlStrategy == 'fulllocal'):
-            #allArguments.append('balanced')
-            kwargs['balance']=True
-
-        if (self.actualParameters['system'] == 'CPREVENT' and controlStrategy in ['fulllocalRTOsBal','fulllocalBal']):
-            #allArguments.append('balanced')
-            kwargs['balance']=True
+        if self.actualParameters['system']['definition']=='namedSystem':
+        
+            if (self.actualParameters['system']['name'][0] == 'D' and controlStrategy == 'fulllocal'):
+                #allArguments.append('balanced')
+                kwargs['balance']=True
+    
+            if (self.actualParameters['system']['name'] == 'CPREVENT' and controlStrategy in ['fulllocalRTOsBal','fulllocalBal']):
+                #allArguments.append('balanced')
+                kwargs['balance']=True
 
 
         controlJson = computeFunction(**kwargs)
