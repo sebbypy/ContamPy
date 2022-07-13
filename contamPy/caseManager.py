@@ -493,8 +493,7 @@ class caseConfigurator:
 class contamRunner:
     
         def __init__(self,contamExeDir):
-            
-            self.contamExe = os.path.join(contamExeDir,'contamx3.exe')
+            self.contamExe = os.path.join(contamExeDir,'contamx34.exe')
     
         def runContam(self,prjFile):
 

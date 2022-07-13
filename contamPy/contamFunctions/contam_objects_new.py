@@ -217,7 +217,7 @@ class initialZonesConcentrations():
 class ahs:
 
     def __init__(self):
-        self.headers=['#','zr#','zs#','pr#','ps#','px#','name']
+        self.headers=['#','zr#','zs#','pr#','ps#','px#','color','name']
         self.df=pd.DataFrame(columns=self.headers)
         
     def read(self,filereader,currentline):
@@ -749,7 +749,7 @@ class sources:
     #2   5   9   0   0     1     0  0 0 0  0 0 0  0 0 0
      
     def __init__(self):
-        self.headers=['#','z','e','s','c','mult','CC0','xmin','ymin','hmin','xmax','ymax','hmax','u','cdvf','cfd']
+        self.headers=['#','z','e','s','c','mult','CC0','xmin','ymin','hmin','xmax','ymax','hmax','color','u','cdvf','cfd']
         self.df=pd.DataFrame(columns=self.headers)
         self.comment='source/sinks:\n'
         
@@ -1972,12 +1972,15 @@ class exposures:
 
     # The exposure section starts with:
     # _npexp // number of exposures (IX)
+    
     # This is followed by three lines of data for all _npexp exposures.
     # For each exposure the first data line includes:
     # nr // exposure number (IX); in order from 1 to _npexp
     # gen // = 1 if contaminants are generated (I2)
     # ncg // number of contaminant generations (I2)
     # cgmlt // contaminant generation multiplier [-] (R4)
+    # color // icon color (I2) {W} {CONTAM 3.3} NEW
+    
     # The second line has the exposure description:
     # desc[] // exposure/person description (I1)
     # The third line has the indices of 12 occupancy schedules:
@@ -2017,6 +2020,7 @@ class exposures:
             gencontaminants=fields[1]
             ncontaminants=int(fields[2])
             multiplier=fields[3]
+            color = fields[4]
             
             description=filereader.readline()
 
@@ -2027,6 +2031,8 @@ class exposures:
             sdict['gencontaminants']=gencontaminants
             sdict['ncontaminants']=ncontaminants
             sdict['multiplier']=multiplier
+            sdict['color']=color
+            
             sdict['description']=description
             sdict['CTMemission']=[]
 
@@ -2052,7 +2058,7 @@ class exposures:
 
         for k,v in self.exposures.items():
 
-            g.write(str(k)+' '+str(v['gencontaminants'])+' '+str(v['ncontaminants'])+' '+str(v['multiplier'])+'\n')
+            g.write(str(k)+' '+str(v['gencontaminants'])+' '+str(v['ncontaminants'])+' '+str(v['multiplier'])+' '+str(v['color'])+'\n')
 
             g.write(v['description'])
             if ('\n' not in v['description']):
@@ -2066,7 +2072,7 @@ class exposures:
                 g.write(item['name']+' '+str(item['schedule'])+' '+str(item['rate'])+' '+str(item['unit'])+' '+str(item['value_file'])+' ! occ. gen\n')
             
         
-    def addExposure(self,description,occupancy_week_schedule,ctmdictlist):
+    def addExposure(self,description,occupancy_week_schedule,ctmdictlist,color='-1'):
     
         newid=self.nexposures+1
         sdict={}
@@ -2077,6 +2083,7 @@ class exposures:
         sdict['ncontaminants']=len(ctmdictlist)
         sdict['multiplier']='1'
         sdict['description']=description
+        sdict['color']=color
 
           
         sdict['CTMemission']=ctmdictlist # {name:  ; schedule:  ,'rate':  ,'unit':  , value_file = 0 }
@@ -2138,6 +2145,7 @@ class flowpaths:
     # Xmin // flow or pressure limit - minimum (R4) {W}
     # icon // icon used to represent flow path (U1) {W}
     # dir // positive flow direction on sketchpad (U1) {W}
+    # color // NEW FROM 3.3
     # u_Ht // units of height (I2) {W}
     # u_XY // units of X and Y (I2) {W}
     # u_dP // units of pressure difference (I2) {W}
@@ -2154,7 +2162,7 @@ class flowpaths:
     def __init__(self):
         
         self.headers=['nr','flags','pzn','pzm','pe','pf','pw','pa','ps','pc','pld','X','Y','relHt',
-        'mult','wPset','wPmod','wazm','Fahs','Xmax','Xmin','icon','dir','u_Ht','u_XY','u_dP','u_F',
+        'mult','wPset','wPmod','wazm','Fahs','Xmax','Xmin','icon','dir','color','u_Ht','u_XY','u_dP','u_F',
         'vf_type','vf_node_name','cfd','name','cfd_ptype','cfd_btype','cfd_capp'] 
 
         self.df=pd.DataFrame(columns=self.headers)
