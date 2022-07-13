@@ -1,6 +1,9 @@
 import sys
-sys.path.append('/home/spec/Documents/Projects/RESEARCH/COMISVENT/2.Work/Python')
-sys.path.append('../contamPy/contamFunctions/')
+
+#sys.path.append('/home/spec/Documents/Projects/RESEARCH/COMISVENT/2.Work/Python')
+#sys.path.append('../contamPy/contamFunctions/')
+sys.path.append('../contamPy/contamFunctions')
+
 
 import contam_functions
 import pandas as pd
@@ -11,20 +14,8 @@ import numpy as np
 
 import argparse
 
+import os
 
-
-parser = argparse.ArgumentParser(description='Draw a building and its ventilation system from CONTAM prj file')
-parser.add_argument('contamPRJ',help='CONTAM prj file to draw')  
-parser.add_argument('-outputFormat', default='png',choices=['png','pdf','svg'], help='Output file format for drawing (default:png)')
-parser.add_argument('-drawCracks',  action='store_true', help='Draw cracks')
-parser.add_argument('-drawTransfers',  action='store_true', help='Draw natural transfer between rooms')
-parser.add_argument('-NoFlows', action='store_true', help='Do not write flow rates/capacity next to devices (drawed by default)')
-
-
-args=parser.parse_args()
-
-contamfile=args.contamPRJ
-outputformat=args.outputFormat
 
 
 
@@ -323,318 +314,407 @@ def drawcrack(ctx,x,y,rotation,color):
     ctx.translate(-x,-y)
 
 
-# ----------------------------------
-# Load CONTAM FILE and various parts
-# ----------------------------------
 
-# legacy levels and icons reader, but allows to get polygons of the rooms (not included in the current reader)
-legacyleveldf,levelicons=contam_functions.geticons(contamfile)
-
-
-# current readers
-contam_data=contam_functions.loadcontamfile(contamfile)
-levels=contam_data['levels']
-zones=contam_data['zones']
-flowpaths=contam_data['flowpaths']
-flowelems=contam_data['flowelems']
-contaminants=contam_data['contaminants']
-ahs=contam_data['ahs']
-controls=contam_data['controls']
-
-AHSreturn=ahs.df.loc[1,'zr#']
-AHSsupply=ahs.df.loc[1,'zs#']
-
-
-
-#---------------------------------
-#Check dimensions of the building
-#---------------------------------
-
-bounds={'minx':100,
-        'maxx':0,
-        'miny':100,
-        'maxy':0
-        }
-
-
-
-
-for level in levels.df.index:
-
-    rooms=legacyleveldf.polygons[level]
+def mergeFloorsPDF(pdfFiles,resultingPDF):
     
     
-    for room in rooms:
-
-        print(room)
-
+    from PyPDF2 import PdfFileMerger,PdfFileReader
     
-        if (room['type']=='room'):
+    merger = PdfFileMerger()
 
-            for i in range(len(room['xy'])):
+    for pdf in pdfFiles:
+        f=open(pdf,'rb')
+        merger.append(PdfFileReader(f, 'rb'))
+        f.close()        
 
-                y,x=room['xy'][i]   # invert x and y because they are inverted in the reader...
-                
-                bounds['maxx']=np.max([bounds['maxx'],x])
-                bounds['maxy']=np.max([bounds['maxy'],y])
-                bounds['minx']=np.min([bounds['minx'],x])
-                bounds['miny']=np.min([bounds['miny'],y])
-  
-bounds['dx']=bounds['maxx']-bounds['minx']
-bounds['dy']=bounds['maxy']-bounds['miny']
-
-#print(bounds)
+    merger.write(resultingPDF)
+    merger.close()
 
 
+    for pdf in pdfFiles:
+        os.remove(pdf)
 
 
-#----------------
-# Loop on levels
-#----------------
+def drawsystem(contamPRJ,outputFormat='png',drawCracks=False,drawTransfers=False,NoFlows=False,mergePDF=False):
 
-for level in levels.df.index:
-
-    rooms=legacyleveldf.polygons[level]
-    #allicons=levelicons[level]
-
-    if (len(rooms)==0):
-        print("No rooms on this level ("+str(level)+"), skipping")
-        continue    
-
-    #-----------------------
-    # Start drawing
-    #-----------------------
-
-
-    WIDTH, HEIGHT = bounds['dx']+20, bounds['dy']+20
-
+    from argparse import Namespace
     
-    if ('png' in outputformat):
-        scale=30
-        ps = cairo.ImageSurface(cairo.FORMAT_ARGB32, WIDTH*scale, HEIGHT*scale)
-    elif (outputformat=='pdf'):
-        ps = cairo.PDFSurface(contamfile.replace('.prj','-'+str(level)+'.pdf'), WIDTH,HEIGHT)
-    elif (outputformat=='svg'):
-        ps = cairo.SVGSurface(contamfile.replace('.prj','-'+str(level)+'.svg'), WIDTH,HEIGHT)
-    else:
-        print("Unknown file format")
-
-
-    ctx = cairo.Context(ps)
+    mydict = {'contamPRJ':contamPRJ,
+              'outputFormat':outputFormat,
+              'drawCracks':drawCracks,
+              'drawTransfers':drawTransfers,
+              'NoFlows':NoFlows,
+              'mergePDF':mergePDF}
     
-    if ('png' in outputformat):
-        ctx.scale(scale,scale)
     
-    ctx.translate(-bounds['minx']+10,-bounds['miny']+10)
-
-    #ctx.scale(WIDTH, HEIGHT)  # Normalizing the canvas
-
-
-    redfill = cairo.SolidPattern(1.0,0.0,0.0,1.0)
-    greenfill = cairo.SolidPattern(0.0,1.0,0.0,1.0)
-    bluefill = cairo.SolidPattern(0.0,0.0,1.0,1.0)
-    whitefill = cairo.SolidPattern(0.0,0.0,0.0,1.0)
-
-
-    #-------------
-    #Drawing rooms
-    #-------------
-
-    for room in rooms:
+    ns = Namespace(**mydict)
     
-        roombbox={'minx':100,
-                  'maxx':0,
-                  'miny':100,
-                  'maxy':0,}
+    main(ns)
+
+
+def main(args):
+
+    contamfile=args.contamPRJ
+    outputformat=args.outputFormat
     
-        if (room['type']=='room'):
 
-            for i in range(len(room['xy'])):
-
+    # ----------------------------------
+    # Load CONTAM FILE and various parts
+    # ----------------------------------
+    
+    # legacy levels and icons reader, but allows to get polygons of the rooms (not included in the current reader)
+    legacyleveldf,levelicons=contam_functions.geticons(contamfile)
+    
+    
+    # current readers
+    contam_data=contam_functions.loadcontamfile(contamfile)
+    levels=contam_data['levels']
+    zones=contam_data['zones']
+    flowpaths=contam_data['flowpaths']
+    flowelems=contam_data['flowelems']
+    ahs=contam_data['ahs']
+    controls=contam_data['controls']
+    
+    AHSreturn=ahs.df.loc[1,'zr#']
+    AHSsupply=ahs.df.loc[1,'zs#']
+    
+    
+    
+    #---------------------------------
+    #Check dimensions of the building
+    #---------------------------------
+    
+    bounds={'minx':100,
+            'maxx':0,
+            'miny':100,
+            'maxy':0
+            }
+    
+    
+    
+    
+    for level in levels.df.index:
+    
+        rooms=legacyleveldf.polygons[level]
+        
+        
+        for room in rooms:
+    
+        
+            if (room['type']=='room'):
+    
+                for i in range(len(room['xy'])):
+    
+                    y,x=room['xy'][i]   # invert x and y because they are inverted in the reader...
+                    
+                    bounds['maxx']=np.max([bounds['maxx'],x])
+                    bounds['maxy']=np.max([bounds['maxy'],y])
+                    bounds['minx']=np.min([bounds['minx'],x])
+                    bounds['miny']=np.min([bounds['miny'],y])
+      
+    bounds['dx']=bounds['maxx']-bounds['minx']
+    bounds['dy']=bounds['maxy']-bounds['miny']
+    
+    #print(bounds)
+    
+    pdfsToMerge=[]
+    
+    
+    #----------------
+    # Loop on levels
+    #----------------
+    
+    for level in levels.df.index:
+    
+        rooms=legacyleveldf.polygons[level]
+        #allicons=levelicons[level]
+    
+        if (len(rooms)==0):
+            #print("No rooms on this level ("+str(level)+"), skipping")
+            continue    
+    
+        #-----------------------
+        # Start drawing
+        #-----------------------
+    
+    
+        WIDTH, HEIGHT = bounds['dx']+20, bounds['dy']+20
+    
+        
+        if ('png' in outputformat):
+            scale=30
+            ps = cairo.ImageSurface(cairo.FORMAT_ARGB32, WIDTH*scale, HEIGHT*scale)
+        elif (outputformat=='pdf'):
             
-                y,x=room['xy'][i]   # invert x and y because they are inverted in the reader...
+            pdfName = contamfile.replace('.prj','-'+str(level)+'.pdf')
+            pdfFile = open(pdfName,'wb')
+            
+            pdfsToMerge.append(pdfName)           
+            ps = cairo.PDFSurface(pdfFile, WIDTH,HEIGHT)
+            
+        elif (outputformat=='svg'):
+            ps = cairo.SVGSurface(contamfile.replace('.prj','-'+str(level)+'.svg'), WIDTH,HEIGHT)
+        else:
+            print("Unknown file format")
+    
+    
+        ctx = cairo.Context(ps)
+        
+        if ('png' in outputformat):
+            ctx.scale(scale,scale)
+        
+        ctx.translate(-bounds['minx']+10,-bounds['miny']+10)
+    
+        #ctx.scale(WIDTH, HEIGHT)  # Normalizing the canvas
+    
+    
+        redfill = cairo.SolidPattern(1.0,0.0,0.0,1.0)
+        greenfill = cairo.SolidPattern(0.0,1.0,0.0,1.0)
+        bluefill = cairo.SolidPattern(0.0,0.0,1.0,1.0)
+        whitefill = cairo.SolidPattern(0.0,0.0,0.0,1.0)
+    
+    
+        #-------------
+        #Drawing rooms
+        #-------------
+    
+        for room in rooms:
+        
+            roombbox={'minx':100,
+                      'maxx':0,
+                      'miny':100,
+                      'maxy':0,
+                      'meanx':0,
+                      'meany':0}
+      
+        
+        
+            if (room['type']=='room'):
+    
+                for i in range(len(room['xy'])):
+    
                 
-                roombbox['maxx']=np.max([roombbox['maxx'],x])
-                roombbox['maxy']=np.max([roombbox['maxy'],y])
-                roombbox['minx']=np.min([roombbox['minx'],x])
-                roombbox['miny']=np.min([roombbox['miny'],y])
-  
-                
-                if i==0:
-                    ctx.move_to(x,y)
+                    y,x=room['xy'][i]   # invert x and y because they are inverted in the reader...
+                    
+                    roombbox['maxx']=np.max([roombbox['maxx'],x])
+                    roombbox['maxy']=np.max([roombbox['maxy'],y])
+                    roombbox['minx']=np.min([roombbox['minx'],x])
+                    roombbox['miny']=np.min([roombbox['miny'],y])
+      
+                    roombbox['meanx'] += x
+                    roombbox['meany'] += y
+      
+                    
+                    if i==0:
+                        ctx.move_to(x,y)
+    
+                    else:
+                        ctx.line_to(x,y)
 
+
+                roombbox['meanx'] /= len(room['xy'])
+                roombbox['meany'] /= len(room['xy'])
+                
+    
+                ctx.close_path()
+                
+                
+                ctx.set_source_rgb(0, 0, 0) # black
+                ctx.set_line_width(0.2)
+                ctx.stroke()
+    
+                ctx.select_font_face("Arial",
+                             cairo.FONT_SLANT_NORMAL,
+                             cairo.FONT_WEIGHT_NORMAL)
+                ctx.set_font_size(1)
+    
+    
+                roomname=zones.df.loc[room['roomid'],'name']
+             
+                xbearing, ybearing, width, height, dx, dy = ctx.text_extents(roomname)
+                ctx.move_to((roombbox['minx']+roombbox['maxx']-width)/2,(roombbox['miny']+roombbox['maxy']-height)/2)
+                ctx.show_text(roomname)
+    
+                #ctx.move_to( roombbox['meanx']- width/2, roombbox['meany']-height/2)
+                # does not work well since thare are intermediate nodes
+    
+                # see https://en.wikipedia.org/wiki/Centroid for closed polygon to make improvement
+    
+    
+        #-----------------------------------
+        # Drawing Natural devices
+        #-----------------------------------
+    
+        #for icon in allicons[allicons['icn']=='23'].index:
+        for flowpathid in flowpaths.df[flowpaths.df['icon']==23].index:
+        
+            if (flowpaths.df.loc[flowpathid,'pld'] != level and not (flowpaths.df.loc[flowpathid,'pld']==level+1 and (flowpaths.df.loc[flowpathid,'dir']==6)) ):
+            
+                continue
+            #flowpathid=allicons.loc[icon,'elemid']
+            
+            junctionlevel=flowpaths.df.loc[flowpathid,'pld']  #for junctions that are defined from the top !
+            
+            allicons=levelicons[junctionlevel] #all incons of this level
+            icon=allicons[allicons['elemid']==str(flowpathid)].index[0]
+            
+            flowelemid=flowpaths.df.loc[int(flowpathid),'pe']
+            
+            flowelemname=flowelems.df.loc[flowelemid,'name']
+            
+            azm=flowpaths.df.loc[int(flowpathid),'wazm']
+            
+            flow=str(int(round(float(flowpaths.df.loc[int(flowpathid),'mult']),0)))
+    
+    
+            #determining rotation
+    
+            rotationdict={1:180,2:270,4:0,5:90,3:90,6:90}
+    
+            sketchdirection=flowpaths.df.loc[int(flowpathid),'dir']
+        
+            rotation=rotationdict[sketchdirection]
+            
+            #sketchdirs={1:'S',2:'W',4:'N',5:'E'}
+            #     if(flowpaths.df.loc[int(flowpathid),'dir'] in [2,5]):
+            #        rotation=90
+    
+    
+      
+             
+            if ('NSV_' in flowelemname):
+                
+                drawarrow(ctx,int(allicons.loc[icon,'col']),int(allicons.loc[icon,'row']),rotation,'green',flow,not args.NoFlows)
+                
+            if ('NT_' in flowelemname and args.drawTransfers):
+            
+                if(flowpaths.df.loc[int(flowpathid),'dir'] in [2,5]):
+                    rotation=90
+                    drawtransfer(ctx,int(allicons.loc[icon,'col']),int(allicons.loc[icon,'row']),rotation)
+    
+                elif(flowpaths.df.loc[int(flowpathid),'dir'] in [1,4]):
+                    rotation=0
+                    drawtransfer(ctx,int(allicons.loc[icon,'col']),int(allicons.loc[icon,'row']),rotation)
+    
+                elif(flowpaths.df.loc[int(flowpathid),'dir'] in [3,6]):
+                    drawcornerarrow(ctx,int(allicons.loc[icon,'col']),int(allicons.loc[icon,'row']),90)
+    
+    
+    
+            if ('crack' in flowelemname and args.drawCracks):
+            
+                if(flowpaths.df.loc[int(flowpathid),'dir'] in [1,2,4,5]):
+                    color='red'
+    
+                if(flowpaths.df.loc[int(flowpathid),'dir'] in [3]):
+                    color='purple'
+    
+                if(flowpaths.df.loc[int(flowpathid),'dir'] in [6]):
+                    color='blue'
+    
+                drawcrack(ctx,int(allicons.loc[icon,'col']),int(allicons.loc[icon,'row']),int(azm),color)
+    
+    
+        #-------------------------------
+        # Drawing mechanical devices
+        #-------------------------------
+    
+    
+    
+        allicons=levelicons[level]
+        #Option 1: place on the location of the return/supply object
+    
+        for fpid in flowpaths.df.index:
+    
+            if ( flowpaths.df.loc[fpid,'pld']==level and flowpaths.df.loc[fpid,'icon'] in [128,129] and float(flowpaths.df.loc[fpid,'Fahs'])>0  ):
+    
+                
+                iconindex=allicons[allicons['elemid']==str(fpid)].index[0]
+                
+                fromto=list(flowpaths.df.loc[fpid,['pzm','pzn']])
+                
+                flow=str(int(round(float(flowpaths.df.loc[fpid,'Fahs'])/1.2041*3600,0)))
+    
+                if (AHSreturn in fromto):
+                    fromto.remove(AHSreturn)
+                    color='red'
+                if (AHSsupply in fromto):
+                    fromto.remove(AHSsupply)
+                    color='green'
+           
+    
+                #print(flowpaths.df.loc[fpid,:])
+                drawarrow(ctx,int(allicons.loc[iconindex,'col']),int(allicons.loc[iconindex,'row']),180,color,flow, not args.NoFlows)       
+                drawfan(ctx,int(allicons.loc[iconindex,'col']),int(allicons.loc[iconindex,'row']),3,2.5)
+    
+    
+    
+        #Option 2: look for an unused natural opening in the same space, and using it as locator
+        # !if there is one!! --> otherwise, just use locator
+    
+        """for fpid in flowpaths.df.index:
+    
+            if ( flowpaths.df.loc[fpid,'pld']==level and flowpaths.df.loc[fpid,'icon'] in [128,129] and float(flowpaths.df.loc[fpid,'Fahs'])>0  ):
+    
+                fromto=list(flowpaths.df.loc[fpid,['pzm','pzn']])
+    
+                if (AHSreturn in fromto):
+                    fromto.remove(AHSreturn)
+                    color='red'
+                if (AHSsupply in fromto):
+                    fromto.remove(AHSsupply)
+                    color='green'
+                
+                zonesextfp=flowpaths.df[ (flowpaths.df['pzm']==fromto[0]) & (flowpaths.df['pzn']==-1) ]
+    
+                #on choisit un qui a un multiplicateur 0, comme ca on est sur qu'il ne sert a rien
+    
+                if(len(zonesextfp[ (zonesextfp['mult']=='0.0') ].index)>0):
+                    fakefpid=zonesextfp[ (zonesextfp['mult']=='0.0') ].index[0]
                 else:
-                    ctx.line_to(x,y)
-
-            ctx.close_path()
-            
-            
-            ctx.set_source_rgb(0, 0, 0) # black
-            ctx.set_line_width(0.2)
-            ctx.stroke()
-
-            ctx.select_font_face("Arial",
-                         cairo.FONT_SLANT_NORMAL,
-                         cairo.FONT_WEIGHT_NORMAL)
-            ctx.set_font_size(1)
-
-
-            roomname=zones.df.loc[room['roomid'],'name']
-
-            xbearing, ybearing, width, height, dx, dy = ctx.text_extents(roomname)
-            ctx.move_to((roombbox['minx']+roombbox['maxx']-width)/2,(roombbox['miny']+roombbox['maxy']-height)/2)
-
-            ctx.show_text(roomname)
-
-
-
-    #-----------------------------------
-    # Drawing Natural devices
-    #-----------------------------------
-
-    #for icon in allicons[allicons['icn']=='23'].index:
-    for flowpathid in flowpaths.df[flowpaths.df['icon']==23].index:
+                    fakefpid=fpid
+                
+                
+                iconindex=allicons[allicons['elemid']==str(fakefpid)].index[0]
+                drawarrow(ctx,int(allicons.loc[iconindex,'col']),int(allicons.loc[iconindex,'row']),180,color)       
+                drawfan(ctx,int(allicons.loc[iconindex,'col']),int(allicons.loc[iconindex,'row']),3,2.5)
+        """
+                
+           
     
-        if (flowpaths.df.loc[flowpathid,'pld'] != level and not (flowpaths.df.loc[flowpathid,'pld']==level+1 and (flowpaths.df.loc[flowpathid,'dir']==6)) ):
-        
-            continue
-        #flowpathid=allicons.loc[icon,'elemid']
-        
-        junctionlevel=flowpaths.df.loc[flowpathid,'pld']  #for junctions that are defined from the top !
-        
-        allicons=levelicons[junctionlevel] #all incons of this level
-        icon=allicons[allicons['elemid']==str(flowpathid)].index[0]
-        
-        flowelemid=flowpaths.df.loc[int(flowpathid),'pe']
-        
-        flowelemname=flowelems.df.loc[flowelemid,'name']
-        
-        azm=flowpaths.df.loc[int(flowpathid),'wazm']
-        
-        flow=str(int(round(float(flowpaths.df.loc[int(flowpathid),'mult']),0)))
+        if ('png' in outputformat):
+            ps.write_to_png(contamfile.replace('.prj','-'+str(level)+'.png'))
+
+        elif('pdf' in outputformat):
+            ps.finish()
+            pdfFile.close()
 
 
-        #determining rotation
+    if args.mergePDF:
+        
+        
+        finalPDF = contamfile.replace('.prj','.pdf')
+        
+        mergeFloorsPDF(pdfsToMerge, finalPDF)
+        
 
-        rotationdict={1:180,2:270,4:0,5:90,3:90,6:90}
 
-        sketchdirection=flowpaths.df.loc[int(flowpathid),'dir']
+if __name__ == '__main__':
+
+    parser = argparse.ArgumentParser(description='Draw a building and its ventilation system from CONTAM prj file')
+    parser.add_argument('contamPRJ',help='CONTAM prj file to draw')  
+    parser.add_argument('-outputFormat', default='png',choices=['png','pdf','svg'], help='Output file format for drawing (default:png)')
+    parser.add_argument('-drawCracks',  action='store_true', help='Draw cracks')
+    parser.add_argument('-drawTransfers',  action='store_true', help='Draw natural transfer between rooms')
+    parser.add_argument('-NoFlows', action='store_true', help='Do not write flow rates/capacity next to devices (drawed by default)')
+    parser.add_argument('-mergePDF', action='store_true', help='Merge PDF in a single file for all floors (only with PDF output)')
     
-        rotation=rotationdict[sketchdirection]
-        
-        #sketchdirs={1:'S',2:'W',4:'N',5:'E'}
-        #     if(flowpaths.df.loc[int(flowpathid),'dir'] in [2,5]):
-        #        rotation=90
+    
+    args=parser.parse_args()
+    
 
-
-  
-         
-        if ('NSV_' in flowelemname):
-            
-            drawarrow(ctx,int(allicons.loc[icon,'col']),int(allicons.loc[icon,'row']),rotation,'green',flow,not args.NoFlows)
-            
-        if ('NT_' in flowelemname and args.drawTransfers):
-        
-            if(flowpaths.df.loc[int(flowpathid),'dir'] in [2,5]):
-                rotation=90
-                drawtransfer(ctx,int(allicons.loc[icon,'col']),int(allicons.loc[icon,'row']),rotation)
-
-            elif(flowpaths.df.loc[int(flowpathid),'dir'] in [1,4]):
-                rotation=0
-                drawtransfer(ctx,int(allicons.loc[icon,'col']),int(allicons.loc[icon,'row']),rotation)
-
-            elif(flowpaths.df.loc[int(flowpathid),'dir'] in [3,6]):
-                drawcornerarrow(ctx,int(allicons.loc[icon,'col']),int(allicons.loc[icon,'row']),90)
-
-
-
-        if ('crack' in flowelemname and args.drawCracks):
-        
-            if(flowpaths.df.loc[int(flowpathid),'dir'] in [1,2,4,5]):
-                color='red'
-
-            if(flowpaths.df.loc[int(flowpathid),'dir'] in [3]):
-                color='purple'
-
-            if(flowpaths.df.loc[int(flowpathid),'dir'] in [6]):
-                color='blue'
-
-            drawcrack(ctx,int(allicons.loc[icon,'col']),int(allicons.loc[icon,'row']),int(azm),color)
-
-
-    #-------------------------------
-    # Drawing mechanical devices
-    #-------------------------------
-
-
-
-    allicons=levelicons[level]
-    #Option 1: place on the location of the return/supply object
-
-    for fpid in flowpaths.df.index:
-
-        if ( flowpaths.df.loc[fpid,'pld']==level and flowpaths.df.loc[fpid,'icon'] in [128,129] and float(flowpaths.df.loc[fpid,'Fahs'])>0  ):
-
-            
-            iconindex=allicons[allicons['elemid']==str(fpid)].index[0]
-            
-            fromto=list(flowpaths.df.loc[fpid,['pzm','pzn']])
-            
-            flow=str(int(round(float(flowpaths.df.loc[fpid,'Fahs'])/1.2041*3600,0)))
-
-            if (AHSreturn in fromto):
-                fromto.remove(AHSreturn)
-                color='red'
-            if (AHSsupply in fromto):
-                fromto.remove(AHSsupply)
-                color='green'
-       
-
-            #print(flowpaths.df.loc[fpid,:])
-            drawarrow(ctx,int(allicons.loc[iconindex,'col']),int(allicons.loc[iconindex,'row']),180,color,flow, not args.NoFlows)       
-            drawfan(ctx,int(allicons.loc[iconindex,'col']),int(allicons.loc[iconindex,'row']),3,2.5)
-
-
-
-    #Option 2: look for an unused natural opening in the same space, and using it as locator
-    # !if there is one!! --> otherwise, just use locator
-
-    """for fpid in flowpaths.df.index:
-
-        if ( flowpaths.df.loc[fpid,'pld']==level and flowpaths.df.loc[fpid,'icon'] in [128,129] and float(flowpaths.df.loc[fpid,'Fahs'])>0  ):
-
-            fromto=list(flowpaths.df.loc[fpid,['pzm','pzn']])
-
-            if (AHSreturn in fromto):
-                fromto.remove(AHSreturn)
-                color='red'
-            if (AHSsupply in fromto):
-                fromto.remove(AHSsupply)
-                color='green'
-            
-            zonesextfp=flowpaths.df[ (flowpaths.df['pzm']==fromto[0]) & (flowpaths.df['pzn']==-1) ]
-
-            #on choisit un qui a un multiplicateur 0, comme ca on est sur qu'il ne sert a rien
-
-            if(len(zonesextfp[ (zonesextfp['mult']=='0.0') ].index)>0):
-                fakefpid=zonesextfp[ (zonesextfp['mult']=='0.0') ].index[0]
-            else:
-                fakefpid=fpid
-            
-            
-            iconindex=allicons[allicons['elemid']==str(fakefpid)].index[0]
-            drawarrow(ctx,int(allicons.loc[iconindex,'col']),int(allicons.loc[iconindex,'row']),180,color)       
-            drawfan(ctx,int(allicons.loc[iconindex,'col']),int(allicons.loc[iconindex,'row']),3,2.5)
-    """
-            
-       
-
-    if ('png' in outputformat):
-        ps.write_to_png(contamfile.replace('.prj','-'+str(level)+'.png'))
-
-
-
-
+    
+    main(args)
 
 
 

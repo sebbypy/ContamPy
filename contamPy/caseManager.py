@@ -32,6 +32,7 @@ class caseConfigurator:
                                     },
                                 'orientation':0,
                                 'v50':3,
+                                'leaksDistribution':'uniform',
                                 'system':{
                                         'definition':'namedSystem',
                                         'name':'DPREVENT'
@@ -377,8 +378,9 @@ class caseConfigurator:
         
         v50= self.actualParameters['v50']
         orientation = self.actualParameters['orientation']
+        leaksDistribution = self.actualParameters['leaksDistribution']
         
-        setBCS.apply(self.ContamModel,v50,orientation)
+        setBCS.apply(self.ContamModel,v50,orientation,leaksDistribution)
         
     
     def setWeather(self):
@@ -554,7 +556,10 @@ class existingSystems:
                             'file':'compute_PREVENT',
                             'arguments':['CRecyclage','auto-balance-prop']
                             },
-
+                    'CCascadePREVENT10Pa':{
+                            'file':'compute_PREVENT',
+                            'arguments':['CRecyclage','auto-balance-prop','10']
+                            },
                     'DPREVENT':{
                             'file':'compute_PREVENT',
                             'arguments':['D','auto-balance-prop']
@@ -661,7 +666,16 @@ class existingControls:
                             'arguments':
                                 {'strategy':'oneMotRTOAndGlobalExtract'}
                             },
-                    
+                    'Zonal1RTO':{
+                            'file':'computeControls',
+                            'arguments':
+                                {'strategy':'Zonal1RTO'}
+                            },
+                    'noMotRTOAndGlobalExtract':{
+                            'file':'computeControls',
+                            'arguments':
+                                {'strategy':'noMotRTOAndGlobalExtract'}
+                            },                   
                     'fulllocal30pc':{
                                 'file':'computeControls',
                                 'arguments':

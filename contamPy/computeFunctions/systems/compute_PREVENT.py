@@ -4,6 +4,14 @@ import pandas as pd
 import copy
 
 
+def writetolog(string):
+    
+    fileName = '.computePREVENTLog'
+    
+    f = open(fileName,'a')
+    f.write(string+'\n')
+    f.close
+        
 
 
  
@@ -55,13 +63,13 @@ def checkArguments(system):
     acceptablesystems=['A','B','C','D','CsupplyHall','CSLAAP','DRecyclage','CRecyclage']
      
     if (system not in acceptablesystems):
-        print("")
-        print("System ",system," does not exist")
+        writetolog("")
+        writetolog("System ",system," does not exist")
         sysstring=''
         for s in acceptablesystems:
             sysstring+=s+' '
-        print("Valid systems are "+sysstring)
-        print("")
+        writetolog("Valid systems are "+sysstring)
+        writetolog("")
         exit()
 
 
@@ -333,8 +341,8 @@ def supplyAndExhaustBalancing(jsondict,system,zones,totalsup,totalexh,autobalanc
         imbalance=totalsup-totalexh
 
         if (autobalancehal):
-            #print("Imbalance: ",imbalance," m3/h (supply:",totalsup,"m3/h, exhaust:",totalexh,"m3/h)")
-            #print("Automatic balancing")
+            #writetolog("Imbalance: ",imbalance," m3/h (supply:",totalsup,"m3/h, exhaust:",totalexh,"m3/h)")
+            #writetolog("Automatic balancing")
             halzonesindex=zones.df[zones.df['type']=='hal'].index
             
             nhal=len(halzonesindex)
@@ -360,13 +368,13 @@ def supplyAndExhaustBalancing(jsondict,system,zones,totalsup,totalexh,autobalanc
                 break
 
             else:
-                #print("No hall to add additional extractions, increasing proportionally in wet spaces")
+                #writetolog("No hall to add additional extractions, increasing proportionally in wet spaces")
                 autobalanceprop=True
             
         
         if (autobalanceprop):
 
-            print("Automatic balancing")            
+            writetolog("Automatic balancing")            
             
             factor=totalsup/totalexh
 
@@ -382,11 +390,11 @@ def supplyAndExhaustBalancing(jsondict,system,zones,totalsup,totalexh,autobalanc
 
             break
 
-        #print("")
-        #print("WARNING: the system is unbalanced !")
-        #print("")
-        #print("Imbalance: ",totalsup-totalexh," m3/h (supply:",totalsup,"m3/h, exhaust:",totalexh,"m3/h)")
-        #print("")
+        #writetolog("")
+        #writetolog("WARNING: the system is unbalanced !")
+        #writetolog("")
+        #writetolog("Imbalance: ",totalsup-totalexh," m3/h (supply:",totalsup,"m3/h, exhaust:",totalexh,"m3/h)")
+        #writetolog("")
         
         if (totalsup > totalexh) : # most common case
         
@@ -397,7 +405,7 @@ def supplyAndExhaustBalancing(jsondict,system,zones,totalsup,totalexh,autobalanc
             
             if (extraexh in ['y','Y']):
             
-                print(zones.df[ (zones.df['type']=='hal') | (zones.df['type']=='dry')]['name'].to_string())
+                writetolog(zones.df[ (zones.df['type']=='hal') | (zones.df['type']=='dry')]['name'].to_string())
             
                 ids=input("Select rooms in which to add an exhaust (room nr seperated with commas, e.g. 1,2,3 ) :  " )
             
@@ -411,22 +419,22 @@ def supplyAndExhaustBalancing(jsondict,system,zones,totalsup,totalexh,autobalanc
                 
                     totalexh+=flow
                 
-                    """print("")
-                    print("Imbalance: ",totalsup-totalexh," m3/h (supply:",totalsup,"m3/h, exhaust:",totalexh,"m3/h)")
-                    print("")
+                    """writetolog("")
+                    writetolog("Imbalance: ",totalsup-totalexh," m3/h (supply:",totalsup,"m3/h, exhaust:",totalexh,"m3/h)")
+                    writetolog("")
                     """
 
             changeflowrate=input("Change flow rate of existing extractions ? (y/n) ")
         
             if (changeflowrate in ['y','Y']):
 
-                #print('{:3}'.format('id'), '{:12}'.format('Room'), '{:10}'.format('Flow rate') )
+                #writetolog('{:3}'.format('id'), '{:12}'.format('Room'), '{:10}'.format('Flow rate') )
                 
                 for item in jsondict['Mechanical exhaust']:
                 
                     roomid=zones.df[zones.df['name']==item['Room']].index[0]
                 
-                    #print('{:3}'.format(str(roomid)), '{:12}'.format(item['Room']), '{:10}'.format(str(item['Nominal flow rate'])))
+                    #writetolog('{:3}'.format(str(roomid)), '{:12}'.format(item['Room']), '{:10}'.format(str(item['Nominal flow rate'])))
 
                 ids=input("Choose rooms for wich to change the flow rate (roomid, separated by commas, e.g. 1,2,3) :  " )
                     
@@ -442,11 +450,11 @@ def supplyAndExhaustBalancing(jsondict,system,zones,totalsup,totalexh,autobalanc
                             item['Nominal flow rate']=flow
                             totalexh+= item['Nominal flow rate']
                             
-                            """print("")
-                            print("Imbalance: ",totalsup-totalexh," m3/h (supply:",totalsup,"m3/h, exhaust:",totalexh,"m3/h)")
-                            print("")"""
-        #print("Dry spaces")
-        #print(zones.df[zones.df['type']=='dry']['name'].to_string())
+                            """writetolog("")
+                            writetolog("Imbalance: ",totalsup-totalexh," m3/h (supply:",totalsup,"m3/h, exhaust:",totalexh,"m3/h)")
+                            writetolog("")"""
+        #writetolog("Dry spaces")
+        #writetolog(zones.df[zones.df['type']=='dry']['name'].to_string())
         
         
         #if (totalsup > totalexh) : # most common case
@@ -456,9 +464,9 @@ def supplyAndExhaustBalancing(jsondict,system,zones,totalsup,totalexh,autobalanc
         if ( abs(totalsup - totalexh) > 1):
             balance=False
         else:
-            """print("")
-            print("Sufficient balance (<1 m3/h) is reached")
-            print("")"""
+            """writetolog("")
+            writetolog("Sufficient balance (<1 m3/h) is reached")
+            writetolog("")"""
             balance=True
 
     
@@ -489,48 +497,48 @@ def balanceNaturalTransfers(zones,flowelems,flowpaths,jsondict):
 
         allbalance,unbaldf = tryBalanceDryAndWetSpaces(zones,flowpaths,flowelems,roombaldf,unbaldf)
 
-        #print("unbal df after drywet")
-        #print(unbaldf)
+        #writetolog("unbal df after drywet")
+        #writetolog(unbaldf)
 
 
         if ('WoonKeuken' in unbaldf.index):
 
             allbalanced,unbaldf = tryBalanceLivingAndOpenKitchen(zones,flowpaths,flowelems,roombaldf,unbaldf)
-            #print("unbal df after wk",unbaldf)
+            #writetolog("unbal df after wk",unbaldf)
       
         if (len(unbaldf)==2):
                    
             allbalanced,unbaldf = tryBalanceTwoLastZones(zones,flowpaths,flowelems,roombaldf,unbaldf)
-            #print("unbal df after tow zones",unbaldf)
+            #writetolog("unbal df after tow zones",unbaldf)
             
         else:
         
             
                     
             
-            #print("More than two zones are unbalanced, cannot easily find a solution")
+            #writetolog("More than two zones are unbalanced, cannot easily find a solution")
             
             
             # one or more than two
             if (len(unbaldf)==1):
-                print("Only one unbalanced zone, impossible to perfectly balance natural transfers")
+                writetolog("Only one unbalanced zone, impossible to perfectly balance natural transfers")
                 break
 
      
             if nloops<3:
-                #print("Loop once more to see if it solves by itself")                
+                #writetolog("Loop once more to see if it solves by itself")                
                 continue
 
             
             else:
-                #print("Try forcing balance")
+                #writetolog("Try forcing balance")
                 # take the worst, and force it to transfer to an unbalanced neighbour. wz stands for Worst zone
                 
                 
                 # we'll take them in the logical order: first solve the ones with only 1 trivial solution
                 """remainingZones = list(unbaldf.index)
 
-                print(remainingZones)
+                writetolog(remainingZones)
 
                 unbalancedNeighbours={}
                 
@@ -549,14 +557,14 @@ def balanceNaturalTransfers(zones,flowelems,flowpaths,jsondict):
 
 
 
-                #print(wzName,wzNeighbours)
+                #writetolog(wzName,wzNeighbours)
 
                 try:
                     otherzone=wzNeighbours[0]
                 except:
                     pass
-                    # print(wzName)
-                    #print(roombaldf.to_string())                        
+                    # writetolog(wzName)
+                    #writetolog(roombaldf.to_string())                        
                                   
                 if (not pd.isna(roombaldf.loc[wzName,otherzone]) ):
                     roombaldf.loc[wzName,otherzone]+=-roombaldf.loc[wzName,'Balance']
@@ -765,7 +773,7 @@ def tryBalanceTwoLastZones(zones,flowpaths,flowelems,roombaldf,unbaldf):
     
     
     allbalanced=False
-    #print(unbaldf)
+    #writetolog(unbaldf)
            
     zname1=unbaldf.index[0]
     zname2=unbaldf.index[1]
@@ -784,7 +792,7 @@ def tryBalanceTwoLastZones(zones,flowpaths,flowelems,roombaldf,unbaldf):
             allbalanced=True
             
     else:
-        #print("2 unbalanced zones remain, but no direct link between them")
+        #writetolog("2 unbalanced zones remain, but no direct link between them")
 
         #we have to find if there is a common neighbour between the unbalanced spaces
         z1neighbours=contam_functions.getNeighboursNamesWithNT(zname1,zones.df,flowpaths.df,flowelems.df)
@@ -795,7 +803,7 @@ def tryBalanceTwoLastZones(zones,flowpaths,flowelems,roombaldf,unbaldf):
         if (len(commonNeighbours)==1):
         
             neighbourname=commonNeighbours[0]
-            #print("Neighbour zone",neighbourname)
+            #writetolog("Neighbour zone",neighbourname)
         
             if (not pd.isna(roombaldf.loc[zname1,neighbourname]) ):
                 roombaldf.loc[zname1,neighbourname]+=-roombaldf.loc[zname1,'Balance']
@@ -814,7 +822,7 @@ def tryBalanceTwoLastZones(zones,flowpaths,flowelems,roombaldf,unbaldf):
                 roombaldf.loc[zname2,neighbourname]=roombaldf.loc[zname1,'Balance']
                 
   
-            # print(roombaldf)
+            # writetolog(roombaldf)
             roombaldf['Balance']=roombaldf.drop(['Balance'],axis=1).sum(axis=1)
             #roombaldf.loc['WoonKeuken',:]=roombaldf.loc['Woonkamer',:]+roombaldf.loc['OKeuken',:]
 

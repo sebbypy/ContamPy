@@ -3,7 +3,29 @@ sys.path.append('/home/spec/Documents/Projects/RESEARCH/COMISVENT/2.Work/Python'
 
 import copy
 
+def getListOfRoomsFromJson(systemJson):
     
+    rooms = []
+    
+    for deviceType,deviceList in systemJson.items():
+        
+        if 'supply' in deviceType or 'exhaust' in deviceType:
+            
+            for device in deviceList:
+
+                rooms.append(device['Room'])
+
+        if 'transfer' in deviceType:
+            
+            for device in deviceList:
+                
+                rooms.append(device['From room'])
+                rooms.append(device['To room'])
+    
+    
+    return list(set(rooms))
+    
+
 def compute(**kwargs):
     
     
@@ -471,6 +493,188 @@ def compute(**kwargs):
     
             x["Actuator"]="Global-"+r
 
+
+    if strategy=='Zonal1RTO':
+        
+        #for C Cascade or CPREVENT (motorized RTO)
+        
+        rooms = getListOfRoomsFromJson(systemJson)
+        
+        if 'Nachthal' in rooms:
+            refhal = 'Nachthal'
+        elif 'NachtHal' in rooms:
+            refhal = 'NachtHal'
+        elif 'Hal' in rooms:
+            refhal = 'Hal'
+        elif 'Inkomhal' in rooms:
+            refhal = 'Inkomhal'
+        else:
+            print("ERROR, CANNOT FIND HAL")
+            raise
+                
+        
+        dryActuators = []        
+        
+        maxSlaapFlow = 0
+        biggestBedRoom = None
+
+
+        nSlaaps = 0
+
+        for x in controlJson["Natural supply"]:
+            r = x["Room"]
+
+            if 'Slaap' in r:
+                nSlaaps += 1
+
+        signaldict={"Type":"Single-Sensor","Specie":"CO2","Room":refhal}
+        controlJson["Signals"]["CO2-"+refhal]=signaldict
+                
+        
+        halAlgo = {"Type":"Linear","Qmin":0.3,"Qmax":1.0,"Vmin":450,"Vmax":400+600/nSlaaps}
+        controlJson["ControlAlgorithms"]["CO2-Linear-Hall"] = halAlgo
+        
+        
+        actuatordict={"SignalName":"CO2-"+refhal,"ControlAlgorithmName":"CO2-Linear-Hall"}                    
+        controlJson["Actuators"]["CO2-"+refhal+"-linear"]=actuatordict
+        
+        dryActuators.append("CO2-"+refhal+"-linear")
+        
+        for x in controlJson["Natural supply"]:
+            r = x["Room"]
+
+            if r=='Woonkamer':
+        
+                signaldict={"Type":"Single-Sensor","Specie":"CO2","Room":r}
+                controlJson["Signals"]["CO2-"+r]=signaldict
+                
+                actuatordict={"SignalName":"CO2-"+r,"ControlAlgorithmName":"CO2-Linear"}                    
+                controlJson["Actuators"]["CO2-"+r+"-linear"]=actuatordict
+         
+                x["Actuator"]="CO2-"+r+"-linear"
+             
+                    
+                dryActuators.append(x['Actuator'])
+
+            
+        for x in controlJson["Mechanical exhaust"]:
+    
+            
+            r=x['Room']
+    
+            if (r=='WC'):
+                signaldict={'Type':'Presence','Room':r}
+                controlJson["Signals"]["Pres-"+r]=signaldict
+                       
+                actuatordict={"SignalName":"Pres-"+r,"ControlAlgorithmName":"Timer30min"}
+                controlJson["Actuators"][r+'-Timer']=actuatordict
+    
+                localActuatorName = r+'-Timer'
+     
+            elif ('Woon' in r or 'OKeuken' in r):
+                signaldict={"Type":"Single-Sensor","Specie":"CO2","Room":r}
+                controlJson["Signals"]["CO2-"+r]=signaldict
+    
+                actuatordict={"SignalName":"CO2-"+r,"ControlAlgorithmName":"CO2-Linear"}
+                controlJson["Actuators"]["CO2-"+r+"-linear"]=actuatordict
+    
+                localActuatorName = "CO2-"+r+"-linear"
+    
+     
+            else:           
+                signaldict={"Type":"Single-Sensor","Specie":"H2O","Room":r}
+                controlJson["Signals"]["H2O-"+r]=signaldict
+    
+                actuatordict={"SignalName":"H2O-"+r,"ControlAlgorithmName":"H2O-Linear"}
+                controlJson["Actuators"]["H2O-"+r+"-linear"]=actuatordict
+    
+                localActuatorName = "H2O-"+r+"-linear"
+    
+            
+            newactuatordict={"ControlAlgorithmName":"Max","Actuators":[]}
+            newactuatordict["Actuators"].append(localActuatorName)
+            newactuatordict["Actuators"] += dryActuators
+            controlJson["Actuators"]["Global-"+r]=newactuatordict
+    
+    
+            x["Actuator"]="Global-"+r
+
+
+    if strategy=='noMotRTOAndGlobalExtract':
+        
+        
+        
+        dryActuators = []        
+        
+        maxSlaapFlow = 0
+        biggestBedRoom = None
+
+
+        for x in controlJson["Natural supply"]:
+            r = x["Room"]
+
+            if 'Slaap' in r:
+                
+                flow = x['Capacity']
+                if (flow > maxSlaapFlow):
+                    maxSlaapFlow = flow
+                    biggestBedRoom = r
+
+        signaldict={"Type":"Single-Sensor","Specie":"CO2","Room":biggestBedRoom}
+        controlJson["Signals"]["CO2-"+biggestBedRoom]=signaldict
+                
+        actuatordict={"SignalName":"CO2-"+biggestBedRoom,"ControlAlgorithmName":"CO2-Linear"}                    
+        controlJson["Actuators"]["CO2-"+biggestBedRoom+"-linear"]=actuatordict
+        
+        dryActuators.append("CO2-"+biggestBedRoom+"-linear")
+        
+        for x in controlJson["Natural supply"]:
+            r = x["Room"]
+
+            if r=='Woonkamer':
+        
+                signaldict={"Type":"Single-Sensor","Specie":"CO2","Room":r}
+                controlJson["Signals"]["CO2-"+r]=signaldict
+                
+                actuatordict={"SignalName":"CO2-"+r,"ControlAlgorithmName":"CO2-Linear"}                    
+                controlJson["Actuators"]["CO2-"+r+"-linear"]=actuatordict
+                    
+                dryActuators.append("CO2-"+r+"-linear")
+
+            
+
+            
+        for x in controlJson["Mechanical exhaust"]:
+    
+            
+            r=x['Room']
+    
+            if (r=='WC'):
+                signaldict={'Type':'Presence','Room':r}
+                controlJson["Signals"]["Pres-"+r]=signaldict
+                       
+                actuatordict={"SignalName":"Pres-"+r,"ControlAlgorithmName":"Timer30min"}
+                controlJson["Actuators"][r+'-Timer']=actuatordict
+    
+                localActuatorName = r+'-Timer'
+     
+            else:           
+                signaldict={"Type":"Single-Sensor","Specie":"H2O","Room":r}
+                controlJson["Signals"]["H2O-"+r]=signaldict
+    
+                actuatordict={"SignalName":"H2O-"+r,"ControlAlgorithmName":"H2O-Linear"}
+                controlJson["Actuators"]["H2O-"+r+"-linear"]=actuatordict
+    
+                localActuatorName = "H2O-"+r+"-linear"
+    
+            
+            newactuatordict={"ControlAlgorithmName":"Max","Actuators":[]}
+            newactuatordict["Actuators"].append(localActuatorName)
+            newactuatordict["Actuators"] += dryActuators
+            controlJson["Actuators"]["Global-"+r]=newactuatordict
+    
+    
+            x["Actuator"]="Global-"+r
 
 
                     

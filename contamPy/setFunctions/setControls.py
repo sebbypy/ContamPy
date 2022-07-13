@@ -270,6 +270,9 @@ def setControls(contam_data,controlJSON):
   
         flowpaths.df.loc[flowpaths.df['pc'].astype(int)==oldCid,'pc']=newCid
         
+        #adding report of controls in log file!
+        # Header is the heaeder of the log file
+        controls.addreport(newCid,'R'+controlname,reporttype='',description='',header=controlname)
     
 
 

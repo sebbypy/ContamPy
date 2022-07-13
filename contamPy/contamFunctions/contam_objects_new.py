@@ -1057,7 +1057,7 @@ class controlnodes:
     
 
 
-    def addreport(self,id_to_report,name,reporttype='',description=''):
+    def addreport(self,id_to_report,name,reporttype='',description='',header=''):
     
         if (len(name)>15):
             name=name.replace('kamer','')
@@ -1103,6 +1103,9 @@ class controlnodes:
             unit='kg/m3'
         
         values=[0,scale,0,name,unit]
+        if header != '':
+            values[3] = header
+
         self.df.loc[self.nctrl,'values']=[ str(v) for v in values ]
     
 
