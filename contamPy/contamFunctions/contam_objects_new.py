@@ -32,7 +32,7 @@ class levels:
             fields=filereader.readline().split()
             mydict={self.headers[i]:fields[i] for i in range(len(fields))}
     
-            self.df=self.df.append(mydict,ignore_index=True)
+            self.df = pd.concat([self.df,pd.DataFrame.from_records([mydict])])
 
             self.icons[mydict['nr']]=self.readlevelicons(filereader,mydict['nicon'])
 
@@ -136,7 +136,7 @@ class zones:
             
             
 
-            self.df=self.df.append(mydict,ignore_index=True)
+            self.df = pd.concat([self.df,pd.DataFrame.from_records([mydict])])
 
         self.df.index=self.df['nr'].astype(int)
         self.df.drop(['nr'],axis=1,inplace=True)
@@ -231,7 +231,7 @@ class ahs:
             mydict={self.headers[i]:fields[i] for i in range(len(fields))}
             mydict['description']=filereader.readline()
         
-        self.df=self.df.append(mydict,ignore_index=True)
+        self.df = pd.concat([self.df,pd.DataFrame.from_records([mydict])])
         self.df.index=self.df['#'].astype(int)
         self.df.drop(['#'],axis=1,inplace=True)
     
@@ -265,7 +265,7 @@ class flowelements:
             mydict['comment']=comment
             mydict['values']=filereader.readline().split()  #SPEC ok for one liners only !!!
             
-            self.df=self.df.append(mydict,ignore_index=True)
+            self.df = pd.concat([self.df,pd.DataFrame.from_records([mydict])])
 
         self.df.index=self.df['id'].astype(int)
         self.df.drop(['id'],axis=1,inplace=True)
@@ -468,7 +468,7 @@ class filterElements:
             
             mydict['efficiencies']=efficiencyDict
             
-            self.df=self.df.append(mydict,ignore_index=True)
+            self.df = pd.concat([self.df,pd.DataFrame.from_records([mydict])])
             
         self.df.index=self.df['id'].astype(int)
         self.df.drop(['id'],axis=1,inplace=True)
@@ -546,7 +546,7 @@ class filters:
             myDict = { header:field for header,field in zip(self.headers,fields) }
             values=filereader.readline().split()
             myDict['values']=values
-            self.df=self.df.append(myDict,ignore_index=True)
+            self.df = pd.concat([self.df,pd.DataFrame.from_records([mydict])])
             
             
         self.df.index=self.df['nr'].astype(int)
@@ -619,7 +619,7 @@ class contaminants:
 
             mydict={self.myheaders[i]:fields[i] for i in range(len(self.myheaders))}
             mydict['description']=filereader.readline()
-            self.df=self.df.append(mydict,ignore_index=True)
+            self.df = pd.concat([self.df,pd.DataFrame.from_records([mydict])])
             
         self.df.index=self.df['#'].astype(int)
         self.df.drop(['#'],axis=1,inplace=True)
@@ -765,7 +765,7 @@ class sources:
             fields=filereader.readline().split()
             mydict={self.headers[i]:fields[i] for i in range(len(fields))}
 
-            self.df=self.df.append(mydict,ignore_index=True)
+            self.df = pd.concat([self.df,pd.DataFrame.from_records([mydict])])
         
         self.df.index=self.df['#'].astype(int)
         self.df.drop(['#'],axis=1,inplace=True)
@@ -839,7 +839,9 @@ class controlnodes:
             mydict['description']=filereader.readline()
             mydict['values']=filereader.readline().split()
                     
-            self.df=self.df.append(mydict,ignore_index=True)
+            self.df = pd.concat([self.df,pd.DataFrame.from_records([mydict])])
+
+
             
         self.df.index=self.df['#'].astype(int)
         self.df.drop(['#'],axis=1,inplace=True)
@@ -2182,8 +2184,11 @@ class flowpaths:
                 mydict['cfd']=mydict['vf_node_name']
                 mydict['vf_node_name']=''
 
-            self.df=self.df.append(mydict,ignore_index=True)
 
+            #self.df = pd.concat([self.df,pd.DataFrame.from_records([mydict])])
+            self.df = pd.concat([self.df,pd.DataFrame.from_records([mydict])])
+            
+         
         self.df.index=self.df['nr'].astype(int)
         self.df.drop(['nr'],axis=1,inplace=True)
         self.df=convert_cols(self.df)
@@ -2223,8 +2228,11 @@ class windpressureprofiles:
             
             fields=filereader.readline().split()
 
-            self.df=self.df.append(dict(zip(self.headers,fields)),ignore_index=True)
-                
+            tmpdict = dict(zip(self.headers,fields))
+           
+            self.df = pd.concat([self.df,pd.DataFrame.from_records([tmpdict])],ignore_index=True)
+                       
+            
             self.df.loc[i,'comment']=filereader.readline()
             self.df.at[i,'values']=[]
             
