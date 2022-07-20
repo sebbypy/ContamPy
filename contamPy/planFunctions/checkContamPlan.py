@@ -39,17 +39,13 @@ def checkContamPlan(fname):
         if (len(flowpaths.df[ (flowpaths.df['pzn']==roomid) & (flowpaths.df['pzm'] == ahsreturn) ]) < 1):
             print("There is no mechanical return device in room ",rooms.loc[roomid,'name'])
             print("Check failed")
-            exit()
+            return
             
         if (len(flowpaths.df[ (flowpaths.df['pzn']==ahssupply) & (flowpaths.df['pzm'] == roomid) ]) < 1):
             print("There is no mechanical supply device in room ",rooms.loc[roomid,'name'])
             print("Check failed")
-            exit()
-       
-    
-    
-    
-    
+            return
+
     
     #-----------------------------------------------------
     #Checking the number of connections between each room
@@ -79,7 +75,7 @@ def checkContamPlan(fname):
                     print("")
                     print(commonflowpaths)
                     print("")
-                    exit()
+                    return
     
             else:
                 if ( len(commonflowpaths) > 0 and len(commonflowpaths) !=4 ):
@@ -89,7 +85,7 @@ def checkContamPlan(fname):
                         print("Wrong number of flow paths between ",rooms.loc[roomid1,'name'],"and",rooms.loc[roomid2,'name'],". There should be FOUR VERTICAL connection between two spaces at different levels")
                         print("")
                         print(commonflowpaths)
-                        exit()
+                        return
     
                     elif (len(commonflowpaths) !=4):
                         
@@ -100,7 +96,7 @@ def checkContamPlan(fname):
                         print("")
                         print(commonflowpaths)
                         print("")
-                        exit()
+                        return
     
     
     
@@ -112,11 +108,11 @@ def checkContamPlan(fname):
     
     if (6 not in flowpaths.df['dir'].unique()):
         print("There is no leak towards the ground")
-        exit()
+        return
         
     if (4 not in flowpaths.df['dir'].unique()):
-        print("There is no lead towards the roof")
-        exit()
+        print("There is no leak towards the roof")
+        return
     
     
     for roomid in rooms.index:  
@@ -125,12 +121,14 @@ def checkContamPlan(fname):
         # other:  dir 4 --> az=0 ; dir 5 : az=90 ; dir 2: az=270  ; dir 1: az=180
         sketchdirs={1:'S',2:'W',4:'N',5:'E'}
       
+        levelid = rooms.loc[roomid,'pl']
+        levelName = levels.df.loc[levelid,'name']
           
         commonflowpaths=contam_functions.getcommonpaths(flowpaths,roomid,-1) #-1 is zone id in flow paths for outside    
         df=commonflowpaths.copy()  #name change for concision
     
     
-        areadf=areadf.append({'roomid':roomid,'roomname':rooms.loc[roomid,'name'],'surface':'floor-area','area':np.nan,'wall-height':'-','wall-length':'-'},ignore_index=True)
+        areadf=areadf.append({'roomid':roomid,'roomname':rooms.loc[roomid,'name'],'level':levelName,'surface':'floor-area','area':np.nan,'wall-height':np.nan,'wall-length':np.nan,'boundary':'-'},ignore_index=True)
            
            
         for direction in df['dir'].unique():
@@ -141,39 +139,53 @@ def checkContamPlan(fname):
             
                 if (npaths != 1):
                     print("")
-                    print("Wrong number of flow paths between ",rooms.loc[roomid,'name'],"and exterior on facade ",sketchdirs[direction])
-                    print("There should be 1 connnection, while there are ",npaths)
+                    print("Wrong number of VERTICAL flow paths between ",rooms.loc[roomid,'name'],"and exterior")
+                    print("There should be 1 connnections, while there are ",npaths)
                     print("")
-                    exit
+                    return
+
                     
                 else:
                     fpindex=df.index[df['dir']==direction][0]
-                    if (df.loc[fpindex,'pld'] > rooms.loc[roomid,'pl'] ):  #junction start for level higher --> roof
-                        areadf=areadf.append({'roomid':roomid,'roomname':rooms.loc[roomid,'name'],'surface':'facade-roof','wall-length':'-','wall-height':'-','area':np.nan},ignore_index=True)
+                    if (df.loc[fpindex,'pld'] > levelid):  #junction start for level higher --> roof
+                        areadf=areadf.append({'roomid':roomid,'roomname':rooms.loc[roomid,'name'],'level':levelName,'surface':'facade-roof','wall-length':np.nan,'wall-height':np.nan,'area':np.nan,'boundary':'flat-outside'},ignore_index=True)
+
                     else:
-                        areadf=areadf.append({'roomid':roomid,'roomname':rooms.loc[roomid,'name'],'surface':'facade-ground','wall-length':'-','wall-height':'-','area':np.nan},ignore_index=True)
+                        areadf=areadf.append({'roomid':roomid,'roomname':rooms.loc[roomid,'name'],'level':levelName,'surface':'facade-ground','wall-length':np.nan,'wall-height':np.nan,'area':np.nan,'boundary':'zero-pressure'},ignore_index=True)
+            
+            
             
             else: # N,S,E,W
                 
-                if (npaths != 4):
+                if (npaths not in [4,5] ):
                     print("")
                     print("Wrong number of flow paths between ",rooms.loc[roomid,'name'],"and exterior on facade ",sketchdirs[direction])
                     print("There should be 4 connnections, while there are ",npaths)
+                    print("There should be 5 connections if there is a sloped roof")
                     print("")
-                    exit
+                    return
                 else:
                 
-                   areadf=areadf.append({'roomid':roomid,'roomname':rooms.loc[roomid,'name'],'surface':'facade-'+sketchdirs[direction],'wall-length':np.nan,'wall-height':3.0,'area':np.nan},ignore_index=True)
+                   areadf=areadf.append({'roomid':roomid,'roomname':rooms.loc[roomid,'name'],'level':levelName,'surface':'facade-'+sketchdirs[direction],'wall-length':np.nan,'wall-height':3.0,'area':np.nan,'boundary':'vertical-outside'},ignore_index=True)
+
+                   if (npaths==5):
+                       #sloped roof
+                       areadf=areadf.append({'roomid':roomid,'roomname':rooms.loc[roomid,'name'],'level':levelName,'surface':'facade-slopedroof','wall-length':np.nan,'wall-height':np.nan,'area':np.nan,'boundary':'sloped-outside'},ignore_index=True)
+
+
     
     areadf.index=areadf['roomid']
     areadf.drop(['roomid'],axis=1,inplace=True)
     areadf.sort_values(by=['surface'],inplace=True)
     
     areadf.to_csv(root+'-areas-empty.csv')
-    #print(areadf)
+    
     
     print("Check successfull")
 
+
+
+    return levels.nlevels,areadf
 
 
 if __name__=='__main__':

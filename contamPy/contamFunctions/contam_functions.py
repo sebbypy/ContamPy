@@ -224,7 +224,25 @@ def writecontamfile(reffile,newname,datadict):
 
 
 
+def readWindLibrary(fname):
+    
+    f=open(fname,'r',errors='ignore')
+    
+    
+    line=True
+    while(line):
 
+        line=f.readline()
+       
+            
+        if ('wind pressure profiles' in line):
+            wp=contam_objects_new.windpressureprofiles()
+            wp.read(f,line)
+
+    
+    datadict={'windprofiles':wp}
+       
+    return datadict
 
 
 def getlevels(fname):
