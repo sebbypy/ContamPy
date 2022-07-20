@@ -25,21 +25,21 @@ class caseConfigurator:
     
     def __init__(self,dimBuildingsDir,occupancyDir,weatherDir,libraryDir,contaminantsDir):
        
-        self.defaultParameters={'building':'COVL-REN-HO1',
+        self.defaultParameters={'building':'',
                                 'buildingDimensionsVariation':{
                                     'volumeRatio': 1.0,
                                     'mode': 'uniform'
                                     },
                                 'orientation':0,
-                                'v50':3,
+                                'v50':1,
                                 'leaksDistribution':'uniform',
                                 'system':{
                                         'definition':'namedSystem',
                                         'name':'DPREVENT'
                                         },
                                 'control':'constant',
-                                'occupancy':'default-home',
-                                'weather':'Uccle',
+                                'occupancy': None,
+                                'weather':'',
                                 'extraContaminants':{},
                                 'filters':None,
                                 'contaminantsFile':None,
@@ -183,7 +183,24 @@ class caseConfigurator:
 
     def readParameters(self,parametersDict):
 
+        minimalParameters = ['building','system','control','weather',
+                             'simulationTimeStep','StartDate','EndDate'
+                             ,'outputTimeStep','outputFiles']        
+
         
+        for p in minimalParameters:
+            if p not in parametersDict.keys():
+                print("Parameter ",p," is required")
+                print("Here is the full list of required parameters")
+                [print('    '+x) for x in minimalParameters]
+                print("")
+                raise ValueError("Missing parameters, see above")
+    
+            
+            
+            
+
+
         if (self.doParametersExist(parametersDict)):
             
             for key in parametersDict.keys():
@@ -205,6 +222,24 @@ class caseConfigurator:
 
 
     def areActualParametersValid(self):
+        
+        
+        buildingFile = os.path.join(self.dimBuildingsDir,self.actualParameters['building']+'.prj')
+        if not os.path.exists(buildingFile):
+            raise ValueError("ERROR with the building file: "+buildingFile+" does not exist")
+    
+        
+        weatherFile = os.path.join(self.weatherDir,self.actualParameters['weather']+'.wth')
+        if not os.path.exists(weatherFile):
+            raise ValueError("ERROR with the weather file: "+weatherFile+" does not exist")
+        
+     
+        if self.actualParameters['contaminantsFile'] is not None:
+            contaminantsFile = os.path.join(self.contaminantsDir,self.actualParameters['contaminantsFile']+'.CTM')
+            if not os.path.exists(contaminantsFile):
+                raise ValueError("ERROR with the contaminants file: "+contaminantsFile+" does not exist")
+        
+     
         
         if self.actualParameters['control']=='file' and self.actualParameters['system']!='file':
             raise ValueError("Control cannot be defined in a file if the system also is")
@@ -275,9 +310,9 @@ class caseConfigurator:
             systemJSON = self.computeSystem(systemName)
         
         
-        elif systemdefinition =='file':
+        elif systemdefinition =='JSONfile':
 
-            systemJSONFile = self.actualParameters['system']['file']
+            systemJSONFile = self.actualParameters['system']['filename']
             with open(systemJSONFile, 'r') as inputFile:
                 systemJSON = json.load(inputFile)
             
@@ -337,6 +372,12 @@ class caseConfigurator:
         
         controlStrategy=self.actualParameters['control']
 
+
+        if controlStrategy == 'systemJSONFile':
+            print("system json")
+            return systemJson
+
+
         computeFunction,arguments = existingControls().functionAndArguments(controlStrategy)
         
         kwargs = {}
@@ -370,8 +411,10 @@ class caseConfigurator:
     def setOccupancyAndSources(self):
 
         occupancy = self.actualParameters['occupancy']
+
+        if occupancy is not None:
         
-        setOccupancyAndSources.apply(self.ContamModel,occupancy,self.occupancyProfilesDir)
+            setOccupancyAndSources.apply(self.ContamModel,occupancy,self.occupancyProfilesDir)
         
 
     def setAirtightnessOrientation(self):
@@ -502,7 +545,6 @@ class contamRunner:
             prjFileRelative = os.path.relpath(prjFile)
 
     
-
             #seems the file name should not be too long otherwise contam do noting --> should use relative path  for the file! 
             #I dont know why but the output of contam is on stderr and not stdout --> catching stderr
             completedProcess=subprocess.run([self.contamExe,prjFileRelative],stderr=subprocess.PIPE)
@@ -511,6 +553,11 @@ class contamRunner:
             f=open(stdoutFileName,'w')
             f.write(completedProcess.stderr.decode())
             f.close()
+
+
+            
+            print("CONTAM run terminated")
+
 
         def makePrjRelative(self,prjFile):
             

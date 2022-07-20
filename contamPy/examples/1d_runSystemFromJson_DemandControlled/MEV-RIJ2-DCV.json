@@ -1,0 +1,227 @@
+{
+  "Mechanical supply": [],
+  "Mechanical exhaust": [
+    {
+      "Room": "Badkamer",
+      "Nominal flow rate": 50,
+      "Actuator": "H2O-Badkamer-linear"
+    },
+    {
+      "Room": "Wasplaats",
+      "Nominal flow rate": 50,
+      "Actuator": "H2O-Wasplaats-linear"
+    },
+    {
+      "Room": "Keuken",
+      "Nominal flow rate": 50,
+      "Actuator": "H2O-Keuken-linear"
+    },
+    {
+      "Room": "WC",
+      "Nominal flow rate": 25,
+      "Actuator": "WC-Timer"
+    }
+  ],
+  "Natural supply": [
+    {
+      "Room": "Slaapkamer3",
+      "Capacity": 25,
+      "Design pressure": 2,
+      "Self-Regulating": "No"
+    },
+    {
+      "Room": "Slaapkamer2",
+      "Capacity": 25,
+      "Design pressure": 2,
+      "Self-Regulating": "No"
+    },
+    {
+      "Room": "Slaapkamer1",
+      "Capacity": 25,
+      "Design pressure": 2,
+      "Self-Regulating": "No"
+    },
+    {
+      "Room": "Bureau",
+      "Capacity": 25,
+      "Design pressure": 2,
+      "Self-Regulating": "No"
+    },
+    {
+      "Room": "Woonkamer",
+      "Capacity": 75,
+      "Design pressure": 2,
+      "Self-Regulating": "No"
+    }
+  ],
+  "Natural exhaust": [],
+  "Natural transfer": [
+    {
+      "From room": "Nachthal2",
+      "To room": "Slaapkamer3",
+      "Capacity": 25,
+      "Design pressure": 2
+    },
+    {
+      "From room": "Nachthal2",
+      "To room": "Slaapkamer2",
+      "Capacity": 25,
+      "Design pressure": 2
+    },
+    {
+      "From room": "Nachthal",
+      "To room": "Nachthal2",
+      "Capacity": 25,
+      "Design pressure": 2
+    },
+    {
+      "From room": "Nachthal",
+      "To room": "Badkamer",
+      "Capacity": 25,
+      "Design pressure": 2
+    },
+    {
+      "From room": "Nachthal",
+      "To room": "Slaapkamer1",
+      "Capacity": 25,
+      "Design pressure": 2
+    },
+    {
+      "From room": "Nachthal",
+      "To room": "Bureau",
+      "Capacity": 25,
+      "Design pressure": 2
+    },
+    {
+      "From room": "Inkomhal",
+      "To room": "Nachthal",
+      "Capacity": 25,
+      "Design pressure": 2
+    },
+    {
+      "From room": "Inkomhal",
+      "To room": "WC",
+      "Capacity": 25,
+      "Design pressure": 2
+    },
+    {
+      "From room": "Woonkamer",
+      "To room": "Keuken",
+      "Capacity": 25,
+      "Design pressure": 2
+    },
+    {
+      "From room": "Inkomhal",
+      "To room": "Woonkamer",
+      "Capacity": 25,
+      "Design pressure": 2
+    }
+  ],
+  "ControlAlgorithms": {
+    "CO2-Linear": {
+      "Type": "Linear",
+      "Qmin": 0.1,
+      "Qmax": 1.0,
+      "Vmin": 500,
+      "Vmax": 1000
+    },
+    "H2O-Linear": {
+      "Type": "Linear",
+      "Qmin": 0.1,
+      "Qmax": 1.0,
+      "Vmin": 0.3,
+      "Vmax": 0.7
+    },
+    "Timer30min": {
+      "Type": "Timer",
+      "Qmin": 0.1,
+      "Qmax": 1,
+      "Duration": "30min"
+    }   
+  },
+  "Windows": [],
+  "Signals": {
+    "H2O-Badkamer": {
+      "Type": "Single-Sensor",
+      "Specie": "H2O",
+      "Room": "Badkamer"
+    },
+    "H2O-Wasplaats": {
+      "Type": "Single-Sensor",
+      "Specie": "H2O",
+      "Room": "Wasplaats"
+    },
+    "H2O-Keuken": {
+      "Type": "Single-Sensor",
+      "Specie": "H2O",
+      "Room": "Keuken"
+    },
+    "Pres-WC": {
+      "Type": "Presence",
+      "Room": "WC"
+    },
+    "CO2-Slaapkamer3": {
+      "Type": "Single-Sensor",
+      "Specie": "CO2",
+      "Room": "Slaapkamer3"
+    },
+    "CO2-Slaapkamer2": {
+      "Type": "Single-Sensor",
+      "Specie": "CO2",
+      "Room": "Slaapkamer2"
+    },
+    "CO2-Slaapkamer1": {
+      "Type": "Single-Sensor",
+      "Specie": "CO2",
+      "Room": "Slaapkamer1"
+    },
+    "CO2-Bureau": {
+      "Type": "Single-Sensor",
+      "Specie": "CO2",
+      "Room": "Bureau"
+    },
+    "CO2-Woonkamer": {
+      "Type": "Single-Sensor",
+      "Specie": "CO2",
+      "Room": "Woonkamer"
+    }
+  },
+  "Actuators": {
+    "H2O-Badkamer-linear": {
+      "SignalName": "H2O-Badkamer",
+      "ControlAlgorithmName": "H2O-Linear"
+    },
+    "H2O-Wasplaats-linear": {
+      "SignalName": "H2O-Wasplaats",
+      "ControlAlgorithmName": "H2O-Linear"
+    },
+    "H2O-Keuken-linear": {
+      "SignalName": "H2O-Keuken",
+      "ControlAlgorithmName": "H2O-Linear"
+    },
+    "WC-Timer": {
+      "SignalName": "Pres-WC",
+      "ControlAlgorithmName": "Timer30min"
+    },
+    "CO2-Slaapkamer3-linear": {
+      "SignalName": "CO2-Slaapkamer3",
+      "ControlAlgorithmName": "CO2-Linear"
+    },
+    "CO2-Slaapkamer2-linear": {
+      "SignalName": "CO2-Slaapkamer2",
+      "ControlAlgorithmName": "CO2-Linear"
+    },
+    "CO2-Slaapkamer1-linear": {
+      "SignalName": "CO2-Slaapkamer1",
+      "ControlAlgorithmName": "CO2-Linear"
+    },
+    "CO2-Bureau-linear": {
+      "SignalName": "CO2-Bureau",
+      "ControlAlgorithmName": "CO2-Linear"
+    },
+    "CO2-Woonkamer-linear": {
+      "SignalName": "CO2-Woonkamer",
+      "ControlAlgorithmName": "CO2-Linear"
+    }
+  }
+}
