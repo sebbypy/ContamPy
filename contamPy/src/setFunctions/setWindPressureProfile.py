@@ -67,7 +67,7 @@ def getProfilesNumbersFromProfileName(profiledf,profileName):
     
     if profileName == 'exposed':
         
-        roofProfileID = profiledf[profiledf['name'] ==  'A2.1-Roof>30°' ].index[0]
+        roofProfileID = profiledf[profiledf['name'] ==  'A2.1-Roof>30' ].index[0]
         wallProfileID = profiledf[profiledf['name'] ==  'A2.1-Walls' ].index[0]
         flatProfileID = profiledf[profiledf['name'] ==  'A2.1-FlatRoof' ].index[0]
 
@@ -75,14 +75,14 @@ def getProfilesNumbersFromProfileName(profiledf,profileName):
     
     elif profileName == 'semi-exposed':
         
-        roofProfileID = profiledf[profiledf['name'] ==  'A2.2-Roof>30°' ].index[0]
+        roofProfileID = profiledf[profiledf['name'] ==  'A2.2-Roof>30' ].index[0]
         wallProfileID = profiledf[profiledf['name'] ==  'A2.2-Walls' ].index[0]
         flatProfileID = profiledf[profiledf['name'] ==  'A2.2-FlatRoof' ].index[0]
 
 
     elif profileName == 'shielded':
         
-        roofProfileID = profiledf[profiledf['name'] ==  'A2.3-Roof>30°' ].index[0]
+        roofProfileID = profiledf[profiledf['name'] ==  'A2.3-Roof>30' ].index[0]
         wallProfileID = profiledf[profiledf['name'] ==  'A2.3-Walls' ].index[0]
         flatProfileID = profiledf[profiledf['name'] ==  'A2.3-FlatRoof' ].index[0]
 
