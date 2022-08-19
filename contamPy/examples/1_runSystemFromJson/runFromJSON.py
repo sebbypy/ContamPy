@@ -2,7 +2,7 @@ import os
 import sys
 
 currentPath = os.getcwd()
-sys.path.append(os.path.join(currentPath,'..','..'))
+sys.path.append(os.path.join(currentPath,'..','..','src'))
 
 from caseManager import caseConfigurator,contamRunner
 

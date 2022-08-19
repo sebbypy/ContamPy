@@ -3,7 +3,7 @@ import sys
 
 currentPath = os.getcwd()
 
-sys.path.append(os.path.join(currentPath,'..','..','planFunctions'))
+sys.path.append(os.path.join(currentPath,'..','..','src','planFunctions'))
 
 
 from setContamPlan import setContamPlan
