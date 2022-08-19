@@ -1,0 +1,116 @@
+{
+  "Mechanical supply": [],
+  "Mechanical exhaust": [
+    {
+      "Room": "Badkamer",
+      "Nominal flow rate": 50
+    },
+    {
+      "Room": "Wasplaats",
+      "Nominal flow rate": 50
+    },
+    {
+      "Room": "Keuken",
+      "Nominal flow rate": 50
+    },
+    {
+      "Room": "WC",
+      "Nominal flow rate": 25
+    }
+  ],
+  "Natural supply": [
+    {
+      "Room": "Slaapkamer3",
+      "Capacity": 28.512000000000004,
+      "Design pressure": 2,
+      "Self-Regulating": "No"
+    },
+    {
+      "Room": "Slaapkamer2",
+      "Capacity": 28.512000000000004,
+      "Design pressure": 2,
+      "Self-Regulating": "No"
+    },
+    {
+      "Room": "Slaapkamer1",
+      "Capacity": 28.512000000000004,
+      "Design pressure": 2,
+      "Self-Regulating": "No"
+    },
+    {
+      "Room": "Bureau",
+      "Capacity": 28.512000000000004,
+      "Design pressure": 2,
+      "Self-Regulating": "No"
+    },
+    {
+      "Room": "Woonkamer",
+      "Capacity": 75,
+      "Design pressure": 2,
+      "Self-Regulating": "No"
+    }
+  ],
+  "Natural exhaust": [],
+  "Natural transfer": [
+    {
+      "From room": "Nachthal2",
+      "To room": "Slaapkamer3",
+      "Capacity": 25,
+      "Design pressure": 2
+    },
+    {
+      "From room": "Nachthal2",
+      "To room": "Slaapkamer2",
+      "Capacity": 25,
+      "Design pressure": 2
+    },
+    {
+      "From room": "Nachthal",
+      "To room": "Nachthal2",
+      "Capacity": 25,
+      "Design pressure": 2
+    },
+    {
+      "From room": "Nachthal",
+      "To room": "Badkamer",
+      "Capacity": 25,
+      "Design pressure": 2
+    },
+    {
+      "From room": "Nachthal",
+      "To room": "Slaapkamer1",
+      "Capacity": 25,
+      "Design pressure": 2
+    },
+    {
+      "From room": "Nachthal",
+      "To room": "Bureau",
+      "Capacity": 25,
+      "Design pressure": 2
+    },
+    {
+      "From room": "Inkomhal",
+      "To room": "Nachthal",
+      "Capacity": 25,
+      "Design pressure": 2
+    },
+    {
+      "From room": "Inkomhal",
+      "To room": "WC",
+      "Capacity": 25,
+      "Design pressure": 2
+    },
+    {
+      "From room": "Woonkamer",
+      "To room": "Keuken",
+      "Capacity": 25,
+      "Design pressure": 2
+    },
+    {
+      "From room": "Inkomhal",
+      "To room": "Woonkamer",
+      "Capacity": 25,
+      "Design pressure": 2
+    }
+  ]
+}

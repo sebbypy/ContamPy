@@ -7,8 +7,8 @@ import json
 dirPath = os.path.dirname(os.path.realpath(__file__))
 
 sys.path.append(os.path.join(dirPath,'contamFunctions'))
-sys.path.append(os.path.join(dirPath,'computeFunctions/systems'))
-sys.path.append(os.path.join(dirPath,'computeFunctions/controls'))
+#sys.path.append(os.path.join(dirPath,'computeFunctions/systems'))
+#sys.path.append(os.path.join(dirPath,'computeFunctions/controls'))
 sys.path.append(os.path.join(dirPath,'computeFunctions/filters'))
 sys.path.append(os.path.join(dirPath,'setFunctions'))
 sys.path.append(os.path.join(dirPath,'tools'))
@@ -17,13 +17,15 @@ sys.path.append(os.path.join(dirPath,'tools'))
 
 import contam_functions
 import setSystem,setControls,setOccupancyAndSources,setBCS,setWeather,setNumericalParameters,setFilters,setContaminants,setWindPressureProfile,setWindSpeedMultiplier,scalePlan,setLeaks,setOpenstairs
-import computeControls,computeFilters,computeOpenDoors
+import computeFilters
+#import computeControls
+#import computeOpenDoors
 
 
 class caseConfigurator:
 
     
-    def __init__(self,dimBuildingsDir,occupancyDir,weatherDir,libraryDir,contaminantsDir):
+    def __init__(self,dimBuildingsDir,occupancyDir,weatherDir,libraryDir,contaminantsDir,systemsDir=None,controlsDir=None):
        
         self.defaultParameters={'building':'',
                                 'buildingDimensionsVariation':{
@@ -63,6 +65,8 @@ class caseConfigurator:
         self.weatherDir = weatherDir
         self.contaminantsDir = contaminantsDir
         self.libraryDir = libraryDir        
+        self.systemsDir = systemsDir
+        self.controlsDir = controlsDir
     
         self.ContamModel = None
 
@@ -325,9 +329,13 @@ class caseConfigurator:
 
     def computeSystem(self,systemName):
         
+        if self.systemsDir==None:
+            print("No directory for namedSystems")
+            raise ValueError("If you use a named system, you should define the location of the named system directory")
+
         #system=self.actualParameters['system']
 
-        systemComputeFunction,systemArgs = existingSystems().functionAndArguments(systemName)
+        systemComputeFunction,systemArgs = existingSystems(self.systemsDir).functionAndArguments(systemName)
 
         allArguments = [self.ContamModel] + systemArgs
 
@@ -372,13 +380,16 @@ class caseConfigurator:
         
         controlStrategy=self.actualParameters['control']
 
-
-        if controlStrategy == 'systemJSONFile':
-            print("system json")
+        if controlStrategy=='constant':
             return systemJson
 
+        if controlStrategy == 'systemJSONFile':
+            return systemJson
 
-        computeFunction,arguments = existingControls().functionAndArguments(controlStrategy)
+        if self.controlsDir == None:
+            raise ValueError("There is no directory defined for custom control algorithms")
+
+        computeFunction,arguments = existingControls(self.controlsDir).functionAndArguments(controlStrategy)
         
         kwargs = {}
         kwargs['systemJson']=systemJson
@@ -575,61 +586,23 @@ class contamRunner:
 
 class existingSystems:
     
-    def __init__(self):
+    def __init__(self,systemRulesDirectory):
         
-        self.systems={
-                    'CNBN':{
-                            'file':'compute_NBN_D50_001',
-                            'arguments':['C']
-                            },
-                    'DNBN':{
-                            'file':'compute_NBN_D50_001',
-                            'arguments':['D','auto-balance-prop']
-                            },
-                    'CNBNSLAAP':{
-                            'file':'compute_NBN_D50_001',
-                            'arguments':['C','extract-slaapkamers']
-                            },
-                    'CPREVENT':{
-                            'file':'compute_PREVENT',
-                            'arguments':['C','auto-balance-prop']
-                            },
-                    'CPREVENT10Pa':{
-                            'file':'compute_PREVENT',
-                            'arguments':['C','auto-balance-prop','10']
-                            },
-                    'CCascadePREVENT':{
-                            'file':'compute_PREVENT',
-                            'arguments':['CRecyclage','auto-balance-prop']
-                            },
-                    'CCascadePREVENT10Pa':{
-                            'file':'compute_PREVENT',
-                            'arguments':['CRecyclage','auto-balance-prop','10']
-                            },
-                    'DPREVENT':{
-                            'file':'compute_PREVENT',
-                            'arguments':['D','auto-balance-prop']
-                            },
-                    'DCascadePREVENT':{
-                            'file':'compute_PREVENT',
-                            'arguments':['DRecyclage','auto-balance-prop']
-                            },
-                    'CSLAAPPREVENT':{
-                            'file':'compute_PREVENT',
-                            'arguments':['CSLAAP']
-                            },
-                    'CSupplyHall':{
-                            'file':'compute_PREVENT',
-                            'arguments':['CsupplyHall','xx','10']
-                            },
-                    'Windows':{
-                            'file':'compute_SingleSidedWindows',
-                            'arguments':[]}                          
-                          
-                    }
+        sys.path.append(systemRulesDirectory)
+        
+        file= os.path.join(systemRulesDirectory,"namedSystems.json")
+        
+        f = open(file)
+        self.systems=json.load(f)
+        f.close()
+        
+
         
     def functionAndArguments(self,system):
                        
+        if (system not in self.getExistingSystems()):
+            raise ValueError("System "+system+" does not exist in the list of named systems")
+        
         systemModule = importlib.import_module(self.systems[system]['file'])        
         
         return systemModule.compute,self.systems[system]['arguments']
@@ -643,95 +616,16 @@ class existingSystems:
 
 class existingControls:
     
-    def __init__(self):
+    def __init__(self,controlsDirectory):
         
-        self.controlsDict={
-                    'constant':{
-                                'file':'computeControls',
-                                'arguments':
-                                    {'strategy':'constant','flowFraction':1.0}
-                                },
-                    'constant70':{
-                                'file':'computeControls',
-                                'arguments':
-                                {'strategy':'constant','flowFraction':0.7}
-                                },
-                    'constant50':{
-                                'file':'computeControls',
-                                'arguments':
-                                {'strategy':'constant','flowFraction':0.5}
-                                },
-                    'singleNightClock':{
-                                'file':'computeControls',
-                                'arguments':
-                                {'strategy':'singleClock','schedule':'nightClock','minFlow':0.3,'maxFlow':1.0},
-                                },
-                    'CentralCO2Living':{
-                                'file':'computeControls',
-                                'arguments':
-                                {'strategy':'CO2Central','minFlow':0.65,'maxFlow':1.0,'balance':True},
-                                },
-                    'CentralCO2Hall':{
-                                'file':'computeControls',
-                                'arguments':
-                                {'strategy':'CO2CentralHall','minFlow':0.3,'maxFlow':1.0,'balance':True},
-                                },
+        sys.path.append(controlsDirectory)
+        
+        file= os.path.join(controlsDirectory,"namedControls.json")
+        
+        f = open(file)
+        self.controlsDict=json.load(f)
+        f.close()
 
-                    'CentralCO2LivingAndNightClock':{
-                                'file':'computeControls',
-                                'arguments':
-                                {'strategy':'NightClockCO2Central','minFlow':0.3,'maxFlow':1.0,'nightFlow':0.7,'balance':True},
-                                },
-                    'LocalCO2LivingAndNightClock':{
-                                'file':'computeControls',
-                                'arguments':
-                                {'strategy':'NightClockCO2Local','minFlow':0.3,'maxFlow':1.0,'nightFlow':0.7,'balance':True},
-                                },
-                    'fulllocal':{
-                                'file':'computeControls',
-                                'arguments':
-                                    {'strategy':'fulllocal'}
-                                },
-                    'fulllocalRTOs':{
-                                'file':'computeControls',
-                                'arguments':
-                                    {'strategy':'fulllocalRTOs'}
-                                },
-                    'fulllocalRTOsBal':{
-                                'file':'computeControls',
-                                'arguments':
-                                    {'strategy':'fulllocalRTOs','balance':True}
-                                },
-                    'allMotRTOAndGlobalExtract':{
-                            'file':'computeControls',
-                            'arguments':
-                                {'strategy':'allMotRTOAndGlobalExtract'}
-                            },
-                    'oneMotRTOAndGlobalExtract':{
-                            'file':'computeControls',
-                            'arguments':
-                                {'strategy':'oneMotRTOAndGlobalExtract'}
-                            },
-                    'Zonal1RTO':{
-                            'file':'computeControls',
-                            'arguments':
-                                {'strategy':'Zonal1RTO'}
-                            },
-                    'noMotRTOAndGlobalExtract':{
-                            'file':'computeControls',
-                            'arguments':
-                                {'strategy':'noMotRTOAndGlobalExtract'}
-                            },                   
-                    'fulllocal30pc':{
-                                'file':'computeControls',
-                                'arguments':
-                                    {
-                                    'strategy':'fulllocal',
-                                    'minFlow':0.3
-                                     }
-                                },                          
-                          
-                    }
         
     def functionAndArguments(self,controlName):
         

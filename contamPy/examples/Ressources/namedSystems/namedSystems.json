@@ -1,0 +1,7 @@
+{
+	"simpleMEV": {
+		"file": "simpleMEVRules",
+		"function": "compute",
+		"arguments": []
+	}
+}

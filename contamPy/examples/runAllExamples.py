@@ -9,7 +9,10 @@ tests = [['0_modelGeneration','runAll.py'],
         ['1_runSystemFromJson','runFromJson.py'],
         ['1b_runSystemFromJson_MoreComplex','runFromJson.py'],
         ['1c_runSystemFromJson_ClockControl','runFromJson.py'],
-        ['1d_runSystemFromJson_DemandControlled','runFromJson.py']
+        ['1d_runSystemFromJson_DemandControlled','runFromJson.py'],
+        ['1e_runSystemFromJson_MHRV_DCV_Balanced','runFromJson.py'],
+        ['2_runSystemFromRules','runFromRules.py'],
+        ['2b_runSystemAndControlsFromRules','runFromRulesWithControl.py']
         ]
 
 
