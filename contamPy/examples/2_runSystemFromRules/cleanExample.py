@@ -8,7 +8,7 @@ filesToDelete = ['MEV-RIJ2-namedSystem.ach',
                  'MEV-RIJ2-namedSystem.sim',
                  'MEV-RIJ2-namedSystem.xlog',
                  'MEV-RIJ2-namedSystem.console',
-                  'MEV-RIJ2-namedSystem.json']
+                 'MEV-RIJ2-namedSystem.json']
 
 
 for file in filesToDelete:
