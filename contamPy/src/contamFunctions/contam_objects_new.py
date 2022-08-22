@@ -546,7 +546,7 @@ class filters:
             myDict = { header:field for header,field in zip(self.headers,fields) }
             values=filereader.readline().split()
             myDict['values']=values
-            self.df = pd.concat([self.df,pd.DataFrame.from_records([mydict])])
+            self.df = pd.concat([self.df,pd.DataFrame.from_records([myDict])])
             
             
         self.df.index=self.df['nr'].astype(int)
@@ -792,7 +792,9 @@ class sources:
             if c not in dict_to_append.keys():
                 dict_to_append[c]=int(0)    
 
-        self.df=self.df.append({'z':roomid,'e':sourceElemid,'s':scheduleid,'c':ctrlid,'mult':mult,'CC0':CC0},ignore_index=True)
+        #self.df=self.df.append({'z':roomid,'e':sourceElemid,'s':scheduleid,'c':ctrlid,'mult':mult,'CC0':CC0},ignore_index=True)
+        self.df = pd.concat([self.df,pd.DataFrame.from_records([{'z':roomid,'e':sourceElemid,'s':scheduleid,'c':ctrlid,'mult':mult,'CC0':CC0}])],ignore_index=True)
+
 
         for c in ['z','e','s','c']:
             self.df[c]=self.df[c].astype(int)

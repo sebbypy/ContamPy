@@ -257,29 +257,46 @@ def apply(contam_data,occupancy_profile,profilesDir):
 
         #print(keukenocc)
 
-        keukenprofile=keukenprofile.append({'hour':'00:00:00','value':0.0},ignore_index=True)
+        #keukenprofile = keukenprofile.append({'hour':'00:00:00','value':0.0},ignore_index=True)
+        keukenprofile = pd.concat([keukenprofile,pd.DataFrame.from_records([{'hour':'00:00:00','value':0}])])
+        keukenprofile = pd.concat([keukenprofile,pd.DataFrame.from_records([{'hour':'00:00:00','value':0}])],ignore_index=True)
 
+        
         #morning
         boolindex=( (keukenocc.index.time > datetime.time(6)) & (keukenocc.index.time < datetime.time(9)) )
         if (keukenocc.loc[boolindex].max() > 0 ): #occupation durant la periode
-            keukenprofile=keukenprofile.append({'hour':'07:00:00','value':0.4},ignore_index=True)
-            keukenprofile=keukenprofile.append({'hour':'07:10:00','value':0.0},ignore_index=True)
+            #keukenprofile=keukenprofile.append({'hour':'07:00:00','value':0.4},ignore_index=True)
+            #keukenprofile=keukenprofile.append({'hour':'07:10:00','value':0.0},ignore_index=True)
+            keukenprofile = pd.concat([keukenprofile,pd.DataFrame.from_records([{'hour':'07:00:00','value':0.4}])],ignore_index=True)
+            keukenprofile = pd.concat([keukenprofile,pd.DataFrame.from_records([{'hour':'07:10:00','value':0.0}])],ignore_index=True)
+
 
         #midi
         boolindex=( (keukenocc.index.time >= datetime.time(12)) & (keukenocc.index.time < datetime.time(14)) )
         if (keukenocc.loc[boolindex].max() > 0 ): #occupation durant la periode
-            keukenprofile=keukenprofile.append({'hour':'12:00:00','value':0.4},ignore_index=True)
-            keukenprofile=keukenprofile.append({'hour':'12:10:00','value':0.0},ignore_index=True)
+            #keukenprofile=keukenprofile.append({'hour':'12:00:00','value':0.4},ignore_index=True)
+            #keukenprofile=keukenprofile.append({'hour':'12:10:00','value':0.0},ignore_index=True)
+            keukenprofile = pd.concat([keukenprofile,pd.DataFrame.from_records([{'hour':'12:00:00','value':0.4}])],ignore_index=True)
+            keukenprofile = pd.concat([keukenprofile,pd.DataFrame.from_records([{'hour':'12:10:00','value':0}])],ignore_index=True)
+
 
         #soir
         boolindex=( (keukenocc.index.time >= datetime.time(18)) & (keukenocc.index.time < datetime.time(20)) )
         if (keukenocc.loc[boolindex].max() > 0 ): #occupation durant la periode
-            keukenprofile=keukenprofile.append({'hour':'18:00:00','value':0.4},ignore_index=True)
-            keukenprofile=keukenprofile.append({'hour':'18:10:00','value':0.67},ignore_index=True)
-            keukenprofile=keukenprofile.append({'hour':'18:20:00','value':1.0},ignore_index=True)
-            keukenprofile=keukenprofile.append({'hour':'18:30:00','value':0.0},ignore_index=True)
+            #îkeukenprofile=keukenprofile.append({'hour':'18:00:00','value':0.4},ignore_index=True)
+            #keukenprofile=keukenprofile.append({'hour':'18:10:00','value':0.67},ignore_index=True)
+            #keukenprofile=keukenprofile.append({'hour':'18:20:00','value':1.0},ignore_index=True)
+            #keukenprofile=keukenprofile.append({'hour':'18:30:00','value':0.0},ignore_index=True)
 
-        keukenprofile=keukenprofile.append({'hour':'24:00:00','value':0.0},ignore_index=True)
+            keukenprofile = pd.concat([keukenprofile,pd.DataFrame.from_records([{'hour':'18:00:00','value':0.40}])],ignore_index=True)
+            keukenprofile = pd.concat([keukenprofile,pd.DataFrame.from_records([{'hour':'18:10:00','value':0.67}])],ignore_index=True)
+            keukenprofile = pd.concat([keukenprofile,pd.DataFrame.from_records([{'hour':'18:20:00','value':1.00}])],ignore_index=True)
+            keukenprofile = pd.concat([keukenprofile,pd.DataFrame.from_records([{'hour':'18:30:00','value':0.00}])],ignore_index=True)
+
+
+        #keukenprofile=keukenprofile.append({'hour':'24:00:00','value':0.0},ignore_index=True)
+        keukenprofile = pd.concat([keukenprofile,pd.DataFrame.from_records([{'hour':'24:00:00','value':0.0}])],ignore_index=True)
+
         #print(keukenprofile)
             
         dayschedules.addSchedule('Keuken_'+str(localcounter),'Kitchen profile for occupancy profiles '+str(group),keukenprofile)  
@@ -319,10 +336,19 @@ def apply(contam_data,occupancy_profile,profilesDir):
     #Laundry/Wasplaats
     
     laundryprofile=pd.DataFrame(columns=['hour','value'])
-    laundryprofile=laundryprofile.append({'hour':'00:00:00','value':0},ignore_index=True)
+    
+    
+    '''laundryprofile=laundryprofile.append({'hour':'00:00:00','value':0},ignore_index=True)
     laundryprofile=laundryprofile.append({'hour':'08:00:00','value':1},ignore_index=True)
     laundryprofile=laundryprofile.append({'hour':'20:00:00','value':0},ignore_index=True)
-    laundryprofile=laundryprofile.append({'hour':'24:00:00','value':0},ignore_index=True)
+    laundryprofile=laundryprofile.append({'hour':'24:00:00','value':0},ignore_index=True)'''
+    
+    laundryprofile = pd.concat([laundryprofile,pd.DataFrame.from_records([{'hour':'00:00:00','value':0}])])
+    laundryprofile = pd.concat([laundryprofile,pd.DataFrame.from_records([{'hour':'08:00:00','value':1}])])
+    laundryprofile = pd.concat([laundryprofile,pd.DataFrame.from_records([{'hour':'20:00:00','value':0}])])
+    laundryprofile = pd.concat([laundryprofile,pd.DataFrame.from_records([{'hour':'24:00:00','value':0}])])
+
+    laundryprofile.index = [1,2,3,4]
     
     dayschedules.addSchedule('Wasplaats','Day laundry profile',laundryprofile)  
 
@@ -399,8 +425,11 @@ def read_standard_occupancy_file(csvf):
         else:
             fields=lines[i].split(',')
             if (len(fields)>1):
-                df=df.append({'hour':fields[0],'zonename':fields[1],'douche':fields[2]=='douche'},ignore_index=True)
-         
+                #df=df.append({'hour':fields[0],'zonename':fields[1],'douche':fields[2]=='douche'},ignore_index=True)
+                df = pd.concat([df,pd.DataFrame.from_records([{'hour':fields[0],'zonename':fields[1],'douche':fields[2]=='douche'}])])
+
+    df.index = range(1,len(df)+1)
+            
     f.close()
          
     return name,description,df

@@ -63,7 +63,8 @@ def compute(**kwargs):
                     x["Actuator"]=actuatorName
 
         else:
-                
+             
+            
             signaldict={"Type":"Single-Sensor","Specie":"H2O","Room":room}
 
             signalName = "H2O-"+room
@@ -80,7 +81,6 @@ def compute(**kwargs):
                     x["Actuator"]=actuatorName
 
                 
-            break
 
     return controlJson
 

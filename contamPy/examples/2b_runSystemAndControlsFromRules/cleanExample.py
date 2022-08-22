@@ -1,7 +1,8 @@
 import os
 
 
-filesToDelete = ['MEV-RIJ2-namedSystemWithControls.ach',
+filesToDelete = ['MEV-RIJ2-namedSystemWithControls.json',
+                 'MEV-RIJ2-namedSystemWithControls.ach',
                  'MEV-RIJ2-namedSystemWithControls.log',
                  'MEV-RIJ2-namedSystemWithControls.prj',
                  'MEV-RIJ2-namedSystemWithControls.rst',
