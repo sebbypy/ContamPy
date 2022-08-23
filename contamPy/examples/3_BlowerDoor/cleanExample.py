@@ -1,14 +1,17 @@
 import os
 
 
-
-filesToDelete = ['DetachedHouse_withDimensions.prj',
-                'DetachedHouse_noDimensions-areas-empty.csv'
-                'DetachedHouse_noDimensions-areas-filled.csv']
+filesToDelete = ['BlowerDoor.val',
+                 'BlowerDoor.log',
+                 'BlowerDoor.prj',
+                 'BlowerDoor.rst',
+                 'BlowerDoor.sim',
+                 'BlowerDoor.xlog',
+                 'BlowerDoor.console']
 
 
 for file in filesToDelete:
-    
+   
     if os.path.exists(file):  
         
         try:

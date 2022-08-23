@@ -127,8 +127,10 @@ def checkContamPlan(fname):
         commonflowpaths=contam_functions.getcommonpaths(flowpaths,roomid,-1) #-1 is zone id in flow paths for outside    
         df=commonflowpaths.copy()  #name change for concision
     
-    
-        areadf=areadf.append({'roomid':roomid,'roomname':rooms.loc[roomid,'name'],'level':levelName,'surface':'floor-area','area':np.nan,'wall-height':np.nan,'wall-length':np.nan,'boundary':'-'},ignore_index=True)
+
+        toAppend = {'roomid':roomid,'roomname':rooms.loc[roomid,'name'],'level':levelName,'surface':'floor-area','area':np.nan,'wall-height':np.nan,'wall-length':np.nan,'boundary':'-'}    
+        areadf = pd.concat([areadf,pd.DataFrame.from_records([toAppend])],ignore_index=True)
+        #areadf=areadf.append({'roomid':roomid,'roomname':rooms.loc[roomid,'name'],'level':levelName,'surface':'floor-area','area':np.nan,'wall-height':np.nan,'wall-length':np.nan,'boundary':'-'},ignore_index=True)
            
            
         for direction in df['dir'].unique():
@@ -148,10 +150,16 @@ def checkContamPlan(fname):
                 else:
                     fpindex=df.index[df['dir']==direction][0]
                     if (df.loc[fpindex,'pld'] > levelid):  #junction start for level higher --> roof
-                        areadf=areadf.append({'roomid':roomid,'roomname':rooms.loc[roomid,'name'],'level':levelName,'surface':'facade-roof','wall-length':np.nan,'wall-height':np.nan,'area':np.nan,'boundary':'flat-outside'},ignore_index=True)
+
+                        #areadf=areadf.append({'roomid':roomid,'roomname':rooms.loc[roomid,'name'],'level':levelName,'surface':'facade-roof','wall-length':np.nan,'wall-height':np.nan,'area':np.nan,'boundary':'flat-outside'},ignore_index=True)
+                        toAppend = {'roomid':roomid,'roomname':rooms.loc[roomid,'name'],'level':levelName,'surface':'facade-roof','wall-length':np.nan,'wall-height':np.nan,'area':np.nan,'boundary':'flat-outside'}   
+                        areadf = pd.concat([areadf,pd.DataFrame.from_records([toAppend])],ignore_index=True)
+
 
                     else:
-                        areadf=areadf.append({'roomid':roomid,'roomname':rooms.loc[roomid,'name'],'level':levelName,'surface':'facade-ground','wall-length':np.nan,'wall-height':np.nan,'area':np.nan,'boundary':'zero-pressure'},ignore_index=True)
+                        #areadf=areadf.append({'roomid':roomid,'roomname':rooms.loc[roomid,'name'],'level':levelName,'surface':'facade-ground','wall-length':np.nan,'wall-height':np.nan,'area':np.nan,'boundary':'zero-pressure'},ignore_index=True)
+                        toAppend = {'roomid':roomid,'roomname':rooms.loc[roomid,'name'],'level':levelName,'surface':'facade-ground','wall-length':np.nan,'wall-height':np.nan,'area':np.nan,'boundary':'zero-pressure'}
+                        areadf = pd.concat([areadf,pd.DataFrame.from_records([toAppend])],ignore_index=True)
             
             
             
@@ -166,12 +174,18 @@ def checkContamPlan(fname):
                     return
                 else:
                 
-                   areadf=areadf.append({'roomid':roomid,'roomname':rooms.loc[roomid,'name'],'level':levelName,'surface':'facade-'+sketchdirs[direction],'wall-length':np.nan,'wall-height':3.0,'area':np.nan,'boundary':'vertical-outside'},ignore_index=True)
+                   #areadf=areadf.append({'roomid':roomid,'roomname':rooms.loc[roomid,'name'],'level':levelName,'surface':'facade-'+sketchdirs[direction],'wall-length':np.nan,'wall-height':3.0,'area':np.nan,'boundary':'vertical-outside'},ignore_index=True)
+
+                   toAppend = {'roomid':roomid,'roomname':rooms.loc[roomid,'name'],'level':levelName,'surface':'facade-'+sketchdirs[direction],'wall-length':np.nan,'wall-height':3.0,'area':np.nan,'boundary':'vertical-outside'}
+                   areadf = pd.concat([areadf,pd.DataFrame.from_records([toAppend])],ignore_index=True)
+
 
                    if (npaths==5):
                        #sloped roof
-                       areadf=areadf.append({'roomid':roomid,'roomname':rooms.loc[roomid,'name'],'level':levelName,'surface':'facade-slopedroof','wall-length':np.nan,'wall-height':np.nan,'area':np.nan,'boundary':'sloped-outside'},ignore_index=True)
+                       #areadf=areadf.append({'roomid':roomid,'roomname':rooms.loc[roomid,'name'],'level':levelName,'surface':'facade-slopedroof','wall-length':np.nan,'wall-height':np.nan,'area':np.nan,'boundary':'sloped-outside'},ignore_index=True)
 
+                       toAppend = {'roomid':roomid,'roomname':rooms.loc[roomid,'name'],'level':levelName,'surface':'facade-slopedroof','wall-length':np.nan,'wall-height':np.nan,'area':np.nan,'boundary':'sloped-outside'}
+                       areadf = pd.concat([areadf,pd.DataFrame.from_records([toAppend])],ignore_index=True)
 
     
     areadf.index=areadf['roomid']

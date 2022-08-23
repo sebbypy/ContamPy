@@ -29,6 +29,7 @@ caseConfig = caseConfigurator(refBuildingsDir,occupancyDir,weatherDir,libraryDir
 # Parameters to apply to the system. The parameters listed here are the minimal required parameters
 
 allParameters = {'building':'COVL-REN-RIJ2',
+                'simulationType':'transient',
                  'v50':3,
                  'orientation':90,
                 'system':{

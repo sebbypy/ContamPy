@@ -2,13 +2,12 @@ import os
 import sys
 
 currentPath = os.getcwd()
-
-srcPath = os.path.join(currentPath,'..','..','src')
-
-sys.path.append(srcPath)
-sys.path.append(currentPath)
+sys.path.append(os.path.join(currentPath,'..','..','src'))
+sys.path.append(os.path.join(currentPath,'..','..','src','postProcessing'))
 
 from caseManager import caseConfigurator,contamRunner
+
+from postpro_functions import getBlowerDoorResults
 
 
 # Defining the paths of the various required ressources: reference building occupancy profiles, weather, libraries, contam EXE
@@ -27,27 +26,13 @@ caseConfig = caseConfigurator(refBuildingsDir,occupancyDir,weatherDir,libraryDir
 
 
 
-# Parameters to apply to the system. The parameters listed here are the minimal required parameters
+
+v50 =1
 
 allParameters = {'building':'COVL-REN-RIJ2',
-                'simulationType':'transient',
-                 'v50':3,
-                 'orientation':90,
-                'system':{
-                        'definition':'JSONfile',
-                        'filename':'MHRV-RIJ2-DCV-BALANCED.json'
-                        },
-                'control':'systemJSONFile',
-                'weather':'Uccle',
-                'simulationTimeStep':'00:05:00',
-                'StartDate':'Jan01',
-                'EndDate':'Jan07',
-                'outputTimeStep':'00:05:00',
+                'simulationType':'blowerDoor',
+                'v50':v50,
                 'outputFiles':['simconc','simflow','log','ach'],
-                'shielding':'semi-exposed',
-                'terrainRoughness':'III',
-                'weatherRoughness':'I',
-                'occupancy':'default-home'
                 }
 
 
@@ -56,27 +41,31 @@ allParameters = {'building':'COVL-REN-RIJ2',
 # Read and apply parameters, writing the resulting contam file
 caseConfig.readParameters(allParameters)
 caseConfig.applyParameters()
-caseConfig.writeContamFile('MHRV-RIJ2-DCV-BALANCED.prj')
-
+caseConfig.writeContamFile('BlowerDoor.prj')
 
 
 # Run an existing PRJ file
 contam = contamRunner(contamDir)    
-contam.runContam('MHRV-RIJ2-DCV-BALANCED.prj')
+contam.runContam('BlowerDoor.prj')
 
 
 
 
-# Plot mechanical flow rates
+#getting blower door results
+leaks = caseConfig.getLeaksInformations()
 
-import plotFlows
-print("Flow rates plotted")
-
-
+blowerDoorResults = getBlowerDoorResults('BlowerDoor.val')
 
 
+n50 = blowerDoorResults['Volume flow rate (m3/h)']/blowerDoorResults['Conditioned volume']
 
 
+print("Sum of leaks multipliers in the CONTAM model (should be equal to v50*(total area) ): "+str(leaks.loc['Total','v50*area']))
+print("v50: ",v50)
+print("Resulting area: ",leaks.loc['Total','v50*area']/v50)
+for k,v in blowerDoorResults.items():
+    print(k+": "+str(v))
+print("n50 :","{:.1f}".format(n50))
 
 
 

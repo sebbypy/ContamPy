@@ -2294,6 +2294,20 @@ class SimInputs:
         
         while('-999' not in lastline):
             lastline=filereader.readline()
+            
+            
+            if ('sim_af' in lastline):
+                self.otherlines.append(lastline)
+                fields = filereader.readline().split()
+                self.airFlowsParameters = fields
+                continue
+
+            if ('sim_mf' in lastline):
+                self.otherlines.append(lastline)
+                fields = filereader.readline().split()
+                self.massFractionParameters = fields
+                continue
+
 
             if ('weather file' in lastline):
                 self.weatherfile,self.wcomment=lastline.split('!')
@@ -2440,6 +2454,18 @@ class SimInputs:
 
         for line in self.otherlines:
         
+            if ('sim_af' in line):
+                g.write(line)
+                [ g.write(str(x)+' ') for x in self.airFlowsParameters]
+                g.write('\n')
+                continue
+
+            if ('sim_mf' in line):
+                g.write(line)
+                [ g.write(str(x)+' ') for x in self.massFractionParameters]
+                g.write('\n')
+                continue
+
             
             if ('weather file' in line):
                 g.write(self.weatherfile+' ! '+self.wcomment)

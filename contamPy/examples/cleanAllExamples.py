@@ -12,7 +12,16 @@ def clean(tests):
     
         print("Cleaning ",folder)
     
-        e,o = subprocess.getstatusoutput('cd '+folder+';python3 cleanExample.py; cd ..')
+        if os.name == 'nt':
+
+            pythonexe = sys.executable
+
+            e,o = subprocess.getstatusoutput('cd '+folder+'& '+pythonexe+' cleanExample.py & cd ..')
+
+        if os.name == 'posix':
+
+    
+            e,o = subprocess.getstatusoutput('cd '+folder+';python3 cleanExample.py; cd ..')
 
 
 

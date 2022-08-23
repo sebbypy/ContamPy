@@ -60,6 +60,7 @@ def setContamPlan(inputFileName,csvFileNameWithPath,outputFileNameWithPath):
     areas.loc[areas['area'].isna(),'area']=areas.loc[areas['area'].isna(),'wall-length']*areas.loc[areas['area'].isna(),'wall-height']
     
     
+    
     #-------------------------------------------------
     # Setting volume of zones (depending on floor area)
     #-------------------------------------------------
@@ -323,7 +324,7 @@ def setContamPlan(inputFileName,csvFileNameWithPath,outputFileNameWithPath):
         if (flowpaths.df.loc[index,'pe'] not in [crackelemid,constant_flow_id,large_opening_id] ):
             flowpaths.df.loc[index,'mult']=0.0
     
-    
+  
     
     contam_functions.writecontamfile(inputFileName,outputFileNameWithPath,contam_data)
     

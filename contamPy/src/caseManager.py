@@ -28,6 +28,7 @@ class caseConfigurator:
     def __init__(self,dimBuildingsDir,occupancyDir,weatherDir,libraryDir,contaminantsDir,systemsDir=None,controlsDir=None):
        
         self.defaultParameters={'building':'',
+                                'simulationType':'transient',
                                 'buildingDimensionsVariation':{
                                     'volumeRatio': 1.0,
                                     'mode': 'uniform'
@@ -35,10 +36,7 @@ class caseConfigurator:
                                 'orientation':0,
                                 'v50':1,
                                 'leaksDistribution':'uniform',
-                                'system':{
-                                        'definition':'namedSystem',
-                                        'name':'DPREVENT'
-                                        },
+                                'system':None,
                                 'control':'constant',
                                 'occupancy': None,
                                 'weather':'',
@@ -78,7 +76,15 @@ class caseConfigurator:
         self.getBuildingModel()
         self.modifyBuildingDimensions()
 
+        self.setAirtightnessOrientation()
+
+        if self.actualParameters['simulationType']=='blowerDoor':
+            self.setBlowerDoor()
+            return
+
+
         self.setNumericalParameters()
+        
 
         systemJSON = self.getSystemJson()
         #systemJSON = self.computeSystem()               
@@ -101,7 +107,6 @@ class caseConfigurator:
 
         self.setContaminantsFile()  
 
-        self.setAirtightnessOrientation()
         
         self.setWeather()
         
@@ -186,11 +191,18 @@ class caseConfigurator:
         
 
     def readParameters(self,parametersDict):
+        
+        if parametersDict['simulationType']=='blowerDoor':
 
-        minimalParameters = ['building','system','control','weather',
-                             'simulationTimeStep','StartDate','EndDate'
-                             ,'outputTimeStep','outputFiles']        
+            minimalParameters = ['building','v50','outputFiles']        
+            
+        else:
+            
+            minimalParameters = ['building','system','control','weather',
+                                 'simulationTimeStep','StartDate','EndDate'
+                                 ,'outputTimeStep','outputFiles']        
 
+            
         
         for p in minimalParameters:
             if p not in parametersDict.keys():
@@ -233,6 +245,9 @@ class caseConfigurator:
             raise ValueError("ERROR with the building file: "+buildingFile+" does not exist")
     
         
+        if self.actualParameters['simulationType'] == 'blowerDoor':
+            return
+    
         weatherFile = os.path.join(self.weatherDir,self.actualParameters['weather']+'.wth')
         if not os.path.exists(weatherFile):
             raise ValueError("ERROR with the weather file: "+weatherFile+" does not exist")
@@ -265,6 +280,14 @@ class caseConfigurator:
                     raise ValueError("A filter cannot be defined for contaminant "+filterSpecie+".The existing contaminants are "+str(allSpecies))
     
 
+    def setBlowerDoor(self):
+        
+        self.ContamModel['siminputs'].airFlowsParameters[0] = 4
+        self.ContamModel['siminputs'].massFractionParameters[0] = 0
+        
+        return
+        
+
     def getExtraContaminants(self):
         
         if (self.actualParameters['extraContaminants'] != None):
@@ -273,6 +296,31 @@ class caseConfigurator:
             return []
 
     
+    def getLeaksInformations(self):
+
+        zones = self.ContamModel['zones'].df
+        
+        flowelems = self.ContamModel['flowelems'].df
+        flowpaths = self.ContamModel['flowpaths'].df
+
+        leakElemId = flowelems[flowelems['name']=='Gen_crack'].index[0]
+
+        leaks = flowpaths[flowpaths['pe']==leakElemId]
+        
+        for li in leaks.index:
+            
+            #leaks.loc[li,'from'] = zones.loc[leaks.loc[li,'pzn']]
+            leaks.loc[li,'from']= 'Ext'
+            leaks.loc[li,'to'] = zones.loc[leaks.loc[li,'pzm'],'name']
+            leaks.loc[li,'v50*area'] = leaks.loc[li,'mult']
+
+        leaks = leaks.filter(items=['from','to','v50*area'])        
+        
+        leaks.loc['Total','v50*area']=leaks['v50*area'].sum()
+        
+        return leaks
+    
+
 
     def getBuildingModel(self):
         
@@ -542,6 +590,8 @@ class caseConfigurator:
         
         if self.actualParameters['openStairs']:
             setOpenstairs.apply(self.ContamModel)
+
+
 
 
 class contamRunner:

@@ -184,6 +184,34 @@ def readAch(contamAch):
     return df
 
 
+def getBlowerDoorResults(valFile):
+    
+    f=open(valFile)
+    
+    lines = f.read().split('\n')
+    f.close()
+    
+    for i in range(len(lines)):
+        
+        if 'Volume flow rate' in lines[i]:
+            flowRate = float(lines[i+2].split()[0])
+    
+        if ('Conditioned zones' in lines[i]):
+            condVolume = float(lines[i+1].split()[0])
+            
+        if 'Unconditioned zones' in lines[i]:
+            uncondVolume = float(lines[i+1].split()[0])
+    
+
+    
+
+    """print("Conditioned volume: "+condVolume)
+    print("Undoncidioned volume: "+uncondVolume)
+    print("Volume flow rate: "+flowRate)"""
+    
+    return {'Conditioned volume':condVolume,'Unconditioned volume':uncondVolume,'Volume flow rate (m3/h)':flowRate}
+
+
 
 def selectOneDay(df,date):
     

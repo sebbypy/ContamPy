@@ -26,6 +26,7 @@ caseConfig = caseConfigurator(refBuildingsDir,occupancyDir,weatherDir,libraryDir
 # Parameters to apply to the system. The parameters listed here are the minimal required parameters
 
 allParameters = {'building':'SingleZone',
+                'simulationType':'transient',
                 'system':{
                         'definition':'JSONfile',
                         'filename':'simpleSystem.json'
