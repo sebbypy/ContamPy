@@ -15,7 +15,8 @@ tests = [['0_modelGeneration','runAll.py'],
          ['2_runSystemFromRules','runFromRules.py'],
          ['2b_runSystemAndControlsFromRules','runFromRulesWithControl.py'],
          ['3_BlowerDoor','runBlowerDoor.py'],
-         ['3b_BlowerDoor_fromExample_0b','runBlowerDoor.py']
+         ['3b_BlowerDoor_fromExample_0b','runBlowerDoor.py'],
+         ['4_SpeciesAndFilters','runFromJSON.py']
          ]
 
 

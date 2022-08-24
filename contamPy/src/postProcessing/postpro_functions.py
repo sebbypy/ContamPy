@@ -165,9 +165,11 @@ def readDataBaseFromFile(dataBase):
 
 def readContamLog(contamlog):
 
+    #'Filters':'Q_*;CO2_*;H2O_*;^O_*;VOC_*',
+
     parameters={
         'Year to assign':2020,
-        'Filters':'Q_*;CO2_*;H2O_*;^O_*;VOC_*',
+        'Filters':'',
         'Load ach file?':False,
     }
 

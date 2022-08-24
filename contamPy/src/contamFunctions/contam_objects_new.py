@@ -467,14 +467,16 @@ class filterElements:
                 efficiencyDict[specie] = float(efficiency)
             
             mydict['efficiencies']=efficiencyDict
+            dictAsString = str(efficiencyDict)
             
-            self.df = pd.concat([self.df,pd.DataFrame.from_records([mydict])])
+            self.df = pd.concat([self.df,pd.DataFrame.from_records([dictAsString])],ignore_index=True)
             
         self.df.index=self.df['id'].astype(int)
         self.df.drop(['id'],axis=1,inplace=True)
 
         self.df=convert_cols(self.df)
- 
+
+
     
     def write(self,g):
     
@@ -490,10 +492,14 @@ class filterElements:
             g.write(self.df.loc[i,'description'])
             if ('\n' not in self.df.loc[i,'description']):
                 g.write('\n')
+
+
+            dictAsString = self.df.loc[i,'efficiencies']
+            efficienciesDict = eval(dictAsString)
             
-            g.write(str(len(self.df.loc[i,'efficiencies']))+'\n')
-             
-            for key,value in self.df.loc[i,'efficiencies'].items() :
+            g.write(str(len(efficienciesDict))+'\n')
+ 
+            for key,value in efficienciesDict.items() :
                 g.write(key+' '+str(value)+'\n')
 
 
@@ -507,11 +513,10 @@ class filterElements:
         self.df.loc[self.nelems,'description']=paramsDict['Description']
 
         
-        self.df.loc[self.nelems,'efficiencies']= [paramsDict['Efficiencies']]
-        # paramsDict[Efficiencies] is a dictionnary
-        # assigning a diciotnnary "as is" a DataFrame cell does not work properly
-        # putting it between [] does the trick
-        
+        self.df.loc[self.nelems,'efficiencies']= str(paramsDict['Efficiencies'])
+        # storing dictionaries in dataframe cells is not consisten across pandas versions
+        # for some version putting the dict in brackets works, but for some is stores an array
+        # store as string, and then evaluate the dictionnary with eval
         
         #Default values for constant efficiency filters
         fields=['ftype','area','depth','density','ual','ud']
@@ -582,7 +587,8 @@ class filters:
         serie.name = self.nelems
         
         
-        self.df = self.df.append(serie)
+        #self.df = self.df.append(serie)
+        self.df = pd.concat([self.df,pd.DataFrame(serie).T])
         
         #self.df.loc[self.nelems,'fe'] = filterElementIndex
         #self.df.loc[self.nelems,'sub'] = 1
