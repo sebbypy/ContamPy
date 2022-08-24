@@ -33,7 +33,9 @@ allParameters = {'building':'COVL-REN-RIJ2',
                         'definition':'JSONfile',
                         'filename':'MEV-RIJ2-Clock.json'
                         },
-                'control':'systemJSONFile',
+                'control':{
+                        'controlType':'systemJSONFile'
+                        },
                 'weather':'Uccle',
                 'simulationTimeStep':'00:05:00',
                 'StartDate':'Jan01',

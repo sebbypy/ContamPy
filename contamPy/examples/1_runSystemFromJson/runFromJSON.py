@@ -31,7 +31,6 @@ allParameters = {'building':'SingleZone',
                         'definition':'JSONfile',
                         'filename':'simpleSystem.json'
                         },
-                'control':'constant',
                 'weather':'Uccle',
                 'simulationTimeStep':'00:05:00',
                 'StartDate':'Jan01',

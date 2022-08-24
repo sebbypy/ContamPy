@@ -35,7 +35,6 @@ allParameters = {'building':'COVL-REN-RIJ2',
                         'definition':'namedSystem',
                         'name':'simpleMEV'
                         },
-                'control':'constant',
                 'weather':'Uccle',
                 'simulationTimeStep':'00:05:00',
                 'StartDate':'Jan01',

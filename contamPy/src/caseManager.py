@@ -37,7 +37,7 @@ class caseConfigurator:
                                 'v50':1,
                                 'leaksDistribution':'uniform',
                                 'system':None,
-                                'control':'constant',
+                                'control':None,
                                 'occupancy': None,
                                 'weather':'',
                                 'extraContaminants':{},
@@ -198,7 +198,7 @@ class caseConfigurator:
             
         else:
             
-            minimalParameters = ['building','system','control','weather',
+            minimalParameters = ['building','system','weather',
                                  'simulationTimeStep','StartDate','EndDate'
                                  ,'outputTimeStep','outputFiles']        
 
@@ -426,41 +426,59 @@ class caseConfigurator:
 
     def computeControl(self,systemJson):
         
-        controlStrategy=self.actualParameters['control']
+        controlDict=self.actualParameters['control']
 
-        if controlStrategy=='constant':
+
+        if controlDict == None:
+
             return systemJson
-
-        if controlStrategy == 'systemJSONFile':
-            return systemJson
-
-        if self.controlsDir == None:
-            raise ValueError("There is no directory defined for custom control algorithms")
-
-        computeFunction,arguments = existingControls(self.controlsDir).functionAndArguments(controlStrategy)
         
-        kwargs = {}
-        kwargs['systemJson']=systemJson
-        kwargs.update(arguments)
+        else:
+
+            controlStrategy = controlDict['controlType']
+
+            if controlStrategy=='constant' or controlStrategy=='systemJSONFile':
+
+                return systemJson
+
+            elif controlStrategy=='namedControlStrategy':        
+                
+
+                if self.controlsDir == None:
+                    raise ValueError("There is no directory defined for custom control algorithms")
+
+                strategyName = controlDict['controlStrategyName']
         
-        #//allArguments = [systemJson] + extraArguments
+                computeFunction,optionsDict = existingControls(self.controlsDir).functionAndArguments(strategyName)
+                
+                kwargs = {}
+                kwargs['systemJson']=systemJson
         
-        if self.actualParameters['system']['definition']=='namedSystem':
+            
+                if "defaultArguments" in optionsDict.keys():
+                    kwargs.update(optionsDict["defaultArguments"])
+            
         
-            if (self.actualParameters['system']['name'][0] == 'D' and controlStrategy == 'fulllocal'):
-                #allArguments.append('balanced')
-                kwargs['balance']=True
-    
-            if (self.actualParameters['system']['name'] == 'CPREVENT' and controlStrategy in ['fulllocalRTOsBal','fulllocalBal']):
-                #allArguments.append('balanced')
-                kwargs['balance']=True
+                #//allArguments = [systemJson] + extraArguments
+                
+                if self.actualParameters['system']['definition']=='namedSystem':
+                
+                    systemName = self.actualParameters['system']['name']
 
+                    if "systemSpecificArguments" in optionsDict.keys():                
+                        if systemName in optionsDict["systemSpecificArguments"].keys():
+                            kwargs.update(optionsDict["systemSpecificArguments"][systemName])   
+        
+                if 'extraArguments' in self.actualParameters['control']:
+                    kwargs.update(self.actualParameters['control']['extraArguments'])
+                    
+        
+                controlJson = computeFunction(**kwargs)
+        
+                return controlJson
 
-        controlJson = computeFunction(**kwargs)
-
-
-        return controlJson
-
+            else:
+                raise ValueError("Uknown control strategy "+controlStrategy)
 
     def setControls(self,controlJson):
         
@@ -672,7 +690,7 @@ class existingControls:
         
         file= os.path.join(controlsDirectory,"namedControls.json")
         
-        f = open(file)
+        f = open(file,'r')
         self.controlsDict=json.load(f)
         f.close()
 
@@ -682,7 +700,8 @@ class existingControls:
                        
         controlModule = importlib.import_module(self.controlsDict[controlName]['file'])        
         
-        return controlModule.compute,self.controlsDict[controlName]['arguments']
+        
+        return controlModule.compute,self.controlsDict[controlName]
 
 
     def getExistingControls(self):

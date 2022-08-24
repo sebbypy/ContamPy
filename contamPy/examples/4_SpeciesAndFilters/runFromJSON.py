@@ -33,11 +33,13 @@ allParameters = {'building':'COVL-REN-RIJ2',
                 'simulationType':'transient',
                  'v50':3,
                  'orientation':90,
-                'system':{
+                 'system':{
                         'definition':'JSONfile',
                         'filename':'MHRV-RIJ2-BALANCED-FILTERS.json'
                         },
-                'control':'systemJSONFile',
+                'control':{
+                        'controlType':'systemJSONFile'
+                        },
                 'weather':'Uccle',
                 'simulationTimeStep':'00:05:00',
                 'StartDate':'Jan01',

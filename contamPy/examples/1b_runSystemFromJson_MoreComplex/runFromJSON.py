@@ -33,7 +33,6 @@ allParameters = {'building':'COVL-REN-RIJ2',
                         'definition':'JSONfile',
                         'filename':'MEV-RIJ2.json'
                         },
-                'control':'constant',
                 'weather':'Uccle',
                 'simulationTimeStep':'00:05:00',
                 'StartDate':'Jan01',

@@ -37,7 +37,9 @@ allParameters = {'building':'COVL-REN-RIJ2',
                         'definition':'JSONfile',
                         'filename':'MHRV-RIJ2-DCV-BALANCED.json'
                         },
-                'control':'systemJSONFile',
+                'control':{
+                        'controlType':'systemJSONFile'
+                        },
                 'weather':'Uccle',
                 'simulationTimeStep':'00:05:00',
                 'StartDate':'Jan01',

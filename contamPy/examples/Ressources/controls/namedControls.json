@@ -1,6 +1,5 @@
 {
     "simpleControl": {
-		"file": "simpleControl",
-		"arguments": {}
+		"file": "simpleControl"
 	}
 }
