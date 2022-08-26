@@ -39,11 +39,23 @@ def setContamPlan(inputFileName,csvFileNameWithPath,outputFileNameWithPath):
     # Getting the ID of the generic flow elements
     #--------------------------------------------
     defaultelem=flowelems.df[flowelems.df['name']=='DefaultPath'].index[0]
-    crackelemid=flowelems.df[flowelems.df['name']=='Gen_crack'].index[0]
     nat_supply_id=flowelems.df[flowelems.df['name']=='Gen_NSV'].index[0]
     nat_transfer_id=flowelems.df[flowelems.df['name']=='Gen_NT'].index[0]
     constant_flow_id=flowelems.df[flowelems.df['name']=='ConstantFlow'].index[0]
     large_opening_id=flowelems.df[flowelems.df['name']=='LargeOpening'].index[0]
+
+    crackelemid=flowelems.df[flowelems.df['name']=='Gen_crack'].index[0]
+
+    flowelems.createNewElementFromExistingOne('Gen_crack','SlopedR_crack','Generic crack for sloped roof')
+    flowelems.createNewElementFromExistingOne('Gen_crack','Floor_crack','Generic crack for floor')
+    flowelems.createNewElementFromExistingOne('Gen_crack','Wall_crack','Generic crack for walls')
+    flowelems.createNewElementFromExistingOne('Gen_crack','FlatR_crack','Generic crack ceiling or flat roof')
+
+    slopedcrackid = flowelems.df[flowelems.df['name']=='SlopedR_crack'].index[0]
+    floorcrackid = flowelems.df[flowelems.df['name']=='Floor_crack'].index[0]
+    wallcrackid = flowelems.df[flowelems.df['name']=='Wall_crack'].index[0]
+    flatroofcrackid = flowelems.df[flowelems.df['name']=='FlatR_crack'].index[0]
+
     
     #----------------------------------------------------
     # Getting ID of AHS zones (to be treated differently)
@@ -106,7 +118,8 @@ def setContamPlan(inputFileName,csvFileNameWithPath,outputFileNameWithPath):
                     
                     index=dirpaths.index[i]
                     flowpaths.df.loc[index,'mult']=area/2
-                    flowpaths.df.loc[index,'pe']=crackelemid
+                    flowpaths.df.loc[index,'pe']=wallcrackid
+                    
     
                     if (i==0):
                         flowpaths.df.loc[index,'relHt']=0.65
@@ -124,7 +137,7 @@ def setContamPlan(inputFileName,csvFileNameWithPath,outputFileNameWithPath):
                         return
 
                 
-                if (i==2): #i==2 --> 3rd in the list
+                if (i==2): #i==2 --> 3rd in the list. Default one for Natural Supply Vents
                     index=dirpaths.index[i]
                     flowpaths.df.loc[index,'pe']=nat_supply_id
     
@@ -140,8 +153,10 @@ def setContamPlan(inputFileName,csvFileNameWithPath,outputFileNameWithPath):
                         print("Error : for natural supply vents, the only acceptable boundary conditions are 'vertical-outside' or 'zero-pressure'")
                         return
                     """ 
-                
     
+                # i==3 : the 4th one is unused for now. 
+    
+                # only if there is a fifth opening - i == 4
                 if (i==4):
                              
                     area=areas[ (areas['roomname']==room) & (areas['surface']=='facade-slopedroof') ]['area'].iloc[0]
@@ -152,7 +167,7 @@ def setContamPlan(inputFileName,csvFileNameWithPath,outputFileNameWithPath):
                     print("boundary ",boundary)
                     
                     index=dirpaths.index[4]
-                    flowpaths.df.loc[index,'pe']=crackelemid
+                    flowpaths.df.loc[index,'pe']=slopedcrackid
                     flowpaths.df.loc[index,'mult']=area
                     
                     flowpaths.df.loc[index,'flags']=1
@@ -178,8 +193,11 @@ def setContamPlan(inputFileName,csvFileNameWithPath,outputFileNameWithPath):
 
                 boundary = areas[ (areas['roomname']==room) & (areas['surface']=='facade-'+directiondict[pathdir]) ]['boundary'].iloc[0]
 
-                
-                flowpaths.df.loc[index,'pe']=crackelemid
+                if pathdir == 3:
+                    flowpaths.df.loc[index,'pe']=floorcrackid
+                else:
+                    flowpaths.df.loc[index,'pe']=flatroofcrackid
+
                 flowpaths.df.loc[index,'mult']=area
 
                 if boundary == 'flat-outside':    
@@ -187,7 +205,8 @@ def setContamPlan(inputFileName,csvFileNameWithPath,outputFileNameWithPath):
                     flowpaths.df.loc[index,'pw']=wprofiles.df[wprofiles.df['name'].str.contains('Flat')].index[0] #flat roof profile
 
                 elif boundary == 'zero-pressure':
-                    print("Zero pressure boundary, doing nothing")
+                    #print("Zero pressure boundary, doing nothing")
+                    pass
 
                 else:
                     print("Only valid boundaries are flat-outside ad zero-pressure")
@@ -319,9 +338,8 @@ def setContamPlan(inputFileName,csvFileNameWithPath,outputFileNameWithPath):
     #----------------------------------------------------------------------------------------------------------------
     
     for index in flowpaths.df.index:
-    
-        #if flowpaths.df.loc[index,'pe']==defaultelem:
-        if (flowpaths.df.loc[index,'pe'] not in [crackelemid,constant_flow_id,large_opening_id] ):
+
+        if (flowpaths.df.loc[index,'pe'] not in [slopedcrackid,floorcrackid,wallcrackid,flatroofcrackid,constant_flow_id,large_opening_id] ):
             flowpaths.df.loc[index,'mult']=0.0
     
   
@@ -333,30 +351,4 @@ def setContamPlan(inputFileName,csvFileNameWithPath,outputFileNameWithPath):
     
 
 
-
-if __name__ == '__main__':
-    
-
-    if (len(sys.argv) <2 ):
-        print("Usage: ")
-        print("")
-        print("     python3 set-contam-plan.py contam.prj")
-        print("")
-        exit()
-
-    inputFileName=sys.argv[1]
-
-    rootwithpath=inputFileName.replace('.prj','')
-    root=os.path.basename(inputFileName).replace('.prj','')  # name of contam file without path and without extension
-
-    
-    csvFileNameWithPath = rootwithpath+'-areas-filled.csv'
-    
-    setdir = os.path.join(os.getcwd(),'2-DimBuildings')
-    
-    outputFileNameWithPath = os.path.join(setdir,root+'.prj')
-   
-    setContamPlan(inputFileName,csvFileNameWithPath,outputFileNameWithPath)
-    
-    exit()
 

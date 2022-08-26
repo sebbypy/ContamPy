@@ -1,4 +1,4 @@
-
+import numpy as np
 
 def apply(contam_data,v50,rot,leaks_distrib='uniform'):
 
@@ -6,69 +6,107 @@ def apply(contam_data,v50,rot,leaks_distrib='uniform'):
     flowpaths=contam_data['flowpaths']
     flowelems=contam_data['flowelems']
 
+    crackElementsIds={}
 
-    crackelemid=flowelems.df[flowelems.df['name']=='Gen_crack'].index[0]
+    for cracktype in ['Floor_crack','Wall_crack','FlatR_crack','SlopedR_crack']:
+                        
+        if cracktype in flowelems.df['name'].values:
+            
+            crackElementsIds[cracktype] = flowelems.df[flowelems.df['name']==cracktype].index[0]
 
-    #Winds speed multiplier
-    # Defaults parameters for now
-    #def wsm(building_height,building_terrain_category,meteo_terrain_category):
+        else:
+            
+            crackElementsIds[cracktype] = np.nan
 
-    """print("hello, world")
-    print(roughnessWeatherStation,roughnessBuilding)
 
-    wsmValue=wsm.wsm(6,'II','II')
-    """
+    if leaks_distrib=='random':
+        
+        leakpaths = flowpaths.df[flowpaths.df['pe'].isin(crackElementsIds.values())]
+        
+        nleaks = len(leakpaths)
+        
+        randomNumbers = np.random.uniform(0,1,size=nleaks)
+        
+        randomSum = randomNumbers.sum()
+        
+        correctionFactor = getTotalArea(flowpaths,crackElementsIds)/randomSum
+        
+        leakAreas = randomNumbers*correctionFactor
 
+        
+        for index,area in zip(leakpaths.index,leakAreas):        
+        
+            flowpaths.df.loc[index,'mult'] = area
+            
+        return
 
 
     if leaks_distrib == 'walls':
 
-        totalArea = 0.
-        wallArea = 0.
-        for index in flowpaths.df.index:
-            
-            if (flowpaths.df.loc[index,'pe']==crackelemid):
-                totalArea += flowpaths.df.loc[index,'mult']
-    
-                if flowpaths.df.loc[index,'dir'] not in [3,6]: #3 and 6 are vertical paths
-                    wallArea += flowpaths.df.loc[index,'mult']
-                
-        correctedv50 = v50*totalArea/wallArea
-                
-        
+        totalArea = getTotalArea(flowpaths,crackElementsIds)
+        wallArea = getWallArea(flowpaths,crackElementsIds)                
+        correctedv50 = v50*totalArea/wallArea       
+
+
     else:
         correctedv50 = v50
 
-            
 
-    """
-    These values have been check on HO1 model, they are 100% consisten with the excel
-    print("Total area",totalArea)
-    print("Wall area",wallArea)
-    """
-    
     for index in flowpaths.df.index:
         
-        if (flowpaths.df.loc[index,'pe']==crackelemid):
-
-            if leaks_distrib == 'walls':
-
-                if flowpaths.df.loc[index,'dir'] not in [3,6]: #3 and 6 are vertical paths
+        
+        if (flowpaths.df.loc[index,'pe']==crackElementsIds['Wall_crack']):
                     
-                    flowpaths.df.loc[index,'mult']*=float(correctedv50) 
-                
+            flowpaths.df.loc[index,'mult']*=float(correctedv50) 
     
-            else: #normal case:
+        else: #normal case:
                 
-                flowpaths.df.loc[index,'mult']*=float(correctedv50) 
+            flowpaths.df.loc[index,'mult']*=float(correctedv50) 
        
-                
-       
-        #by doing so, the ones that would be 0 remain 0
-            
+
+        #by doing so, the ones that would be 0 remain 0           
         if (flowpaths.df.loc[index,'pw']>0):
             
             flowpaths.df.loc[index,'wazm']+=int(rot)
             #flowpaths.df.loc[index,'wPmod']=wsmValue
 
+
+
+def getTotalArea(flowpaths,crackElementsIds):
+
+    totalArea=0    
+
+    for index in flowpaths.df.index:
+        
+        if flowpaths.df.loc[index,'pe'] in crackElementsIds.values():
+
+            totalArea += flowpaths.df.loc[index,'mult']
+    
+    return totalArea
+
+
+def getWallArea(flowpaths,crackElementsIds):
+
+    wallArea=0
+    
+    for index in flowpaths.df.index:
+        
+        if flowpaths.df.loc[index,'pe'] == crackElementsIds['Wall_crack'] : 
+            
+            wallArea += flowpaths.df.loc[index,'mult']
+
+    return wallArea
+
+
+def getFloorArea(flowpaths,crackElementsIds):
+
+    floorArea=0
+    
+    for index in flowpaths.df.index:
+        
+        if flowpaths.df.loc[index,'pe'] == crackElementsIds['Floor_crack'] : 
+            
+            floorArea += flowpaths.df.loc[index,'mult']
+
+    return floorArea
 

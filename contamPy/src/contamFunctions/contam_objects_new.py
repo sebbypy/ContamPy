@@ -1,6 +1,7 @@
 import pandas as pd
 import numpy as np
 
+pd.options.mode.chained_assignment = None
 
 class levels:
 
@@ -271,7 +272,23 @@ class flowelements:
         self.df.drop(['id'],axis=1,inplace=True)
 
         self.df=convert_cols(self.df)
+    
+
+    def createNewElementFromExistingOne(self,existingElementName,newElementName,newComment):
+
+    
+        self.nelems += 1
         
+        newElem = self.df[self.df['name']==existingElementName]
+        
+        newElem.index = [self.nelems]
+        newElem.loc[self.nelems,'name'] = newElementName
+        newElem.loc[self.nelems,'comment'] = newComment
+        
+
+        self.df = pd.concat([self.df,newElem])
+        
+    
     def addflowelem(self,elemtype,valuesdict):
     
         # elemtype: NSV, NT
@@ -1831,7 +1848,11 @@ class daySchedules:
             
             for l in range(npoints):
                 fields=filereader.readline().split()
-                sdict['dataframe']=sdict['dataframe'].append(dict(zip(cols,fields)),ignore_index=True)
+                
+                dictToAppend = dict(zip(cols,fields))
+
+                sdict['dataframe'] = pd.concat( [sdict['dataframe'],pd.DataFrame.from_records(dictToAppend) ],ignore_index=True)                
+                #sdict['dataframe']=sdict['dataframe'].append(dict(zip(cols,fields)),ignore_index=True)
 
             
 
