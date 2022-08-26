@@ -3,7 +3,7 @@ import os
 
 
 filesToDelete = ['DetachedHouse_withDimensions.prj',
-                'DetachedHouse_noDimensions-areas-empty.csv'
+                'DetachedHouse_noDimensions-areas-empty.csv',
                 'DetachedHouse_noDimensions-areas-filled.csv']
 
 
