@@ -59,6 +59,7 @@ contam.runContam('houseWithSlopedRoofWithDimensions-blowerDoor.prj')
 #getting blower door results
 leaks = caseConfig.getLeaksInformations()
 
+
 blowerDoorResults = getBlowerDoorResults('houseWithSlopedRoofWithDimensions-blowerDoor.val')
 
 

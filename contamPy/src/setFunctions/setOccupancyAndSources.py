@@ -390,14 +390,42 @@ def apply(contam_data,occupancy_profile,profilesDir):
         sources.addSource(spaceid,bufferSourceId,0,0,multiplier,0.007) #last parameter: initial concentration (optional). 7g/kg = 50pc RH at 20degC
 
 
-    # Adding VOC emissions with constant rate
 
-    VOCsourceElemID=sourceElems.getSourceID('VOC')
+
+
+def addPollutantSourcePerFloorArea(contamModel,contaminantName,rate,unit):
+    
+    sourceElems=contamModel['sourceelems']
+    sources=contamModel['sources']
+    zones=contamModel['zones']
+
+    sourceElems.addConstantRateSourceElement(contaminantName,'ccf',contaminantName+"S",'constant source',rate,unit)
+    sourceElementID = sourceElems.nsources
+
+    for spaceid in list(zones.df.index):
+
+        A=float(zones.df.loc[spaceid,'Vol'])/3.0
+        multiplier=A
+        sources.addSource(spaceid,sourceElementID,0,0,multiplier,0) 
+
+
+    
+def addPollutantSourcePerTotalArea(contamModel,contaminantName,rate,unit):
+    
+    sourceElems=contamModel['sourceelems']
+    sources=contamModel['sources']
+    zones=contamModel['zones']
+
+    sourceElems.addConstantRateSourceElement(contaminantName,'ccf',contaminantName+"S",'constant source',rate,unit)
+    sourceElementID = sourceElems.nsources
+
     for spaceid in list(zones.df.index):
 
         A=float(zones.df.loc[spaceid,'Vol'])/3.0
         multiplier=A+12*np.sqrt(A)
-        sources.addSource(spaceid,VOCsourceElemID,0,0,multiplier,0) 
+        sources.addSource(spaceid,sourceElementID,0,0,multiplier,0) 
+    
+    
     
     
 

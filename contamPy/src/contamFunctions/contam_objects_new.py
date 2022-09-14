@@ -208,9 +208,12 @@ class initialZonesConcentrations():
         #to write
         return
         
-    def addInitConcentration(self,pollutantName,value):
+    def addInitConcentration(self,pollutantName,userUnitValue,unit,MM=0):
         
-        self.df.loc[:,pollutantName] = value
+        
+        kgkgValue = contaminants().convertConcentrations(userUnitValue,unit,MM)
+        
+        self.df.loc[:,pollutantName] = kgkgValue
         self.nConcentrations = len(self.df.columns)*len(self.df.index)
     
     
@@ -625,6 +628,10 @@ class contaminants:
         
         self.df=pd.DataFrame(columns=self.myheaders)
         
+        
+        self.unitcodes = {'ppm':1, 'ug/m3':13}
+
+        
     def read(self,filereader,currentline):
         
         nctm,self.comment1=currentline.split('!')
@@ -672,12 +679,20 @@ class contaminants:
             if ('\n' not in self.df.loc[i,'description']):
                 g.write('\n')
 
-    def addSpecie(self,specieName,defaultConcentration):
+    def addSpecie(self,specieName,defaultConcentration,unit='kg/kg',molarMass=0):
       
         self.nspecies += 1
         specieID = self.nspecies
         
-        nonNullDefaultsValues={'s':1,'Dm':2e-5,'Cp':1000}
+        
+        if unit != 'kg/kg':
+            defaultConcentration = self.convertConcentrations(defaultConcentration,unit, molarMass)
+            unitcode = self.getUnitCode(unit)
+        else:
+            unitcode=0
+        
+        nonNullDefaultsValues={'s':1,'Dm':2e-5,'Cp':1000,'molwt':molarMass,'ccdef':defaultConcentration,'u0':unitcode}
+
 
 
         self.df.loc[specieID,'name'] = specieName
@@ -698,7 +713,56 @@ class contaminants:
         return
 
 
+    def getUnitCode(self,unitName):
         
+        return self.unitcodes[unitName]
+
+    def getUnitNameFromCode(self,unitCode):
+        
+        reversedDict = {v:k for k,v in self.unitcodes.items()}
+        
+        unitName = reversedDict[unitCode]
+        
+        return unitName
+        
+
+    def getUnitName(self,contaminantName):
+        
+        
+        specieID = self.df[self.df['name']==contaminantName].index[0]
+        specieUnitCode = self.df.loc[specieID,'u0']
+        
+        unitName = self.getUnitNameFromCode(specieUnitCode)
+        
+        return unitName
+        
+
+    def convertConcentrations(self,value,fromUnit,MM=0):
+        #convert any unit to kg/kg
+        
+        Vs= 24.05 #volume of 1 kmol in standard conditions
+        rho_air = 1.204 # at 20 de
+
+        if fromUnit == 'ppm':
+            #kg/kg = (ppm x MM) / (1 000 000 xVs x rho_air)
+            
+            return value*MM/(1e6*Vs*rho_air)
+
+        elif fromUnit == 'ug/m3':
+           
+            return value*1e-9/rho_air
+
+        else:
+            raise ValueError("Unknown unit "+fromUnit)
+
+
+    def kgkgToUnit(self,unitName):
+        
+        return 1/self.convertConcentrations(1,unitName)
+
+    
+
+
 
 class sourceElements:
     #15 ! source/sink elements:
@@ -751,7 +815,7 @@ class sourceElements:
             if ('\n' not in v['description']):
                 g.write('\n')
             
-            [ g.write(x+' ') for x in v['values'] ]
+            [ g.write(str(x)+' ') for x in v['values'] ]
             g.write('\n')
     
     def getSourceID(self,source_name):
@@ -764,6 +828,34 @@ class sourceElements:
                 
         return 0
                 
+    
+    def addConstantRateSourceElement(self,specie,stype,name,description,rate,unitName):
+        
+        #rate should be kg/s
+        #unit if fake for now
+        unitIndex = {'kg/s':0,'L/s':9, 'L/h':33, 'ug/h':30}
+        
+        
+        self.nsources += 1
+        
+        sdict={}
+        sdict['specie']=specie
+        sdict['source type']=stype
+        sdict['name']=name
+        sdict['description']=description
+        sdict['values'] = [ self.toKilosPerSeconds(unitName,rate),0,unitIndex[unitName],0]
+            
+        self.sources[self.nsources]=sdict
+        
+        
+    def toKilosPerSeconds(self,unitName,value):
+        
+        if unitName == 'ug/h':
+            
+            return value/1e9/3600
+        
+    
+    
                          
 class sources:
 
@@ -827,6 +919,9 @@ class sources:
         if (self.df.index[0]==0):
             self.df.index=[ x+1 for x in self.df.index]
         
+   
+    
+   
     
 class controlnodes:
 
@@ -901,7 +996,7 @@ class controlnodes:
             g.write('\n')
     
        
-    def addspeciesensor(self,zonesdf,roomid,specie_name,name,description=''):
+    def addspeciesensor(self,zonesdf,roomid,specie_name,name,description='',multiplier=1,unit=''):
         
         if (len(name)>15):
             name=name.replace('kamer','')
@@ -948,9 +1043,8 @@ class controlnodes:
         # units[] // units of coordinates {W} (I1)
         # species[] // species name [I1]; convert to pointer
 
-        
 
-        self.addreport(self.nctrl,specie_name+'_'+roomname,specie_name)
+        self.addreport(self.nctrl,specie_name+'_'+roomname,specie_name,multiplier=multiplier,unit=unit)
 
     def addoccupancysensor(self,zonesdf,roomid,name,description=''):
         
@@ -994,7 +1088,7 @@ class controlnodes:
         self.addreport(self.nctrl,'O_'+roomname)
 
 
-    def addexposuresensor(self,oid,specie_name,description=''):
+    def addexposuresensor(self,oid,specie_name,description='',multiplier=1):
         
         self.nctrl+=1
         
@@ -1034,8 +1128,7 @@ class controlnodes:
         # units[] // units of coordinates {W} (I1)
         # species[] // species name [I1]; convert to pointer
       
-
-        self.addreport(self.nctrl,specie_name+'_O'+str(oid),specie_name) 
+        self.addreport(self.nctrl,specie_name+'_O'+str(oid),specie_name,multiplier=multiplier) 
 
 
 
@@ -1084,7 +1177,7 @@ class controlnodes:
     
 
 
-    def addreport(self,id_to_report,name,reporttype='',description='',header=''):
+    def addreport(self,id_to_report,name,reporttype='',description='',header='',multiplier=1,unit=''):
     
         if (len(name)>15):
             name=name.replace('kamer','')
@@ -1110,13 +1203,14 @@ class controlnodes:
         # header[] // header string (I1)
         # units[] // units string (I1)
     
-        scale=1
+        scale=multiplier
         unit='n/a'
     
-        if (reporttype=='CO2'):
-            scale=658008
+        if reporttype=='CO2':
+            scale=(1e6*24.05*1.204)/44
             unit='ppm'
-        
+    
+    
         if (reporttype=='H2O'):
             scale= 68.37 # H2O in kg/kg to RH in standardized conditions
             unit='RH'
@@ -1125,9 +1219,8 @@ class controlnodes:
             scale=2989.78
             unit='m3/h'
 
-        if (reporttype=='VOC'):
-            scale=1.20
-            unit='kg/m3'
+        
+
         
         values=[0,scale,0,name,unit]
         if header != '':

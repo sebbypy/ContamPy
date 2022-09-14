@@ -40,7 +40,7 @@ class caseConfigurator:
                                 'control':None,
                                 'occupancy': None,
                                 'weather':'',
-                                'extraContaminants':{},
+                                'contaminants':{},
                                 'filters':None,
                                 'contaminantsFile':None,
                                 'shielding':'semi-exposed',
@@ -101,9 +101,9 @@ class caseConfigurator:
 
         self.fullJSON = filterJSON
 
-        self.setExtraContaminants()
 
         self.setOccupancyAndSources()
+        self.setExtraContaminants()
 
         self.setContaminantsFile()  
 
@@ -290,8 +290,8 @@ class caseConfigurator:
 
     def getExtraContaminants(self):
         
-        if (self.actualParameters['extraContaminants'] != None):
-            return list(self.actualParameters['extraContaminants'].keys())
+        if (self.actualParameters['contaminants'] != None):
+            return list(self.actualParameters['contaminants'].keys())
         else:
             return []
 
@@ -303,9 +303,9 @@ class caseConfigurator:
         flowelems = self.ContamModel['flowelems'].df
         flowpaths = self.ContamModel['flowpaths'].df
 
-        leakElemId = flowelems[flowelems['name']=='Gen_crack'].index[0]
+        leakElemIds = flowelems[flowelems['name'].str.contains('_crack')].index
 
-        leaks = flowpaths[flowpaths['pe']==leakElemId]
+        leaks = flowpaths[flowpaths['pe'].isin(leakElemIds)]
         
         for li in leaks.index:
             
@@ -558,18 +558,41 @@ class caseConfigurator:
 
     def setExtraContaminants(self):
         
-        contaminantsDict = self.actualParameters['extraContaminants']
+        contaminantsDict = self.actualParameters['contaminants']
 
         for cName,cDict in contaminantsDict.items():
-            self.addContaminant(cName,cDict['exterior default concentration'],cDict['initial concentration'])
             
+            if 'molarMass' not in cDict.keys():
+                cDict['molarMass']=0
+            
+            self.addContaminant(cName,cDict['outsideConcentration'],cDict['initialConcentration'],cDict['unit'],cDict['molarMass'])
 
-    def addContaminant(self,name,defaultOutsideConcentration,insideInitialConcentration):
+            if 'source' in cDict.keys():
+                
+                sourceDict = cDict['source']
+                
+                if sourceDict['type'] == "constantRatePerFloorArea":
+                    
+                    setOccupancyAndSources.addPollutantSourcePerFloorArea(self.ContamModel,cName,sourceDict['rate'],sourceDict['unit'])
 
-        self.ContamModel['contaminants'].addSpecie(name,defaultOutsideConcentration)
-        self.ContamModel['initConc'].addInitConcentration(name,insideInitialConcentration)
+                elif sourceDict['type'] == "constantRatePerTotalArea":
+                    
+                    setOccupancyAndSources.addPollutantSourcePerTotalArea(self.ContamModel,cName,sourceDict['rate'],sourceDict['unit'])
+
+                else:
+                    raise ValueError("Uknown type of source")
+
+        
+
+    def addContaminant(self,name,defaultOutsideConcentration,insideInitialConcentration,unit,MM):
+
+        self.ContamModel['contaminants'].addSpecie(name,defaultOutsideConcentration,unit,MM)
+        self.ContamModel['initConc'].addInitConcentration(name,insideInitialConcentration,unit,MM)
         self.addContaminantSensors(name)
         self.addContaminantExposure(name)
+        
+        
+
 
 
     def addContaminantSensors(self,contaminantName):
@@ -577,23 +600,32 @@ class caseConfigurator:
         zones = self.ContamModel['zones']
         controls = self.ContamModel['controls']
         
+        contaminantUnit = self.ContamModel['contaminants'].getUnitName(contaminantName)
+        multiplier = self.ContamModel['contaminants'].kgkgToUnit(contaminantUnit)
+        
+        
         for zoneid in zones.df.index:
             if ('AHS' not in zones.df.loc[zoneid,'name']):
 
-                controls.addspeciesensor(zones.df,zoneid,contaminantName,contaminantName+'-sensor') #add sensor and report directly
+                controls.addspeciesensor(zones.df,zoneid,contaminantName,contaminantName+'-sensor',multiplier=multiplier,unit=contaminantUnit) #add sensor and report directly
 
-
-        controls.addspeciesensor(zones.df,-1,contaminantName,contaminantName+'-sensor') # for EXT 
+        controls.addspeciesensor(zones.df,-1,contaminantName,contaminantName+'-sensor',multiplier=multiplier,unit=contaminantUnit) # for EXT 
         
   
     def addContaminantExposure(self,contaminantName):
 
+
         occupants = self.ContamModel['exposures']
         controls = self.ContamModel['controls']
 
+        contaminantUnit = self.ContamModel['contaminants'].getUnitName(contaminantName)
+        multiplier = self.ContamModel['contaminants'].kgkgToUnit(contaminantUnit)
+
+
         for oid in range(1,occupants.nexposures+1):
-        
-            controls.addexposuresensor(oid,contaminantName,description=contaminantName+'-'+str(oid))
+
+            print(contaminantName)
+            controls.addexposuresensor(oid,contaminantName,description=contaminantName+'-'+str(oid),multiplier=multiplier)
 
 
 
