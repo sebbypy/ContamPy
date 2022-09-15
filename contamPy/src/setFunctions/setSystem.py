@@ -114,14 +114,49 @@ def apply(contam_data,systemJson):
                 continue
                 
             if (len(fpid)>1):
-                print("WARNING, more than one location to define natural supply")
-                print("Choosing the first one in the list, please check your model afterwards")
-                fpid = fpid[0]
+                 
+                 if W['Preferred orientation'] =="":
+                    
+                    fpid = fpid[0]
+                    
+                    print("WARNING, more than one location to define windows")
+                    print("Choosing the first one in the list, please check your model afterwards")
+                 else:
+                    
+                    fpid=flowpaths.df[ (flowpaths.df['pzm']==zoneid) & (flowpaths.df['pe']==generic_NSV_id) & (flowpaths.df['wazm']== int(W['Preferred orientation'])) ].index
+                    
+                    if len(fpid)==0: 
+                        print("WARNING: No windows could be defined !")
+                        print("No existing path between ",zones.df.loc[zoneid,'name'],"and outside on the facade",W['Preferred orientation'],"°")
+                        continue
+                
+           
+            #A=W['Height']*W['Width']
+            
+            if W['Type']=='normalwindow':
+                
+                W_name = 'NW'+'_'+str(float(W['Height']))+'_'+str(float(W['Width']))
+                if (flowelems.df['name'].isin([W_name]).max() == False):
+                    flowelems.addflowelem('NW',{'h':float(W['Height']),'w':float(W['Width']) })
+                
+              
+            if W['Type']=='roofwindow':
+                W_name = 'RW'+'_'+str(float(W['Height']))+'_'+str(float(W['Width']))
+                #print(W_name)
+                if (flowelems.df['name'].isin([W_name]).max() == False):
+                    flowelems.addflowelem('RW',{'h':float(W['Height']),'w':float(W['Width']) })
+                
+            #W_name='Window-Cd01'
 
-            W_name='Window-Cd01'
-
+            #flowpaths.df.loc[fpid,'pe']=flowelems.df[flowelems.df['name']==W_name].index[0]
+            #flowpaths.df.loc[fpid,'mult']=float(W['Area'])
+            
+            #print(W_name)
+            #print(flowelems.df['name'])
+            #print(W_name)
+            print(fpid)
             flowpaths.df.loc[fpid,'pe']=flowelems.df[flowelems.df['name']==W_name].index[0]
-            flowpaths.df.loc[fpid,'mult']=float(W['Area'])
+            flowpaths.df.loc[fpid,'mult']=float(1.0)
 
 
 
@@ -179,7 +214,90 @@ def apply(contam_data,systemJson):
             flowpaths.df.loc[fpid,'mult']=float(1.0)
         
 
+    if ('Two ways door' in systemJson.keys()):
+         
+         for D in systemJson['Two ways door']:
+            roomid1=zones.df[zones.df['name']==D['From room']].index[0] # find ID of zone which has the same name
+            roomid2=zones.df[zones.df['name']==D['To room']].index[0] # find ID of zone which has the same name
+            commonflowpaths=contam_functions.getcommonpaths(flowpaths,roomid1,roomid2)  
+            if (len(commonflowpaths) > 0):
+                fpid=commonflowpaths.index[0] #un des defaults paths
+                
+            else:
+                print("Error")
+                print("No path detected between "+D['From room']+' and '+D['To room']+' to define a transfer opening')
+                return
+            
+           
+            D_name='D'+'_'+str(float(D['Height']))+'_'+str(float(D['Width']))
+            if (flowelems.df['name'].isin([D_name]).max() == False):
+                flowelems.addflowelem('D',{'h':int(D['Height']),'w':int(D['Width']) })
+            
+            flowpaths.df.loc[fpid,'pe']=flowelems.df[flowelems.df['name']==D_name].index[0]
+            flowpaths.df.loc[fpid,'mult']=float(1.0)
+         
+            
+         
+         # Ventilative cooling component
+         # --------------
+    if ('Ventilative cooling component' in systemJson.keys()):
+        for VC in systemJson['Ventilative cooling component']:
+            generic_VCC_id = flowelems.df[flowelems.df['name']=='Gen_VCC'].index[0]  
+            zoneid=zones.df[zones.df['name']==VC['Room']].index[0] # find ID of zone which has the same name
+            #print(flowpaths.df[flowpaths.df['pe']==generic_VCC_id])
+            #flowpath index
+            fpid=flowpaths.df[ (flowpaths.df['pzm']==zoneid) & (flowpaths.df['pe']==generic_VCC_id) ].index
+            
         
+            if (len(fpid)==0):
+                print("WARINING: No ventilative cooling could be defined !")
+                print("No existing path between ",zones.df.loc[zoneid,'name'],"and outside")
+                continue
+            
+            if (len(fpid)>1):
+               
+                
+                if VC['Preferred orientation'] =="":
+                    
+                    fpid = fpid[0]
+                    
+                    print("WARNING, more than one location to define ventilative cooling")
+                    print("Choosing the first one in the list, please check your model afterwards")
+                else:
+                    
+                    fpid=flowpaths.df[ (flowpaths.df['pzm']==zoneid) & (flowpaths.df['pe']==generic_VCC_id) & (flowpaths.df['wazm']== int(VC['Preferred orientation'])) ].index
+                    
+                    if len(fpid)==0: 
+                        print("WARNING: No ventilative cooling could be defined !")
+                        print("No existing path between ",zones.df.loc[zoneid,'name'],"and outside on the facade",VC['Preferred orientation'],"°")
+                        continue
+                   
+
+        #check if flow element with the required pressure exist
+        
+            VCC_name='VCC_'+str(11)
+            
+          
+
+            if (flowelems.df['name'].isin([VCC_name]).max() == False):
+            #print(NSV_name+' element does not exist yet, adding it')
+
+        
+                    flowelems.addflowelem('VCC',{})
+            
+            #flowelems.addflowelem('VCC',{})
+            #flowpaths.df.loc[fpid,'name']=VCC_name
+            #large_opening_id=flowelems.df[flowelems.df['name']=='LargeOpening'].index[0]
+            flowpaths.df.loc[fpid,'pe']=flowelems.df[flowelems.df['name']==VCC_name].index[0]
+            flowpaths.df.loc[fpid,'mult']=float(VC['Area']*VC['Discharge coefficient'])
+        
+
+
+
+
+
+
+  
 
 
 

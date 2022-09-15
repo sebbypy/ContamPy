@@ -299,7 +299,11 @@ class flowelements:
                  'NT':'Natural transfer opening',
                  'SR_NSV':'Self regulating Natural Supply Vent',
                  'OD':'Open Door',
-                 'IL':'InternalLeak'}
+                 'IL':'InternalLeak',
+                 'VCC': 'Ventilative cooling component',
+                 'RW': 'Roof window',
+                 'NW': 'Normal window',
+                 'D': 'Two ways door'}
         
     
         if (elemtype in ['NSV','NT','SR_NSV']):
@@ -397,7 +401,6 @@ class flowelements:
             
             
             #   C  = Cd*A*sqr(2/rho)
-
             
             Cd = 0.6
             Area = 2.0
@@ -418,8 +421,147 @@ class flowelements:
             self.df=convert_cols(self.df)
 
 
-
+        if elemtype == 'VCC':
+            # 5 23 plr_qcn Gen_VCC
+            #Generic model for Ventilative Cooling (1m3/h at 1Pa)
+            #1.63401e-07 0.000277778 0.5
             
+            n=0.5
+            rho=1.2
+            Cturb=np.sqrt(2/rho)
+            Clam=self.Clam(Cturb,n)
+            self.nelems+=1
+
+            self.df.loc[self.nelems,'icon']=int(23)
+            self.df['icon']=self.df['icon'].astype(int)
+            self.df.loc[self.nelems,'dtype']='plr_qcn'
+            self.df.at[self.nelems,'values']=[Clam,Cturb,n]
+            self.df.loc[self.nelems,'name']=elemtype+'_'+str(11)
+            self.df.loc[self.nelems,'comment']='Ventilative cooling component by Python'
+            self.df=convert_cols(self.df)
+            
+        if elemtype =='RW': 
+            #8 27 dor_door Window-Cd06 
+            #0.8 x 1.25 Window (1.0 m2) - Cd 0.6 (full opening))
+            # 0.0234146 0.848528 0.5 0.01 1.25 0.8 0.6 0 0 0  
+            #lam // laminar flow coefficient (R4)
+            #turb // turbulent flow coefficient (R4)
+            #expt // pressure exponent (R4)
+            #dTmin // minimum temperature difference for two-way flow [C] (R4)
+            #// Not used since version 2.4.
+            #ht // height of doorway [m] (R4)
+            #wd // width of doorway [m] (R4)
+            #cd // discharge coefficient
+            #u_T // units of temperature (I2) {W}
+            #u_H // units of height (I2) {W}
+            #u_W // units of width (I2) {W}
+           
+            #model dor_door C_turb = np.sqrt(2)*A*Cd without rho
+            #toit pente 35 et fenetre ouverte
+           
+            rho=1.2
+            n=0.5
+            h=valuesdict['h']*0.573576
+            w=valuesdict['w']*valuesdict['h']/h
+            A=float(valuesdict['h']*valuesdict['w'])
+            Cd=0.6
+            Cturb=np.sqrt(2)*A*Cd
+            Cturb_bis=np.sqrt(2/rho)*A*Cd
+            
+            Clam=self.Clam(Cturb_bis,n) # pas exactement ok
+            self.nelems+=1
+  
+            self.df.loc[self.nelems,'icon']=int(27)
+            self.df['icon']=self.df['icon'].astype(int)
+            self.df.loc[self.nelems,'dtype']='dor_door'
+            self.df.at[self.nelems,'values']=[Clam,Cturb,n,0.01,h,w,Cd,0,0,0]
+            self.df.loc[self.nelems,'name']=elemtype+'_'+str(float(valuesdict['h']))+'_'+str(float(valuesdict['w']))
+            
+           
+            self.df.loc[self.nelems,'comment']='Roofwindow- by Python'
+            self.df=convert_cols(self.df)
+            
+        if elemtype =='NW': 
+            #8 27 dor_door Window-Cd06 
+            #0.8 x 1.25 Window (1.0 m2) - Cd 0.6 (full opening))
+            # 0.0234146 0.848528 0.5 0.01 1.25 0.8 0.6 0 0 0  
+            #lam // laminar flow coefficient (R4)
+            #turb // turbulent flow coefficient (R4)
+            #expt // pressure exponent (R4)
+            #dTmin // minimum temperature difference for two-way flow [C] (R4)
+            #// Not used since version 2.4.
+            #ht // height of doorway [m] (R4)
+            #wd // width of doorway [m] (R4)
+            #cd // discharge coefficient
+            #u_T // units of temperature (I2) {W}
+            #u_H // units of height (I2) {W}
+            #u_W // units of width (I2) {W}
+            #model dor_door C_turb = np.sqrt(2)*A*Cd without rho
+            # fenetre ouverte
+              
+            n=0.5
+            Cd=0.6
+            rho=1.2
+            h=valuesdict['h']
+            w=valuesdict['w']
+            A=valuesdict['h']*valuesdict['w']  
+            Cturb=np.sqrt(2)*A*Cd
+            Cturb_bis=np.sqrt(2/rho)*A*Cd
+            
+            Clam=self.Clam(Cturb_bis,n)# pas exactement ok
+            self.nelems+=1
+            
+          
+            self.df.loc[self.nelems,'icon']=int(27)
+            self.df['icon']=self.df['icon'].astype(int)
+            self.df.loc[self.nelems,'dtype']='dor_door'
+            self.df.at[self.nelems,'values']=[Clam,Cturb,n,0.01,h,w,0.6,0,0,0]
+            self.df.loc[self.nelems,'name']=elemtype+'_'+str(float(h))+'_'+str(float(w))
+            #'NW'+'_'+str(float(W['Height']))+'_'+str(float(W['Width']))
+            self.df.loc[self.nelems,'comment']='Normalwindow - by Python'
+            self.df=convert_cols(self.df)    
+            
+        if elemtype =='D':
+       
+            #8 27 dor_door Window-Cd06 
+            #0.8 x 1.25 Window (1.0 m2) - Cd 0.6 (full opening))
+            # 0.0234146 0.848528 0.5 0.01 1.25 0.8 0.6 0 0 0  
+            #lam // laminar flow coefficient (R4)
+            #turb // turbulent flow coefficient (R4)
+            #expt // pressure exponent (R4)
+            #dTmin // minimum temperature difference for two-way flow [C] (R4)
+            #// Not used since version 2.4.
+            #ht // height of doorway [m] (R4)
+            #wd // width of doorway [m] (R4)
+            #cd // discharge coefficient
+            #u_T // units of temperature (I2) {W}
+            #u_H // units of height (I2) {W}
+            #u_W // units of width (I2) {W}
+            #model dor_door C_turb = np.sqrt(2)*A*Cd without rho
+            # fenetre ouverte
+           
+            n=0.5
+            Cd=0.6
+            rho=1.2
+            h=valuesdict['h']
+            w=valuesdict['w']
+            A=float(valuesdict['h']*valuesdict['w'])
+            Cturb=np.sqrt(2)*A*Cd
+            Cturb_bis=np.sqrt(2/rho)*A*Cd
+            Clam=self.Clam(Cturb_bis,n)# pas exactement ok
+            self.nelems+=1
+          
+            self.df.loc[self.nelems,'icon']=int(27)
+            self.df['icon']=self.df['icon'].astype(int)
+            self.df.loc[self.nelems,'dtype']='dor_door'
+            self.df.at[self.nelems,'values']=[Clam,Cturb,n,0.01,h,w,0.6,0,0,0]
+            self.df.loc[self.nelems,'name']=elemtype+'_'+str(float(h))+'_'+str(float(w))
+            self.df.loc[self.nelems,'comment']='Two ways door - by Python'
+            self.df=convert_cols(self.df)    
+            #print(elemtype+'_'+str(float(h))+'_'+str(float(w)))
+          
+      
+      
             
     def Clam(self,Ct,n):
         rho=1.2041
@@ -1174,6 +1316,33 @@ class controlnodes:
         self.addreport(self.nctrl,report_name,'FLOW')
 
 
+    def addtemperaturesensor(self,zonesdf,roomid,name):
+        
+        
+        if (roomid != -1):       
+            roomname=zonesdf.loc[roomid,'name']
+        else:
+            roomname = 'EXT'
+    
+    
+        self.nctrl+=1
+        
+        self.df.loc[self.nctrl,'typ']='sns'
+        
+        self.df.loc[self.nctrl,'seq']=int(self.nctrl)
+        self.df.loc[self.nctrl,'f']=int(0)
+        self.df.loc[self.nctrl,'n']=int(0)
+        self.df.loc[self.nctrl,'c1']=int(0)
+        self.df.loc[self.nctrl,'c2']=int(0)
+        self.df.loc[self.nctrl,'name']=name
+        
+        values=[0, 1, 0, 0, roomid, 1, 1, 0.0,0.0, 0.0, 0, name]
+        
+        self.df.loc[self.nctrl,'description']='Temperature sensor by Python'
+       
+        self.df.at[self.nctrl,'values']=[ str(v) for v in values]
+    
+        self.addreport(self.nctrl,'T'+'_'+roomname, 'T'+'_' + roomname)
     
 
 
@@ -1287,6 +1456,37 @@ class controlnodes:
         return self.nctrl
     
     
+    def addBool(self,otype,name,input1,input2,description=''):
+        
+        #otype can be: sub,mul,add,div
+        olist=['and']
+        
+        if (otype not in olist):
+            print("Operation ",otype,"not programmed yet")
+            exit()
+    
+        self.nctrl+=1
+        self.df.loc[self.nctrl,'typ']=otype
+        self.df.loc[self.nctrl,'seq']=int(self.nctrl)
+        self.df.loc[self.nctrl,'f']=int(0)
+        self.df.loc[self.nctrl,'n']=int(2)
+        self.df.loc[self.nctrl,'c1']=int(input1)
+        self.df.loc[self.nctrl,'c2']=int(input2)
+        self.df.loc[self.nctrl,'name']=name
+        
+        
+        if (description==''):
+            description=otype+' by Python'
+        else:
+            description+=' - by Python'
+        self.df.loc[self.nctrl,'description']=description
+    
+        self.df.at[self.nctrl,'values']=[ ]
+    
+        return self.nctrl
+    
+    
+    
     def addMinMax(self,otype,name,inputs,description=''):
         #inputs= list of control ids
         
@@ -1360,7 +1560,46 @@ class controlnodes:
         
         self.addMinMax('max','Final',[ctrlids['Qmin'],ctrlids['upperbounded']])
         
+   
+    def addGreaterThanOtherSignal(self,sensorid,otherid):
+
+
+        """zones=contam_data['zones']
+        controls=contam_data['controls']
+        
+        ctrlids={}
+        T_name='T_EXT'
+        
+        if (controls.df['name'].isin([T_name]).max() == False):
+            self.addtemperaturesensor(zones.df,-1,'T-sensor')
+            ctrlids['Ext']=self.nctrl
+        else: 
+            ctrlids['Ext']=controls.df[controls.df['name']==T_name].index[0]
+        """    
+        
+        self.addLLS(otherid,sensorid,'Lower than')
+   
+    def addGreaterThanValue(self,sensorid,value):
+                
+        self.addconstant('constant'+str(value), value)
+        constantid = self.nctrl
+        
+        self.addLLS(constantid,sensorid,'Lower than '+str(value))
+
+
+    def addIsBetween(self,sensorid,lowervalueid,highervalueid):
+
+
+        self.addLLS(lowervalueid,sensorid,'Lower than')
+        lowerswitchid = self.nctrl
+        self.addLLS(sensorid,highervalueid,'Lower than')
+        higherswitchid = self.nctrl
+        
+        self.addBool('and', 'Isbetween', lowerswitchid, higherswitchid)
+                
+        
     
+
     def addCollector(self,flow_rates_ids,species_ids,description=''):
     
         #Computing a collector based on a vector of flow rates and a vector of speces
@@ -1939,12 +2178,13 @@ class daySchedules:
             cols=['hour','value']
             sdict['dataframe']=pd.DataFrame(columns=cols)
             
+            
+            
             for l in range(npoints):
                 fields=filereader.readline().split()
                 
                 dictToAppend = dict(zip(cols,fields))
-
-                sdict['dataframe'] = pd.concat( [sdict['dataframe'],pd.DataFrame.from_records(dictToAppend) ],ignore_index=True)                
+                sdict['dataframe'] = pd.concat( [sdict['dataframe'],pd.DataFrame.from_records(dictToAppend,index=[0]) ],ignore_index=True)                
                 #sdict['dataframe']=sdict['dataframe'].append(dict(zip(cols,fields)),ignore_index=True)
 
             

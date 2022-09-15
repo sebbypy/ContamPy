@@ -3,7 +3,7 @@ import sys
 sys.path.append('../../')
 
 import customExceptions
-
+import contam_functions
 
 def setControls(contam_data,controlJSON):
 
@@ -71,11 +71,17 @@ def setControls(contam_data,controlJSON):
         
             if "Actuator" in W.keys():
                 usedActuatorsNames.append(W["Actuator"])
-
-                controlname='C_NS_'+W['Room']
                 
+                if W['Preferred orientation']=="":
+                    
+                    zoneid=zones.df[zones.df['name']==W['Room']].index[0]
+                    fpid=flowpaths.df[ (flowpaths.df['pzm']==zoneid) & (flowpaths.df['pzn']==-1) ].index
+                    controlname='C_NS_'+str(flowpaths.df.loc[fpid[1],'wazm'])+W['Room']
+                else : 
+                    controlname='C_NS_'+str(W["Preferred orientation"])+W['Room']
+                    
                 if (len(controlname)>15):
-                    controlname=controlname.replace('kamer','')
+                        controlname=controlname.replace('kamer','')
 
                 controlname_actuator_map[controlname]=W['Actuator']
 
@@ -94,6 +100,63 @@ def setControls(contam_data,controlJSON):
                 controlname_actuator_map[controlname]=NS['Actuator']
                 nflows[controlname]=NS["Capacity"]
 
+
+    if ('Ventilative cooling component' in controlJSON.keys()):
+        for VC in controlJSON['Ventilative cooling component']:
+        
+            if "Actuator" in VC.keys():
+                usedActuatorsNames.append(VC["Actuator"])
+                zoneid=zones.df[zones.df['name']==VC['Room']].index[0]
+                if VC['Preferred orientation']=="":
+                    
+                    
+                    fpid=flowpaths.df[ (flowpaths.df['pzm']==zoneid)&(flowpaths.df['pzn']==-1)].index 
+                    #print(fpid)
+                    fpid=fpid[4]
+                    
+                    controlname='C_VC_'+str(flowpaths.df.loc[fpid,'wazm'])+VC['Room']
+                    qname='Q_VC_'+str(flowpaths.df.loc[fpid,'wazm'])+VC['Room']
+                else : 
+                    
+                    controlname='C_VC_'+str(VC["Preferred orientation"])+VC['Room']
+                    qname='Q_VC_'+str(VC["Preferred orientation"])+VC['Room']
+                    fpid=flowpaths.df[ (flowpaths.df['pzm']==zoneid)&(flowpaths.df['pzn']==-1)&(flowpaths.df['wazm'] == int(VC['Preferred orientation'])) ].index
+                    fpid=fpid[3]
+                    
+                    
+                if (len(controlname)>15):
+                        controlname=controlname.replace('kamer','')
+             
+                
+                controlname_actuator_map[controlname]=VC['Actuator']
+                controls.addconstant(controlname,1)
+                flowpaths.df.loc[fpid,'pc']=controls.df.index[-1]
+                controls.addflowsensor(fpid,qname)
+
+               
+    if ('Two ways door' in controlJSON.keys()):
+        for D in controlJSON['Two ways door']:
+        
+            if "Actuator" in D.keys():
+                usedActuatorsNames.append(D["Actuator"])
+                roomid1=zones.df[zones.df['name']==D['From room']].index[0] # find ID of zone which has the same name
+                roomid2=zones.df[zones.df['name']==D['To room']].index[0] # find ID of zone which has the same name
+                commonflowpaths=contam_functions.getcommonpaths(flowpaths,roomid1,roomid2)  
+                fpid=commonflowpaths.index[0]#premier choisi comme NT
+                
+                controlname='C_NT_'+str(fpid)
+                
+                if (len(controlname)>15):
+                    controlname=controlname.replace('kamer','')
+
+                controlname_actuator_map[controlname]=D['Actuator']
+                
+                controls.addconstant('C_NT_'+str(fpid),1)
+                flowpaths.df.loc[fpid,'pc']=controls.df.index[-1]
+                controls.addflowsensor(fpid,'Q_NT_'+str(fpid))
+                
+                
+       
 
 
     usedControlSignals=[]
@@ -183,9 +246,25 @@ def setControls(contam_data,controlJSON):
                 #print("Adding timer")
                 controls.addClockControl(schedules,weekschedules,Sdescription["Schedule"],'nightClockSignal')
 
-    
-        
+            
+            elif (Sdescription["Type"]=="Single-TSensor"):
+                  
+                room=Sdescription['Room']
+                if room != 'EXT':
+                    zoneid=zones.df[zones.df['name']==room].index[0]
+                else:
+                    zoneid = -1
+          
+                controls.addtemperaturesensor(zones.df,zoneid,'T-sensor')
+                sensordict[Sname]=controls.nctrl
                 
+
+            elif (Sdescription["Type"]=="Constant"):
+                  
+                value = Sdescription["Value"]
+                controls.addconstant(str(value),value)
+                sensordict[Sname]=controls.nctrl
+
     
                    
         #print(sensordict)
@@ -212,6 +291,34 @@ def setControls(contam_data,controlJSON):
                 #print("Adding timer")
                 controls.addClockControl(schedules,weekschedules,AlgoObject["Schedule"],algoname)
                     
+                
+            elif (AlgoObject["Type"]=="GreaterThanOtherSignal"):
+             
+                sensorid1 = sensordict[Aobject['SignalName']]
+                sensorid2 = sensordict[Aobject['SignalName2']]
+                                       
+                controls.addGreaterThanOtherSignal(sensorid1,sensorid2)
+
+            elif (AlgoObject["Type"]=="GreaterThanValue"):
+             
+                sensorid = sensordict[Aobject['SignalName']]
+                value = AlgoObject['Value']                       
+                
+                controls.addGreaterThanValue(sensorid,value)
+
+
+
+            elif (AlgoObject["Type"]=="IsBetween"):
+                
+                sensorid = sensordict[Aobject['SignalName']]
+   
+                lowerValueID = sensordict[Aobject['LowerValue']]
+                upperValueID = sensordict[Aobject['UpperValue']]
+                
+                controls.addIsBetween(sensorid,lowerValueID,upperValueID)
+                
+                
+                
 
             elif (AlgoObject['Type']=='Max'):
 
@@ -232,8 +339,8 @@ def setControls(contam_data,controlJSON):
 
                 
             else:
-                print(AlgoObject["Type"]+" does not exist yet")
-                exit()
+                raise ValueError(AlgoObject["Type"]+" does not exist yet")
+                
             
             actuatorscid[A]=controls.nctrl
 
