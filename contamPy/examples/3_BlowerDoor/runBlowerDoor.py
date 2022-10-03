@@ -54,6 +54,8 @@ contam.runContam('BlowerDoor.prj')
 #getting blower door results
 leaks = caseConfig.getLeaksInformations()
 
+print(leaks)
+
 blowerDoorResults = getBlowerDoorResults('BlowerDoor.val')
 
 
