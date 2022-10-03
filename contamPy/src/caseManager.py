@@ -34,8 +34,9 @@ class caseConfigurator:
                                     'mode': 'uniform'
                                     },
                                 'orientation':0,
-                                'v50':1,
-                                'leaksDistribution':'uniform',
+                                'airTightness':
+                                    {'v50':3,
+                                     'leaksDistribution':'uniform'},
                                 'system':None,
                                 'control':None,
                                 'occupancy': None,
@@ -194,7 +195,7 @@ class caseConfigurator:
         
         if parametersDict['simulationType']=='blowerDoor':
 
-            minimalParameters = ['building','v50','outputFiles']        
+            minimalParameters = ['building','airTightness','outputFiles']        
             
         else:
             
@@ -369,7 +370,7 @@ class caseConfigurator:
                 systemJSON = json.load(inputFile)
             
         else:
-            print("Error in getSystem")
+            raise ValueError ("Valide system definitions are 'namedSystem' or 'JSONfile'")
             
             
         return systemJSON
@@ -496,11 +497,21 @@ class caseConfigurator:
 
     def setAirtightnessOrientation(self):
         
-        v50= self.actualParameters['v50']
-        orientation = self.actualParameters['orientation']
-        leaksDistribution = self.actualParameters['leaksDistribution']
+        if 'v50' in self.actualParameters['airTightness'].keys():
+            leakValue = self.actualParameters['airTightness']['v50']
+            leakDefinition = 'v50'
         
-        setBCS.apply(self.ContamModel,v50,orientation,leaksDistribution)
+        
+        elif 'n50' in self.actualParameters['airTightness'].keys():
+            leakValue = self.actualParameters['airTightness']['n50']
+            leakDefinition = 'n50'
+        
+        
+        #v50= self.actualParameters['v50']
+        orientation = self.actualParameters['orientation']
+        leaksDistribution = self.actualParameters['airTightness']['leaksDistribution']
+        
+        setBCS.apply(self.ContamModel,leakDefinition,leakValue,orientation,leaksDistribution)
         
     
     def setWeather(self):

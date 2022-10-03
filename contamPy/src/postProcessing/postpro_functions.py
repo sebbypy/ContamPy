@@ -64,7 +64,7 @@ def maxHoursAboveThreshold(df,threshold,debug=False):
     return maxHours
 
 
-def getIaqIndicators(df,debug=False,CO2Limit=1000,VOCLimit=20,H2OLimit=0.7):
+def getIaqIndicators(df,debug=False,CO2Limit=1040,VOCLimit=20,H2OLimit=0.7):
 
     year = df.index[0].year
     

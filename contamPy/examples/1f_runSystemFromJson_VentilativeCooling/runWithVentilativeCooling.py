@@ -30,8 +30,7 @@ caseConfig = caseConfigurator(refBuildingsDir,occupancyDir,weatherDir,libraryDir
 allParameters = {'building':'MaisonLimal-filled',
                  'simulationType':'transient',
                  'orientation':0,
-                 'v50':3,
-                 'leaksDistribution':'uniform',
+                 'airTightness':{'v50':3,'leaksDistribution':'uniform'},
                  'system':{
                         'definition':'JSONfile',
                         'filename':'MHRV-And-VentilativeCooling.json'

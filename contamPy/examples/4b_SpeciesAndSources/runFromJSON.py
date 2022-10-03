@@ -30,7 +30,7 @@ caseConfig = caseConfigurator(refBuildingsDir,occupancyDir,weatherDir,libraryDir
 
 allParameters = {'building':'COVL-REN-RIJ2',
                 'simulationType':'transient',
-                 'v50':3,
+                 'airTightness':{'v50':3,'leaksDistribution':'uniform'},
                  'orientation':90,
                  'system':{
                         'definition':'JSONfile',

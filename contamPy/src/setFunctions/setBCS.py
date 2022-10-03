@@ -1,8 +1,9 @@
 import numpy as np
 
-def apply(contam_data,v50,rot,leaks_distrib='uniform'):
+def apply(contam_data,leakDefinition='v50',leakValue=1,rot=0,leaks_distrib='uniform'):
 
 
+    zones = contam_data['zones']
     flowpaths=contam_data['flowpaths']
     flowelems=contam_data['flowelems']
 
@@ -17,6 +18,19 @@ def apply(contam_data,v50,rot,leaks_distrib='uniform'):
         else:
             
             crackElementsIds[cracktype] = np.nan
+
+
+    if leakDefinition == 'n50':
+        #compute v50 from v50
+        v50 = n50Tov50(leakValue, zones, flowpaths, crackElementsIds)
+
+    elif leakDefinition == 'v50':
+        
+        v50 = leakValue
+
+    else:
+        raise ValueError("Leak definition has to be 'v50' or 'n50'")         
+
 
 
     if leaks_distrib=='random':
@@ -47,6 +61,13 @@ def apply(contam_data,v50,rot,leaks_distrib='uniform'):
         wallArea = getWallArea(flowpaths,crackElementsIds)                
         correctedv50 = v50*totalArea/wallArea       
 
+    elif leaks_distrib == 'allButFloor':
+        
+        totalArea = getTotalArea(flowpaths,crackElementsIds)
+        floorArea = getFloorArea(flowpaths,crackElementsIds)                
+        
+        remainingArea = totalArea-floorArea
+        correctedv50 = v50*totalArea/remainingArea       
 
     else:
         correctedv50 = v50
@@ -54,10 +75,26 @@ def apply(contam_data,v50,rot,leaks_distrib='uniform'):
 
     for index in flowpaths.df.index:
         
-        
-        if (flowpaths.df.loc[index,'pe']==crackElementsIds['Wall_crack']):
+        if leaks_distrib == 'walls':
+            
+            if (flowpaths.df.loc[index,'pe']==crackElementsIds['Wall_crack']):
                     
-            flowpaths.df.loc[index,'mult']*=float(correctedv50) 
+                flowpaths.df.loc[index,'mult']*=float(correctedv50) 
+
+            else:
+
+                flowpaths.df.loc[index,'mult']*=0
+
+
+        elif leaks_distrib == 'allButFloor':
+            
+            if (flowpaths.df.loc[index,'pe'] != crackElementsIds['Floor_crack']):
+                    
+                flowpaths.df.loc[index,'mult']*=float(correctedv50) 
+
+            else:
+                flowpaths.df.loc[index,'mult']*=0
+
     
         else: #normal case:
                 
@@ -110,3 +147,18 @@ def getFloorArea(flowpaths,crackElementsIds):
 
     return floorArea
 
+
+def n50Tov50(n50,zones,flowpaths,crackElementsIds):
+    
+    zonedf = zones.df
+    zonedf=zonedf[zonedf['flags']==3]
+    volume=zonedf['Vol'].sum()
+
+    totalArea = getTotalArea(flowpaths,crackElementsIds)
+    
+    v50 = n50*volume/totalArea
+
+
+    return v50
+    
+    

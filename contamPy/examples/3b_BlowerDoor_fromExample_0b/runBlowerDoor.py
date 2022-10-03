@@ -40,7 +40,7 @@ if not os.path.exists(os.path.join(refBuildingsDir,'houseWithSlopedRoofWithDimen
 
 allParameters = {'building':'houseWithSlopedRoofWithDimensions',
                 'simulationType':'blowerDoor',
-                'v50':v50,
+                'airTightness':{'v50':v50,'leaksDistribution':'uniform'},
                 'outputFiles':['simconc','simflow','log','ach'],
                 }
 

@@ -68,9 +68,23 @@ def apply(contam_data,systemJson):
             continue
             
         if (len(fpid)>1):
-            print("WARNING, more than one location to define natural supply")
-            print("Choosing the first one in the list, please check your model afterwards")
-            fpid = fpid[0]
+
+            if 'Preferred orientation' in NS.keys():
+                print("Chosing preferend orientation")
+                fpid=flowpaths.df[ (flowpaths.df['pzm']==zoneid) & (flowpaths.df['pe']==generic_NSV_id) & (flowpaths.df['wazm']== int(NS['Preferred orientation'])) ].index
+                
+                if len(fpid)==0: 
+                    print("WARNING: No windows could be defined !")
+                    print("No existing path between ",zones.df.loc[zoneid,'name'],"and outside on the facade",NS['Preferred orientation'],"°")
+                    continue
+
+            else:
+                print("WARNING, more than one location to define natural supply")
+                print("Choosing the first one in the list, please check your model afterwards")
+                fpid = fpid[0]
+
+                    
+
 
         #check if flow element with the required pressure exist
         if (NS['Self-Regulating']=='No'):

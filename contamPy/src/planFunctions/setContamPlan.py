@@ -324,13 +324,15 @@ def setContamPlan(inputFileName,csvFileNameWithPath,outputFileNameWithPath):
             fromto.remove(-1)
             otherzone=fromto[0]
     
-            controls.addconstant('C_NS_'+str(zones.df.loc[int(otherzone),'name']),1)
+            controls.addconstant('C_NS_'+str(flowpaths.df.loc[index,'wazm'])+str(zones.df.loc[int(otherzone),'name']),1)
+            #controls.addconstant('C_NS_'+str(zones.df.loc[int(otherzone),'name']),1)
             flowpaths.df.loc[index,'pc']=controls.df.index[-1]
      
             #print('flow path '+str(index)+' adding natural supply for room '+str(zones.df.loc[int(otherzone),'name']))
             
             #addflowensor(self,flowpathdf,pathid,,name,description=''):
-            controls.addflowsensor(index,'Q_NS_'+str(zones.df.loc[otherzone,'name']))
+            #controls.addflowsensor(index,'Q_NS_'+str(zones.df.loc[otherzone,'name']))
+            controls.addflowsensor(index,'Q_NS_'+str(flowpaths.df.loc[index,'wazm'])+str(zones.df.loc[otherzone,'name']))
     
     
     #----------------------------------------------------------------------------------------------------------------

@@ -88,17 +88,28 @@ def setControls(contam_data,controlJSON):
 
     if ('Natural supply' in controlJSON.keys()):
         for NS in controlJSON['Natural supply']:
-        
+
             if "Actuator" in NS.keys():
                 usedActuatorsNames.append(NS["Actuator"])
 
-                controlname='C_NS_'+NS['Room']
+
+                if 'Preferred orientation' not in NS.keys():
+                    zoneid=zones.df[zones.df['name']==NS['Room']].index[0]
+                    fpid=flowpaths.df[ (flowpaths.df['pzm']==zoneid) & (flowpaths.df['pzn']==-1) ].index
+                    controlname='C_NS_'+str(flowpaths.df.loc[fpid[1],'wazm'])+NS['Room']
+                else:
+
+                    controlname='C_NS_'+str(NS["Preferred orientation"])+NS['Room']
                 
                 if (len(controlname)>15):
                     controlname=controlname.replace('kamer','')
+                    controlname=controlname.replace('Inkom','I')
+                    controlname=controlname.replace('Nacht','N')
+                    controlname=controlname.replace('plaats','p')
 
                 controlname_actuator_map[controlname]=NS['Actuator']
                 nflows[controlname]=NS["Capacity"]
+
 
 
     if ('Ventilative cooling component' in controlJSON.keys()):

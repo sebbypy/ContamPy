@@ -31,7 +31,7 @@ v50 =1
 
 allParameters = {'building':'COVL-REN-RIJ2',
                 'simulationType':'blowerDoor',
-                'v50':v50,
+                'airTightness':{'v50':v50,'leaksDistribution':'uniform'},
                 'outputFiles':['simconc','simflow','log','ach'],
                 }
 

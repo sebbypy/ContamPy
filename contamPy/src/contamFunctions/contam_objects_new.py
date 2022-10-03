@@ -1140,9 +1140,13 @@ class controlnodes:
        
     def addspeciesensor(self,zonesdf,roomid,specie_name,name,description='',multiplier=1,unit=''):
         
-        if (len(name)>15):
+        """if (len(name)>15):
             name=name.replace('kamer','')
-
+            name=name.replace('Inkom','I')
+            name=name.replace('Nacht','N')
+            name=name.replace('plaats','p')
+            """
+        name = shortenTooLongName(name,15)
         
         if (roomid != -1):       
             roomname=zonesdf.loc[roomid,'name']
@@ -1348,9 +1352,13 @@ class controlnodes:
 
     def addreport(self,id_to_report,name,reporttype='',description='',header='',multiplier=1,unit=''):
     
-        if (len(name)>15):
+        """if (len(name)>15):
             name=name.replace('kamer','')
-        
+            name=name.replace('Inkom','I')
+            name=name.replace('Nacht','N')
+            name=name.replace('plaats','p')"""
+        name = shortenTooLongName(name,15)
+
     
         self.nctrl+=1
         
@@ -1400,9 +1408,14 @@ class controlnodes:
 
     def addconstant(self,name,value):
         
-        if (len(name)>15):
+        """if (len(name)>15):
             name=name.replace('kamer','')
-        
+            name=name.replace('Inkom','I')
+            name=name.replace('Nacht','N')
+            name=name.replace('plaats','p')
+        """
+        name = shortenTooLongName(name,15)
+
         
         #! # typ seq f n  c1  c2 name
         #1 set   1 0 0   0   0 test
@@ -2911,5 +2924,24 @@ def convertTimeString(tstring):
         return nhours.zfill(2)+':00:00'
 
 
+def shortenTooLongName(varName,maxNumberOfChars):
+    """shorten string that are too long for contam. 
+    if last char is a digit, I keep it, then shorten the string and re-add the number"""
+    
+    name = varName    
+
+    if len(varName) > maxNumberOfChars:
+
+        lastChar = name[-1]
+        
+        if lastChar.isdigit():
+            name = name[:maxNumberOfChars-1]
+            name += lastChar                
+
+        else:
+            name=name[:maxNumberOfChars]
+        
+        
+    return name
 
 
