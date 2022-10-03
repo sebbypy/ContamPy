@@ -69,8 +69,12 @@ def apply(contam_data,leakDefinition='v50',leakValue=1,rot=0,leaks_distrib='unif
         remainingArea = totalArea-floorArea
         correctedv50 = v50*totalArea/remainingArea       
 
-    else:
+    elif leaks_distrib == 'uniform':
         correctedv50 = v50
+
+
+    else:
+        raise ValueError("Possible values for leaks distribution are: 'uniform','random','allButFloor,'walls'")
 
 
     for index in flowpaths.df.index:
@@ -94,6 +98,7 @@ def apply(contam_data,leakDefinition='v50',leakValue=1,rot=0,leaks_distrib='unif
 
             else:
                 flowpaths.df.loc[index,'mult']*=0
+
 
     
         else: #normal case:

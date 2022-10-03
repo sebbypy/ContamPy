@@ -3,6 +3,16 @@ import numpy as np
 
 pd.options.mode.chained_assignment = None
 
+import os
+dirPath = os.path.dirname(os.path.realpath(__file__))
+import sys
+sys.path.append(os.path.join(dirPath,'../utilities'))
+
+from utilityFunctions import shortenTooLongName
+
+
+
+
 class levels:
 
     # nr // level number (IX), in order from 1 to nlev
@@ -2924,24 +2934,6 @@ def convertTimeString(tstring):
         return nhours.zfill(2)+':00:00'
 
 
-def shortenTooLongName(varName,maxNumberOfChars):
-    """shorten string that are too long for contam. 
-    if last char is a digit, I keep it, then shorten the string and re-add the number"""
-    
-    name = varName    
 
-    if len(varName) > maxNumberOfChars:
-
-        lastChar = name[-1]
-        
-        if lastChar.isdigit():
-            name = name[:maxNumberOfChars-1]
-            name += lastChar                
-
-        else:
-            name=name[:maxNumberOfChars]
-        
-        
-    return name
 
 

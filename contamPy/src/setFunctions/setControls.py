@@ -5,6 +5,14 @@ sys.path.append('../../')
 import customExceptions
 import contam_functions
 
+import os
+dirPath = os.path.dirname(os.path.realpath(__file__))
+import sys
+sys.path.append(os.path.join(dirPath,'../utilities'))
+
+from utilityFunctions import shortenTooLongName
+
+
 def setControls(contam_data,controlJSON):
 
     
@@ -45,7 +53,7 @@ def setControls(contam_data,controlJSON):
             controlname='C_ME_'+ME['Room']
             
             if (len(controlname)>15):
-                controlname=controlname.replace('kamer','')
+                controlname = shortenTooLongName(controlname,15)
 
             controlname_actuator_map[controlname]=ME['Actuator']
             nflows[controlname]=ME["Nominal flow rate"]
@@ -60,7 +68,7 @@ def setControls(contam_data,controlJSON):
             controlname='C_MS_'+MS['Room']
             
             if (len(controlname)>15):
-                controlname=controlname.replace('kamer','')
+                controlname = shortenTooLongName(controlname,15)
 
             controlname_actuator_map[controlname]=MS['Actuator']
             nflows[controlname]=MS["Nominal flow rate"]
