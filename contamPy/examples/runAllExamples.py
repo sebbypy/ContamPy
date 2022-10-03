@@ -18,6 +18,8 @@ tests = [['0_modelGeneration','runAll.py'],
          ['3_BlowerDoor','runBlowerDoor.py'],
          ['3b_BlowerDoor_fromExample_0b','runBlowerDoor.py'],
          ['3c_BlowerDoor_n50','runBlowerDoor.py'],
+         ['3d_BlowerDoor_noFloors','runBlowerDoor.py'],
+         ['3e_BlowerDoor_wallOnly','runBlowerDoor.py'],
          ['4_SpeciesAndFilters','runFromJSON.py'],
          ['4b_SpeciesAndSources','runFromJSON.py']
          ]
