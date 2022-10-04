@@ -89,7 +89,7 @@ def setControls(contam_data,controlJSON):
                     controlname='C_NS_'+str(W["Preferred orientation"])+W['Room']
                     
                 if (len(controlname)>15):
-                        controlname=controlname.replace('kamer','')
+                    controlname = shortenTooLongName(controlname,15)
 
                 controlname_actuator_map[controlname]=W['Actuator']
 
@@ -110,10 +110,8 @@ def setControls(contam_data,controlJSON):
                     controlname='C_NS_'+str(NS["Preferred orientation"])+NS['Room']
                 
                 if (len(controlname)>15):
-                    controlname=controlname.replace('kamer','')
-                    controlname=controlname.replace('Inkom','I')
-                    controlname=controlname.replace('Nacht','N')
-                    controlname=controlname.replace('plaats','p')
+                    controlname = shortenTooLongName(controlname,15)
+
 
                 controlname_actuator_map[controlname]=NS['Actuator']
                 nflows[controlname]=NS["Capacity"]
@@ -144,8 +142,8 @@ def setControls(contam_data,controlJSON):
                     
                     
                 if (len(controlname)>15):
-                        controlname=controlname.replace('kamer','')
-             
+                        controlname = shortenTooLongName(controlname,15)
+
                 
                 controlname_actuator_map[controlname]=VC['Actuator']
                 controls.addconstant(controlname,1)
@@ -166,7 +164,7 @@ def setControls(contam_data,controlJSON):
                 controlname='C_NT_'+str(fpid)
                 
                 if (len(controlname)>15):
-                    controlname=controlname.replace('kamer','')
+                    controlname = shortenTooLongName(controlname,15)
 
                 controlname_actuator_map[controlname]=D['Actuator']
                 
@@ -239,7 +237,7 @@ def setControls(contam_data,controlJSON):
                     sensor_name='Q_ME_'+room
                     
                     if (len(sensor_name)>15):
-                        sensor_name=sensor_name.replace('kamer','')
+                        sensor_name = shortenTooLongName(sensor_name,15)
      
                     flow_sensors_ids.append(controls.df[controls.df['name']==sensor_name].index[0])
     
@@ -382,7 +380,7 @@ def setControls(contam_data,controlJSON):
         
         if (not controlname in list(controls.df['name']) ):
             #means the control does not exist, which also means the device does not exist!
-            print("Warning ! Control ",controlname,"does not exist!")
+            print("Warning ! Control ",controlname,"does not exist XX!")
             continue
         
         oldCid=controls.df[controls.df['name']==controlname].index[0]

@@ -171,6 +171,13 @@ class zones:
         
         self.df = newzonesdf
 
+    def getNumberOfZones(self):
+        
+        return self.nzones-2
+    
+    def getZonesNames(self):
+        
+        return list(self.df['name'])
 
 
 class initialZonesConcentrations():
@@ -905,7 +912,7 @@ class contaminants:
             return value*1e-9/rho_air
 
         else:
-            raise ValueError("Unknown unit "+fromUnit)
+            raise ValueError("Unknown unit "+fromUnit+".Currently accepted units are ug/m3 and ppm")
 
 
     def kgkgToUnit(self,unitName):
@@ -1150,12 +1157,6 @@ class controlnodes:
        
     def addspeciesensor(self,zonesdf,roomid,specie_name,name,description='',multiplier=1,unit=''):
         
-        """if (len(name)>15):
-            name=name.replace('kamer','')
-            name=name.replace('Inkom','I')
-            name=name.replace('Nacht','N')
-            name=name.replace('plaats','p')
-            """
         name = shortenTooLongName(name,15)
         
         if (roomid != -1):       
@@ -1362,11 +1363,6 @@ class controlnodes:
 
     def addreport(self,id_to_report,name,reporttype='',description='',header='',multiplier=1,unit=''):
     
-        """if (len(name)>15):
-            name=name.replace('kamer','')
-            name=name.replace('Inkom','I')
-            name=name.replace('Nacht','N')
-            name=name.replace('plaats','p')"""
         name = shortenTooLongName(name,15)
 
     
@@ -1418,12 +1414,6 @@ class controlnodes:
 
     def addconstant(self,name,value):
         
-        """if (len(name)>15):
-            name=name.replace('kamer','')
-            name=name.replace('Inkom','I')
-            name=name.replace('Nacht','N')
-            name=name.replace('plaats','p')
-        """
         name = shortenTooLongName(name,15)
 
         
@@ -1680,18 +1670,16 @@ class controlnodes:
         
     def addBalanceControl(self,balrooms,nom_flows_dict,unbal_ctrls_dict,ids):
     
-        #print(nom_flows_dict)
-        #print(unbal_ctrls_dict)
-        #print(ids)
-        
-        #print(balrooms)
-        shortrooms=[x.replace('kamer','') for x in balrooms]
-        
+        #this assumes the control have the form C_MS_roomname or C_ME_roomname
+        #Then shortnames are max 10 char (as control have max 15 chars)
+        shortrooms=[shortenTooLongName(x,10) for x in balrooms]
         
         supplyids=[]
         exhaustids=[]
         
         for c in unbal_ctrls_dict.keys():
+
+            print("Control",c)            
 
             room=c.split('_')[-1]
 
@@ -2080,8 +2068,8 @@ class occupancy_schedules:
                 g.write('\n')
             
             
-            if 'douche' in v['dataframe'].columns:
-                v['dataframe'].drop(['douche'],axis=1).to_csv(g,header=False,index=False,sep=' ',line_terminator='\n')
+            if 'shower' in v['dataframe'].columns:
+                v['dataframe'].drop(['shower'],axis=1).to_csv(g,header=False,index=False,sep=' ',line_terminator='\n')
 
             else:
                 v['dataframe'].to_csv(g,header=False,index=False,sep=' ',line_terminator='\n')
@@ -2103,7 +2091,7 @@ class occupancy_schedules:
         sdict['name']=name
         sdict['description']=description
 
-        sdict['dataframe']=profiledf.loc[:,['hour','zid','douche']]
+        sdict['dataframe']=profiledf.loc[:,['hour','zid','shower']]
         sdict['dataframe']['x']=0.0
         sdict['dataframe']['y']=0.0
         sdict['dataframe']['relHt']=0.0

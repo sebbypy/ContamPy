@@ -49,7 +49,7 @@ allParameters = {'building':'COVL-REN-RIJ2',
                 'shielding':'semi-exposed',
                 'terrainRoughness':'III',
                 'weatherRoughness':'I',
-                'occupancy':'default-home'
+                'occupancy':'default-active'
                 }
 
 

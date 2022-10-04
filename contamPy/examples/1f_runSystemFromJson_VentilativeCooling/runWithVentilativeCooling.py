@@ -26,6 +26,9 @@ contamDir = os.path.join(ressourcesDir,'CONTAM-Exe')
 caseConfig = caseConfigurator(refBuildingsDir,occupancyDir,weatherDir,libraryDir,contaminantsDir)
 
 
+""" NB: this reference building should be reviewed to make sure the controls are named 
+consistently with the latest approach"""
+
 
 allParameters = {'building':'MaisonLimal-filled',
                  'simulationType':'transient',

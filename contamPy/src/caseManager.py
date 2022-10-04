@@ -591,7 +591,7 @@ class caseConfigurator:
                     setOccupancyAndSources.addPollutantSourcePerTotalArea(self.ContamModel,cName,sourceDict['rate'],sourceDict['unit'])
 
                 else:
-                    raise ValueError("Uknown type of source")
+                    raise ValueError("Uknown type of source. Possible sources are 'constantRatePerFloorArea' or 'constantRatePerTotalArea'")
 
         
 
