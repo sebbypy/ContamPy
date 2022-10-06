@@ -25,19 +25,16 @@ def apply(contam_data,occupancyProfileName,profilesDir,CO2Rate=16,H2ORate=55,CO2
     sourceElems=contam_data['sourceelems']
     sources=contam_data['sources']
 
-    #Determining number of slaapkamers
-    
-    
-    boolarray=['Slaapkamer' in x for x in list(contam_data['zones'].df['name']) ]
-    slaaplist=list(contam_data['zones'].df.loc[boolarray,'name'])
-    nslaap = len(slaaplist) 
+
     
 
-    if contam_data['zones'].getNumberOfZones == 1 :
+    if contam_data['zones'].getNumberOfZones() == 1 :
         print("Only a single zone in the model, skipping occupancy and sources definition")
         return 
 
-    numberOfOccupants = nslaap+1
+
+    numberOfBedrooms = zones.getNumberOfBedrooms()
+    numberOfOccupants = numberOfBedrooms+1
 
     occupantsReferenceSchedules,co2EmissionsReferenceSchedules,h2oEmissionsReferenceSchedules = generateOccupantsDaySchedules(numberOfOccupants,
                                                                                                                               profilesDir,
@@ -53,8 +50,6 @@ def apply(contam_data,occupancyProfileName,profilesDir,CO2Rate=16,H2ORate=55,CO2
                                                                                                                      h2oEmissionsReferenceSchedules,
                                                                                                                      weekschedules)
 
-    
-    
 
     for oid in range(1,numberOfOccupants+1):
         
@@ -74,36 +69,29 @@ def apply(contam_data,occupancyProfileName,profilesDir,CO2Rate=16,H2ORate=55,CO2
     schedules_groups,unique_groups = getDaySchedulesCombinations(exposures)
     #schedule groups = combinsations of occupants schedules for all 12 refernce days
     #unique_groups = unique combinations 
- 
             
-    bathroomid=contam_functions.getzoneid('Badkamer',zones.df)
-    
-    if ('Keuken' in list(zones.df['name'])):
-        kitchenid=contam_functions.getzoneid('Keuken',zones.df)
-    else:
-        kitchenid=contam_functions.getzoneid('OKeuken',zones.df)
-
+    bathroomid = zones.getBathroomID()
+    bathroomName = zones.getBathroomName()
 
     shower_profile_dict = generateDailyShowerProfiles(unique_groups,oschedules,bathroomid,dayschedules)    
-    kitchen_profile_dict = generateDailyKitchenProfiles(unique_groups,oschedules,kitchenid,dayschedules)
-
-    
-
-    #shower week profiles    
     shower_week_profile=[ shower_profile_dict[tuple(g)] for g in schedules_groups]   #this is the week profile for showers, computed on basis on the week profiles of the occupants   
     weekschedules.addSchedule('Shower_Week','Shower week schedule based on occupants schedules',shower_week_profile)
     shower_week_schedule_ID=weekschedules.getLastId()    
     sourceElemID=sourceElems.getSourceID('H2O_Badkamer')
-    sourceController=controls.addSourceLimiter('Badkamer',shower_week_schedule_ID)    
+    sourceController=controls.addSourceLimiter(bathroomName,shower_week_schedule_ID)    
     sources.addSource(bathroomid,sourceElemID,0,sourceController,1.0) #control via control var with limiter (stop source if RH>100)
     
 
-    #kitchen week profiles
+    kitchenid = zones.getKitchenID()
+    kitchenName = zones.getKitchenName()
+
+    kitchen_profile_dict = generateDailyKitchenProfiles(unique_groups,oschedules,kitchenid,dayschedules)
+
     kitchen_week_profile=[ kitchen_profile_dict[tuple(g)] for g in schedules_groups]   #this is the week profile for kitchen, computed on basis on the week profiles of the occupants
-    weekschedules.addSchedule('Keuken_Week','Keuken week schedule based on occupants schedules',kitchen_week_profile)
+    weekschedules.addSchedule('Kitchen_Week','Kitchen week schedule based on occupants schedules',kitchen_week_profile)
     kitchen_week_schedule_ID=weekschedules.getLastId()
     sourceElemID=sourceElems.getSourceID('H2O_Keuken')
-    KsourceController=controls.addSourceLimiter(zones.df.loc[kitchenid,'name'],kitchen_week_schedule_ID)
+    KsourceController=controls.addSourceLimiter(kitchenName,kitchen_week_schedule_ID)
     sources.addSource(kitchenid,sourceElemID,0,KsourceController,1.0)
    
 
@@ -111,14 +99,13 @@ def apply(contam_data,occupancyProfileName,profilesDir,CO2Rate=16,H2ORate=55,CO2
     weekschedules.addSchedule('Laundry_Week','Laundry profile week',[ laundrydayprofile for i in range(12) ])
     laundryweekschedule=weekschedules.getLastId()
     LaundrySourceElemID=sourceElems.getSourceID('H2O_Wasplaats')
-    
-    if ('Wasplaats' in list(zones.df['name'])):
-        laundryid=contam_functions.getzoneid('Wasplaats',zones.df)
-    else:
-        laundryid=bathroomid
-        
+
+    laundryid = zones.getLaundryID()    
+    laundryName = zones.getLaundryName()
+
     #sources.addSource(laundryid,LaundrySourceElemID,laundryweekschedule,0,1.0)
-    WsourceController=controls.addSourceLimiter(zones.df.loc[laundryid,'name'],laundryweekschedule)
+
+    WsourceController=controls.addSourceLimiter(laundryName,laundryweekschedule)
     sources.addSource(laundryid,LaundrySourceElemID,0,WsourceController,1.0)
 
 
@@ -184,7 +171,7 @@ def read_standard_occupancy_file(csvf):
             fields=lines[i].split(',')
             if (len(fields)>1):
                 #df=df.append({'hour':fields[0],'zonename':fields[1],'shower':fields[2]=='shower'},ignore_index=True)
-                df = pd.concat([df,pd.DataFrame.from_records([{'hour':fields[0],'zonename':fields[1],'shower':fields[2]=='douche'}])])
+                df = pd.concat([df,pd.DataFrame.from_records([{'hour':fields[0],'zonename':fields[1],'shower':fields[2]=='shower'}])])
 
     df.index = range(1,len(df)+1)
             
@@ -200,7 +187,11 @@ def generateOccupantsDaySchedules(numberOfOccupants,profilesDir,zones,contam_dat
     co2EmissionsReferenceSchedules={} # occupancy schedule id : CO2 schedule id
     h2oEmissionsReferenceSchedules={} # occupancy schedule id:  H2O schedule id
     
-    zoneslist=zones.getZonesNames()
+  
+    bedrooms = zones.getAllBedroomsNames(sortingMethod='Volume')
+    biggestbedroom=bedrooms[0]
+    bedrooms.remove(biggestbedroom)
+
     
     for oid in range(1,numberOfOccupants+1):
         
@@ -212,37 +203,25 @@ def generateOccupantsDaySchedules(numberOfOccupants,profilesDir,zones,contam_dat
                 #print(fname+" does not exist, skipping")
                 continue
         
-            #Reading standard profile 
             name,des,df=read_standard_occupancy_file(fname)
-
-            slaapkamerName='Slaapkamer'
-
-            sortedbedrooms=list(zones.df[zones.df['name'].str.contains('Slaapkamer')].sort_values(by='Vol',ascending=False)['name'])
-
-
-            biggestbedroom=sortedbedrooms[0]
-            sortedbedrooms.remove(biggestbedroom)
 
 
             if (oid <3):
-                slaapkamerName=biggestbedroom
+                bedroomName=biggestbedroom
 
             elif (oid>2):
-                slaapkamerName=sortedbedrooms[oid-3]
+                bedroomName=bedrooms[oid-3]
                 
-                #else : oid<3 and Slaapkamer1 not in slaaplist ) --> do nothing
 
-            df.replace('Slaapkamer',slaapkamerName,inplace=True)
-
-            if ('OKeuken' in zoneslist):
-                df.replace('Keuken','OKeuken',inplace=True)
-
-            if ('WC' not in zoneslist):
-                df.replace('WC','Badkamer',inplace=True)
+            df.replace('Bedroom',bedroomName,inplace=True)
+            df.replace('Kitchen',zones.getKitchenName(),inplace=True)
+            df.replace('WC',zones.getToiletName(),inplace=True)
+            df.replace('Livingroom',zones.getLivingroomName(),inplace=True)
+            df.replace('Bathroom',zones.getBathroomName(),inplace=True)
 
 
-            zonesid=[ contam_functions.getzoneid(x,contam_data['zones'].df) if x!='ext' else -1 for x in df['zonename'] ]
-            df['zid']=zonesid 
+            df['zid']=zones.getZonesID(df['zonename'])
+            
 
             # add day occupancy schedule for occupant
             oschedules.addSchedule(name,des,df)
@@ -250,17 +229,14 @@ def generateOccupantsDaySchedules(numberOfOccupants,profilesDir,zones,contam_dat
             
             occupantsReferenceSchedules['O'+str(oid)+'_'+ptype]=scheduleid
 
-            # create corresponding CO2 and H2O emission schedules 
-            slaapkamerid=contam_functions.getzoneid(slaapkamerName,contam_data['zones'].df)  #bedroom ID of the occupant
+            bedroomID = zones.getZonesID([bedroomName])[0]
             
-            #print(slaapkamerid)
-            
-            co2schedule=oschedules.genEmissionSchedule(scheduleid,slaapkamerid,0.625)
+            co2schedule=oschedules.genEmissionSchedule(scheduleid,bedroomID,0.625)
             dayschedules.addSchedule('CO2_Day_O'+str(oid)+'S'+str(scheduleid),'CO2 emission for occ-profile '+str(scheduleid),co2schedule)
 
             co2EmissionsReferenceSchedules[scheduleid]=dayschedules.getLastId()
 
-            h2oschedule=oschedules.genEmissionSchedule(scheduleid,slaapkamerid,0.7)
+            h2oschedule=oschedules.genEmissionSchedule(scheduleid,bedroomID,0.7)
             dayschedules.addSchedule('H2O_Day_O'+str(oid)+'S'+str(scheduleid),'H2O emission for occ-profile '+str(scheduleid),h2oschedule)
 
             h2oEmissionsReferenceSchedules[scheduleid]=dayschedules.getLastId()
@@ -290,7 +266,7 @@ def generateOccupantsWeekSchedules(numberOfOccupants,occupancyProfileName,occupa
             textschedulelist= [ 'O'+str(oid)+'_'+'Home' if i in [0,6] else 'O'+str(oid)+'_Busy' for i in range(12) ] #full text list of 12 day schedules 
         
         else:
-            raise ValueError("Wrong occupation profile",occupancyProfileName)
+            raise ValueError("Wrong occupancy profile",occupancyProfileName)
 
         
         occupantsReferenceWeekSchedules[oid]=[ occupantsReferenceSchedules[x] for x in textschedulelist]            # list of 12 schedules with ids
@@ -399,9 +375,6 @@ def generateDailyKitchenProfiles(unique_groups,oschedules,kitchenid,dayschedules
 
         kitchenocc=kitchenocc.sum(axis=1)
 
-
-        #kitchenprofile = kitchenprofile.append({'hour':'00:00:00','value':0.0},ignore_index=True)
-        #kitchenprofile = pd.concat([kitchenprofile,pd.DataFrame.from_records([{'hour':'00:00:00','value':0}])])
         kitchenprofile = pd.concat([kitchenprofile,pd.DataFrame.from_records([{'hour':'00:00:00','value':0}])],ignore_index=True)
 
         
@@ -432,7 +405,7 @@ def generateDailyKitchenProfiles(unique_groups,oschedules,kitchenid,dayschedules
         kitchenprofile = pd.concat([kitchenprofile,pd.DataFrame.from_records([{'hour':'24:00:00','value':0.0}])],ignore_index=True)
 
             
-        dayschedules.addSchedule('Keuken_'+str(localcounter),'Kitchen profile for occupancy profiles '+str(group),kitchenprofile)  
+        dayschedules.addSchedule('Kitchen_'+str(localcounter),'Kitchen profile for occupancy profiles '+str(group),kitchenprofile)  
         kitchen_day_profile_id=dayschedules.getLastId()
         kitchen_profile_dict[group]=kitchen_day_profile_id
 
@@ -476,7 +449,7 @@ def generateLaundrySourceProfile(dayschedules):
 
     laundryprofile.index = [1,2,3,4]
     
-    dayschedules.addSchedule('Wasplaats','Day laundry profile',laundryprofile)  
+    dayschedules.addSchedule('Laundry','Day laundry profile',laundryprofile)  
 
     laundrydayprofile=dayschedules.getLastId()
     
@@ -489,18 +462,9 @@ def addH2OBuffering(zones,sources,sourceElems,kitchenid,laundryid,bathroomid):
     Adding moisture buffering in 'wet' spaces
     Estimates the wall and ceiling areas from volume
     Add corresponding source
+    Source Element is already existing in the template
     """
     
-    ############
-    # Buffering
-    ############
-    
-    #buffering in wet spaces
-    # Medium buffering: wanden en plafond
-    # Plafond --> vloer oppervlakte --> Volume / 3.0
-    # Wanden: laten we een vierkant beschouwen :  perimeter = 4*sqrt(vloer oppervlakte) --> wanden oppervlakte = perimeter * 3
-    # Wanden oppervlakte:  3*4*sqrt(vloer oppervlakte)
-    # Total oppervlakte =   (vloer oppervlakte)*12*sqrt(vloer oppevlakte)
     
     bufferSourceId=sourceElems.getSourceID('Buffer_H2O')
     

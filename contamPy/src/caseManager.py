@@ -7,8 +7,6 @@ import json
 dirPath = os.path.dirname(os.path.realpath(__file__))
 
 sys.path.append(os.path.join(dirPath,'contamFunctions'))
-#sys.path.append(os.path.join(dirPath,'computeFunctions/systems'))
-#sys.path.append(os.path.join(dirPath,'computeFunctions/controls'))
 sys.path.append(os.path.join(dirPath,'computeFunctions/filters'))
 sys.path.append(os.path.join(dirPath,'setFunctions'))
 sys.path.append(os.path.join(dirPath,'tools'))
@@ -18,8 +16,6 @@ sys.path.append(os.path.join(dirPath,'tools'))
 import contam_functions
 import setSystem,setControls,setOccupancyAndSources,setBCS,setWeather,setNumericalParameters,setFilters,setContaminants,setWindPressureProfile,setWindSpeedMultiplier,scalePlan,setLeaks,setOpenstairs
 import computeFilters
-#import computeControls
-#import computeOpenDoors
 
 
 class caseConfigurator:
@@ -328,6 +324,13 @@ class caseConfigurator:
         self.baseFileName = os.path.join(self.dimBuildingsDir,self.actualParameters['building']+'.prj')
         self.ContamModel = contam_functions.loadcontamfile(self.baseFileName)
 
+        self.ContamModel['zones'].defineZonesFunctions(kitchenKey='Keuken',
+                                                       laundryKey='Wasplaats',
+                                                       bedroomsKey='Slaap',
+                                                       bathroomKey='Badkamer',
+                                                       toiletKey='WC',
+                                                       livingKey='Woonkamer')
+        
 
     def modifyBuildingDimensions(self):
         

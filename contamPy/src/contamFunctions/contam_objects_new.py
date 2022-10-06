@@ -179,6 +179,107 @@ class zones:
         
         return list(self.df['name'])
 
+    def getZonesID(self,zoneList):
+        
+        ids=[]
+        
+        for zonename in zoneList:
+            if zonename != 'ext':            
+                ids.append(self.df[self.df['name']==zonename].index[0])
+            else:
+                ids.append(-1)
+        
+        return ids
+
+    def defineZonesFunctions(self,kitchenKey,bedroomsKey,laundryKey,bathroomKey,toiletKey,livingKey):
+        
+        self.kitchenKey = kitchenKey
+        self.bedroomsKey = bedroomsKey
+        self.laundryKey = laundryKey
+        self.bathroomKey = bathroomKey
+        self.toiletKey = toiletKey
+        self.livingKey = livingKey
+    
+    def getLivingroomName(self):
+        
+        name = self.df[self.df['name'].str.contains(self.livingKey)]['name'].iloc[0]
+        
+        return name
+
+
+    def getKitchenName(self):
+        
+        name = self.df[self.df['name'].str.contains(self.kitchenKey)]['name'].iloc[0]
+        
+        return name
+    
+    def getKitchenID(self):
+        
+        kid = self.df[self.df['name'].str.contains(self.kitchenKey)]['name'].index[0]
+        
+        return kid
+
+    def getBathroomName(self):
+        
+        name = self.df[self.df['name'].str.contains(self.bathroomKey)]['name'].iloc[0]
+        
+        return name
+    
+
+    def getBathroomID(self):
+        
+        bid = self.df[self.df['name'].str.contains(self.bathroomKey)]['name'].index[0]
+       
+        return bid
+
+    def getLaundryID(self):
+        
+        if (len(self.df[self.df['name'].str.contains(self.laundryKey)]['name']) > 0):
+            lid = self.df[self.df['name'].str.contains(self.laundryKey)].index[0]
+        else:
+            lid = self.getBathroomID()
+            
+        return lid
+
+    def getLaundryName(self):
+        
+        lid = self.getLaundryID()
+        return self.df.loc[lid,'name']
+
+    def getToiletName(self):
+        
+        if (len(self.df[self.df['name'].str.contains(self.toiletKey)]['name']) > 0):
+            tid = self.df[self.df['name'].str.contains(self.toiletKey)].index[0]
+        else:
+            tid = self.getBathroomID()
+
+        tname = self.df.loc[tid,'name']
+        return tname
+            
+
+    def getAllBedroomsNames(self,sortingMethod='None'):
+        
+        bedroomsdf = self.df[self.df['name'].str.contains(self.bedroomsKey)]
+        
+        if sortingMethod == 'Volume':
+            bedrooms = bedroomsdf.sort_values(by='Vol',ascending=False)['name'].values
+
+        else:
+            bedrooms = bedroomsdf['name'].values
+            
+        return list(bedrooms)
+        
+    def getNumberOfBedrooms(self):
+        
+        return len(self.df[self.df['name'].str.contains(self.bedroomsKey)])
+        
+
+    def isKitchenOpen(self):
+        
+        if self.getKitchenName()[0] == 'O':
+            return True
+        else:
+            return False
 
 class initialZonesConcentrations():
     
@@ -1005,7 +1106,8 @@ class sourceElements:
         sdict['values'] = [ self.toKilosPerSeconds(unitName,rate),0,unitIndex[unitName],0]
             
         self.sources[self.nsources]=sdict
-        
+
+            
         
     def toKilosPerSeconds(self,unitName,value):
         

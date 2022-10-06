@@ -6,7 +6,6 @@ sys.path.append(os.path.join(dirPath,'..','contamFunctions'))
 
 
 import contam_functions
-import numpy as np
 import pandas as pd
 import itertools
 
@@ -25,9 +24,18 @@ def setContamPlan(inputFileName,csvFileNameWithPath,outputFileNameWithPath):
     
     contam_data=contam_functions.loadcontamfile(inputFileName)
     
-    # Extract different sections
+    
     levels=contam_data['levels']
     zones=contam_data['zones']
+    zones.defineZonesFunctions(kitchenKey='Keuken',
+                               laundryKey='Wasplaats',
+                               bedroomsKey='Slaap',
+                               bathroomKey='Badkamer',
+                               toiletKey='WC',
+                               livingKey='Woonkamer')
+
+    
+    
     flowpaths=contam_data['flowpaths']
     flowelems=contam_data['flowelems']
     contaminants=contam_data['contaminants']
@@ -231,7 +239,7 @@ def setContamPlan(inputFileName,csvFileNameWithPath,outputFileNameWithPath):
                 
                 index=commonflowpaths.index[i]
             
-                if ('OKeuken' in [roomname1,roomname2] and 'Woonkamer' in [roomname1,roomname2]):
+                if (zones.isKitchenOpen() and zones.getKitchenName() in [roomname1,roomname2] and zones.getLivingroomName() in [roomname1,roomname2]):
                    
                     if (i==1):
                         flowpaths.df.loc[index,'pe']=large_opening_id
