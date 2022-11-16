@@ -1871,6 +1871,118 @@ class controlnodes:
         
         return(returndict)
 
+    def addGlobalExtractMinimumControlOnTopOfLocal(self,extractRooms,nom_flows_dict,local_ctrls_dict,globalMinimumCtrlId,ids):
+    
+        #print(nom_flows_dict)
+        #print(unbal_ctrls_dict)
+        #print(ids)
+        
+        #print(balrooms)
+        shortrooms=[x.replace('kamer','') for x in extractRooms]
+
+        supplyids=[]
+        exhaustids=[]
+
+        qtot = 0
+        
+        for c in local_ctrls_dict.keys():
+
+            room=c.split('_')[-1]
+
+            if (room in extractRooms) or (room in shortrooms):
+
+                qnom=nom_flows_dict[c]
+
+                qtot += qnom
+
+                self.addconstant('<none>',qnom)
+                
+                qid=self.nctrl
+                cid=ids[local_ctrls_dict[c]]
+                
+                #print(qid,cid)
+                self.addBasicOperation('mul','<none>',qid,cid,'')
+
+                if ('ME' in c):
+                    exhaustids.append(self.nctrl)
+                #else:
+                #    supplyids.append(self.nctrl)
+                    
+
+
+        for d in exhaustids:
+            
+            if (exhaustids.index(d)==0):
+                previous=d
+                continue
+
+            self.addBasicOperation('add','<none>',previous,d)
+            #print("Den: Previous,current,new",previous,d,self.nctrl)
+            previous=self.nctrl
+            
+
+        totaleid=self.nctrl
+
+        
+        for d in supplyids:
+            
+            if (supplyids.index(d)==0):
+                previous=d
+                continue
+
+            self.addBasicOperation('add','<none>',previous,d)
+            #print("Den: Previous,current,new",previous,d,self.nctrl)
+            previous=self.nctrl
+            
+
+        #total Nominal extract flow
+        self.addconstant('<none>',qtot) 
+        totalNominalExtractFlowId = self.nctrl
+
+        #total nominal flow * control variable for the gloal control
+        self.addBasicOperation('mul','<none>',totalNominalExtractFlowId,globalMinimumCtrlId ,'')
+        totalsid=self.nctrl
+
+        
+        supoverexh=self.addBasicOperation('div','<none>',totalsid,totaleid)
+        
+        self.addreport(supoverexh,'Sup_over_exh')
+        #I checked it wrt log, it works at the first try!!! too strong :-) 
+
+        c1=self.addconstant('<none>',1)
+        soeswitch=self.addULS(supoverexh,c1) # sup/exh > 1       
+        inverse=self.addNot(soeswitch)
+
+        #soemin=self.addMinMax('max','<none>',[soeswith,self.addconstant('<none>',0.01)])
+
+        #supcase1=self.addBasicOperation('mul','<none>',c1,soeswitch)
+        #supcase2=self.addBasicOperation('div','<none>',inverse,supoverexh)
+        #fsup=self.addMinMax('max','<none>',[supcase1,supcase2])
+        
+        exhcase1=self.addBasicOperation('mul','<none>',soeswitch,supoverexh)
+        exhcase2=self.addBasicOperation('mul','<none>',inverse,c1)
+        fexh=self.addMinMax('max','<none>',[exhcase1,exhcase2])
+
+        
+        returndict={}
+        
+        
+        for c in local_ctrls_dict.keys():
+            room=c.split('_')[-1]
+
+            if (room in extractRooms) or (room in shortrooms):
+
+                if ('ME' in c):
+                    mult=fexh
+                #if ('MS' in c):
+                #    mult=fsup not sup here, its juste a set point for minimum global extract
+
+                cid=ids[local_ctrls_dict[c]]
+                returndict[c]=self.addBasicOperation('mul','<none>',mult,cid)
+                
+        
+        return(returndict)
+
         
     def addNot(self,inputvalue,name='',description=''):
     
@@ -2093,6 +2205,65 @@ class controlnodes:
 
 
         return sourcecontrol
+        
+    
+    def addSum(self,name,ctrlidstosumaslist,description):
+        
+            nids = len(ctrlidstosumaslist)
+        
+            self.nctrl+=1
+            self.df.loc[self.nctrl,'typ']='sum'
+            self.df.loc[self.nctrl,'seq']=int(self.nctrl)
+            self.df.loc[self.nctrl,'f']=int(0)
+            self.df.loc[self.nctrl,'n']=nids
+            self.df.loc[self.nctrl,'c1']=0
+            self.df.loc[self.nctrl,'c2']=0
+            self.df.loc[self.nctrl,'name']=name
+            
+            
+            if (description==''):
+                description='sum by Python'
+            else:
+                description+=' - by Python'
+            self.df.loc[self.nctrl,'description']=description
+        
+            values = [nids]+ctrlidstosumaslist
+        
+            self.df.at[self.nctrl,'values']=values
+        
+            return self.nctrl
+     
+        
+    
+    def addWeightedSum(self,signals_ids,weights):
+        
+        weight_ids = []
+
+
+        numeratorterms =[]
+
+        
+        for w in weights:
+            wid=self.addconstant('weight'+str(w),w)
+            weight_ids.append(wid)
+            
+            
+        for wid,sid in zip(weight_ids,signals_ids):
+            
+            weightedSignal =self.addBasicOperation('mul','<none>',wid,sid)      
+            numeratorterms.append(weightedSignal)
+
+
+        numeratorid = self.addSum('num_sum',numeratorterms,'numerator for weighted sum')
+        denominatorid = self.addSum('den_sum',weight_ids,'denotminator for wweighted sum')
+
+        weightedsignal = self.addBasicOperation('div', 'weightedsign', numeratorid, denominatorid)            
+
+        self.addreport(weightedsignal,'C_Wei_'+str(weightedsignal))
+
+
+
+        return weightedsignal            
         
         
 class occupancy_schedules:

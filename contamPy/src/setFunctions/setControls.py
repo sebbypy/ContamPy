@@ -334,8 +334,6 @@ def setControls(contam_data,controlJSON):
                 
                 controls.addIsBetween(sensorid,lowerValueID,upperValueID)
                 
-                
-                
 
             elif (AlgoObject['Type']=='Max'):
 
@@ -353,6 +351,28 @@ def setControls(contam_data,controlJSON):
                         
                 controls.addMinMax('max','<none>',signalsIdsList,A)
 
+
+            elif (AlgoObject['Type']=="WeightedSum"):
+                
+                signalsIdsList=[]
+                for actuatorName in Aobject["Actuators"]:
+                    
+                    try:
+                        actuatorID = actuatorscid[actuatorName]
+                        
+                        signalsIdsList.append(actuatorID)
+                    except:
+                        print("error, The actuator",actuatorName,"does not exist")
+                        input('...')
+                        exit()
+                
+
+                weights = Aobject["Weights"]
+                
+                controls.addWeightedSum(signalsIdsList,weights)
+             
+                    
+                    
 
                 
             else:
@@ -374,6 +394,25 @@ def setControls(contam_data,controlJSON):
     else:
         balancedcontrolsids={}
 
+
+    if ("GlobalMinimumExtractControl" in controlJSON.keys()):
+    
+        globalActuatorName = controlJSON['GlobalMinimumExtractControl']['GlobalExtractActuator']    
+    
+        globalActuactorId = actuatorscid[globalActuatorName]
+
+        
+        extractRooms = controlJSON['GlobalMinimumExtractControl']['Rooms']
+    
+        globalextractcontrolids = controls.addGlobalExtractMinimumControlOnTopOfLocal(extractRooms,nflows,controlname_actuator_map,globalActuactorId ,actuatorscid)
+
+    else:
+        globalextractcontrolids = {}
+
+
+
+
+
    
     for controlname,actuatorname in controlname_actuator_map.items():
     #loop the old ids (default constant) and replace it by the new ones
@@ -388,6 +427,9 @@ def setControls(contam_data,controlJSON):
         if (controlname in balancedcontrolsids):
             newCid=balancedcontrolsids[controlname]
 
+        elif controlname in globalextractcontrolids:
+            newCid = globalextractcontrolids[controlname]
+
         else:
             newCid=actuatorscid[actuatorname]
 
@@ -398,6 +440,8 @@ def setControls(contam_data,controlJSON):
         # Header is the heaeder of the log file
         controls.addreport(newCid,'R'+controlname,reporttype='',description='',header=controlname)
     
+
+
 
 
 
