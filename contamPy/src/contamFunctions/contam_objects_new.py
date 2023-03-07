@@ -1461,6 +1461,37 @@ class controlnodes:
     
         self.addreport(self.nctrl,'T'+'_'+roomname, 'T'+'_' + roomname)
     
+    def addtemperaturesensor(self,zonesdf,roomid,name):
+        
+        #if (len(name)>15):
+           # name=name.replace('kamer','')
+
+        
+        if (roomid != -1):       
+            roomname=zonesdf.loc[roomid,'name']
+        else:
+            roomname = 'EXT'
+
+    
+        self.nctrl+=1
+        
+        self.df.loc[self.nctrl,'typ']='sns'
+        
+        self.df.loc[self.nctrl,'seq']=int(self.nctrl)
+        self.df.loc[self.nctrl,'f']=int(0)
+        self.df.loc[self.nctrl,'n']=int(0)
+        self.df.loc[self.nctrl,'c1']=int(0)
+        self.df.loc[self.nctrl,'c2']=int(0)
+        self.df.loc[self.nctrl,'name']=name
+        
+        values=[0, 1, 0, 0, roomid, 1, 1, 0.0,0.0, 0.0, 0, name]
+        
+        self.df.loc[self.nctrl,'description']='Temperature sensor by Python'
+       
+        self.df.at[self.nctrl,'values']=[ str(v) for v in values]
+    
+        self.addreport(self.nctrl,'T'+'_'+roomname, 'T'+'_' + roomname)
+    
 
 
     def addreport(self,id_to_report,name,reporttype='',description='',header='',multiplier=1,unit=''):
