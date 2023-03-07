@@ -1511,8 +1511,10 @@ class controlnodes:
         if header != '':
             values[3] = header
 
-        self.df.loc[self.nctrl,'values']=[ str(v) for v in values ]
-    
+
+        #self.df.loc[self.nctrl,'values']=[ str(v) for v in values ]
+        self.df.at[self.nctrl,'values']=[ str(v) for v in values ]
+
 
     def addconstant(self,name,value):
         
@@ -1781,7 +1783,7 @@ class controlnodes:
         
         for c in unbal_ctrls_dict.keys():
 
-            print("Control",c)            
+            #print("Control",c)            
 
             room=c.split('_')[-1]
 
