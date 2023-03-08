@@ -1,0 +1,287 @@
+{
+  "Mechanical supply": [
+    {
+      "Room": "Slaapkamer3",
+      "Nominal flow rate": 25
+    },
+    {
+      "Room": "Slaapkamer1",
+      "Nominal flow rate": 50
+    },
+    {
+      "Room": "Slaapkamer2",
+      "Nominal flow rate": 25
+    },
+    {
+      "Room": "Woonkamer",
+      "Nominal flow rate": 100
+    }
+  ],
+  "Mechanical exhaust": [
+    {
+      "Room": "WC-etage",
+      "Nominal flow rate": 33.33333333333333
+    },
+    {
+      "Room": "Badkamer",
+      "Nominal flow rate": 66.66666666666666
+    },
+    {
+      "Room": "WC-rdc",
+      "Nominal flow rate": 33.33333333333333
+    },
+    {
+      "Room": "OKeuken",
+      "Nominal flow rate": 66.66666666666666
+    }
+  ],
+  "Natural supply": [],
+  "Natural exhaust": [],
+  "Natural transfer": [
+    {
+      "From room": "WC-etage",
+      "To room": "Hall_1",
+      "Capacity": 33.33333333333333,
+      "Design pressure": 2
+    },
+    {
+      "From room": "Hall_1",
+      "To room": "Slaapkamer3",
+      "Capacity": 25.0,
+      "Design pressure": 2
+    },
+    {
+      "From room": "Hall_1",
+      "To room": "Slaapkamer1",
+      "Capacity": 50.0,
+      "Design pressure": 2
+    },
+    {
+      "From room": "Hall_1",
+      "To room": "Slaapkamer2",
+      "Capacity": 25.0,
+      "Design pressure": 2
+    },
+    {
+      "From room": "Badkamer",
+      "To room": "Hall_1",
+      "Capacity": 66.66666666666666,
+      "Design pressure": 2
+    },
+    {
+      "From room": "Woonkamer",
+      "To room": "Hall_1",
+      "Capacity": 1.4210854715202004e-14,
+      "Design pressure": 2
+    },
+    {
+      "From room": "WC-rdc",
+      "To room": "Hall_0",
+      "Capacity": 33.33333333333333,
+      "Design pressure": 2
+    },
+    {
+      "From room": "OKeuken",
+      "To room": "Woonkamer",
+      "Capacity": 66.66666666666666,
+      "Design pressure": 2
+    },
+    {
+      "From room": "Hall_0",
+      "To room": "Woonkamer",
+      "Capacity": 33.33333333333336,
+      "Design pressure": 2
+    }
+  ],
+  "ControlAlgorithms": {
+    "CO2-Linear": {
+      "Type": "Linear",
+      "Qmin": 0.1,
+      "Qmax": 1.0,
+      "Vmin": 500,
+      "Vmax": 1000
+    },
+    "GreaterThan": {
+      "Type": "GreaterThanOtherSignal"
+    },
+	"IsBetween": {
+      "Type": "IsBetween"
+    },
+	"GreaterThan25": {
+      "Type": "GreaterThanValue",
+	  "Value": 25
+    },
+
+    "H2O-Linear": {
+      "Type": "Linear",
+      "Qmin": 0.1,
+      "Qmax": 1.0,
+      "Vmin": 0.3,
+      "Vmax": 0.7
+    },
+    "Timer30min": {
+      "Type": "Timer",
+      "Qmin": 0.1,
+      "Qmax": 1,
+      "Duration": "30min"
+    },
+    "NightClock": {
+      "Type": "Clock",
+      "Schedule": {
+        "00:00:00": 1.0,
+        "07:00:00": 0.1,
+        "23:00:00": 1.0,
+        "24:00:00": 1.0
+      }
+    },
+    "DayClock": {
+      "Type": "Clock",
+      "Schedule": {
+        "00:00:00": 0.1,
+        "08:00:00": 1.0,
+        "22:00:00": 0.1,
+        "24:00:00": 0.1
+      }
+    },
+    "ConstantClock": {
+      "Type": "Clock",
+      "Schedule": {
+        "00:00:00": 1.0,
+        "24:00:00": 1.0
+      }
+    },
+    "Max": {
+      "Type": "Max"
+    }
+  },
+  "Windows": [
+    {
+      "Room": "Slaapkamer1",
+      "Type": "roofwindow",
+      "Height": 2,
+      "Width": 4,
+      "Preferred orientation": "",
+      "Actuator": "TSlaapkamer1above"
+    },
+    {
+      "Room": "Slaapkamer3",
+      "Type": "normalwindow",
+      "Height": 1.25,
+      "Width": 0.8,
+      "Preferred orientation": 90,
+      "Actuator": "TSlaapkamer3above"
+    },
+    {
+      "Room": "Slaapkamer1",
+      "Type": "roofwindow",
+      "Height": 2.2,
+      "Width": 4.8,
+      "Preferred orientation": "180",
+      "Actuator": "TSlaapkamer1above"
+    },
+    {
+      "Room": "Slaapkamer2",
+      "Type": "roofwindow",
+      "Height": 2.2,
+      "Width": 1.5,
+      "Preferred orientation": "",
+      "Actuator": "ConstantClockActuator"
+    }
+  ],
+  "Ventilative cooling component": [
+    {
+      "Room": "Garage",
+      "Discharge coefficient": 0.226,
+      "Area": 2.25,
+      "Preferred orientation": "180",
+      "Actuator": "TGarageabove"
+    },
+    {
+      "Room": "Slaapkamer2",
+      "Discharge coefficient": 0.226,
+      "Area": 2.25,
+      "Preferred orientation": "90",
+      "Actuator": "TSlaapkamer2above"
+    },
+    {
+      "Room": "Slaapkamer3",
+      "Discharge coefficient": 0.226,
+      "Area": 2.25,
+      "Preferred orientation": "",
+      "Actuator": "ConstantClockActuator"
+    }
+  ],
+  "Two ways door": [
+    {
+      "From room": "Slaapkamer1",
+      "To room": "Hall_1",
+      "Height": 2,
+      "Width": 4,
+      "Actuator": "ConstantClockActuator"
+    },
+    {
+      "From room": "Slaapkamer3",
+      "To room": "Hall_1",
+      "Height": 2,
+      "Width": 4,
+      "Actuator": "ConstantClockActuator"
+    }
+  ],
+  "Signals": {
+    "TGarage": {
+      "Type": "Single-TSensor",
+      "Room": "Garage"
+    },
+    "TSlaapkamer1": {
+      "Type": "Single-TSensor",
+      "Room": "Slaapkamer1"
+    },
+    "TSlaapkamer2": {
+      "Type": "Single-TSensor",
+      "Room": "Slaapkamer2"
+    },
+    "TSlaapkamer3": {
+      "Type": "Single-TSensor",
+      "Room": "Slaapkamer3"
+    },
+	"Text":{
+	    "Type": "Single-TSensor",
+		"Room": "EXT"
+	},
+	"17":{
+		"Type": "Constant",
+		"Value": 290
+	},		
+	"25":{
+		"Type": "Constant",
+		"Value": 298
+	}		
+
+  },
+  "Actuators": {
+    "TGarageabove": {
+      "SignalName": "TGarage",
+      "ControlAlgorithmName": "GreaterThan",
+	  "SignalName2": "Text"
+    },
+    "TSlaapkamer1above": {
+      "SignalName": "TSlaapkamer1",
+      "ControlAlgorithmName": "GreaterThan",
+	  "SignalName2": "Text"
+    },
+    "TSlaapkamer2above": {
+      "SignalName": "TSlaapkamer2",
+      "ControlAlgorithmName": "GreaterThan",
+	  "SignalName2": "Text"
+    },
+    "TSlaapkamer3above": {
+      "SignalName": "TSlaapkamer3",
+      "ControlAlgorithmName": "GreaterThan",
+	  "SignalName2": "Text"
+    },
+    "ConstantClockActuator": {
+      "SignalName": "",
+      "ControlAlgorithmName": "DayClock"
+    }
+  }
+}

@@ -1,0 +1,34 @@
+ContaminantLibrary ContamW 3.2 
+Library of H2O sources and buffers
+0 ! contaminants:
+2 ! species:
+! # s t   molwt    mdiam       edens       decay         Dm         CCdef        Cp          Kuv     u[5]      name
+  1 0 0  18.0150 0.0000e+000 0.0000e+000 0.0000e+000 2.0000e-005 4.2041e-003 1.0000e+003 0.0000e+000 10 0 0 0 0 H2O
+
+  2 0 0   0.0000 0.0000e+000 0.0000e+000 0.0000e+000 2.0000e-005 0.0000e+000 1.0000e+000 0.0000e+000 0 0 0 0 0 VOC
+VOC 
+-999
+0 ! exposure limits:
+-999
+0 ! filter elements:
+-999
+0 ! kinetic reactions:
+-999
+5 ! source/sink elements:
+1 H2O bls Buffer_H2O
+Vochtbuffering
+ 0.0003 1.2 6.23 1.18 0 0 0
+2 H2O ccf H2O_Badkamer
+Douche: 0.5 l/s gedurende 10 min
+ 0.000374532 0 9 0
+3 H2O ccf H2O_Keuken
+0.6 l/s 10 min + 1 l/s 10 min + 1.5 l/s 10 min
+ 0.0011236 0 9 7
+4 H2O ccf H2O_Wasplaats
+0.06 l/s gedurende 12h
+ 4.49439e-005 0 9 0
+5 VOC ccf VOC
+VOC source
+ 1e-006 0 5 0
+-999
+* end library.

@@ -1,0 +1,17 @@
+{
+  "Mechanical supply": [
+    {
+      "Room": "Woonkamer",
+      "Nominal flow rate": 50
+    }
+  ],
+  "Mechanical exhaust": [
+    {
+      "Room": "Woonkamer",
+      "Nominal flow rate": 45
+    }
+  ],
+  "Natural supply": [],
+  "Natural exhaust": [],
+  "Natural transfer": []
+}
