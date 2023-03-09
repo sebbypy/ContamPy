@@ -16,7 +16,7 @@ The purpose of this library is to ease and speed-up the setup of CONTAM simulati
 
 ### Drawing a ContamPy compatible building
 
-[Example: 0_modelGeneration](ContamPy/examples/0_modelGeneration)
+[Example: 0_modelGeneration](examples/0_modelGeneration)
 
 
 As ContamPy relies on a few default components, a new building should be drawed starting from the file: 
