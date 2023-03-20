@@ -1,13 +1,13 @@
 import os
 
 
-filesToDelete = ['MHRV-And-VentilativeCooling.ach',
-                 'MHRV-And-VentilativeCooling.log',
-                 'MHRV-And-VentilativeCooling.prj',
-                 'MHRV-And-VentilativeCooling.rst',
-                 'MHRV-And-VentilativeCooling.sim',
-                 'MHRV-And-VentilativeCooling.xlog',
-                 'MHRV-And-VentilativeCooling.console']
+filesToDelete = ['VentilativeCooling.ach',
+                 'VentilativeCooling.log',
+                 'VentilativeCooling.prj',
+                 'VentilativeCooling.rst',
+                 'VentilativeCooling.sim',
+                 'VentilativeCooling.xlog',
+                 'VentilativeCooling.console']
 
 
 for file in filesToDelete:

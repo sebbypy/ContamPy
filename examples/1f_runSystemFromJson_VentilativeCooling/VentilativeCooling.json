@@ -1,0 +1,112 @@
+{
+  "Mechanical supply": [
+    {
+      "Room": "Woonkamer",
+      "Nominal flow rate": 100
+    }
+  ],
+  "Mechanical exhaust": [
+    {
+      "Room": "Woonkamer",
+      "Nominal flow rate": 100
+    }
+  ],
+  "Natural supply": [],
+  "Natural exhaust": [],
+  "Natural transfer": [],
+  "ControlAlgorithms": {
+    "GreaterThan": {
+      "Type": "GreaterThanOtherSignal"
+    },
+	"IsBetween": {
+      "Type": "IsBetween"
+    },
+	"GreaterThan25": {
+      "Type": "GreaterThanValue",
+	  "Value": 25
+    },
+    "Timer30min": {
+      "Type": "Timer",
+      "Qmin": 0.1,
+      "Qmax": 1,
+      "Duration": "30min"
+    },
+    "NightClock": {
+      "Type": "Clock",
+      "Schedule": {
+        "00:00:00": 1.0,
+        "07:00:00": 0.1,
+        "23:00:00": 1.0,
+        "24:00:00": 1.0
+      }
+    },
+    "DayClock": {
+      "Type": "Clock",
+      "Schedule": {
+        "00:00:00": 0.1,
+        "08:00:00": 1.0,
+        "22:00:00": 0.1,
+        "24:00:00": 0.1
+      }
+    },
+    "ConstantClock": {
+      "Type": "Clock",
+      "Schedule": {
+        "00:00:00": 1.0,
+        "24:00:00": 1.0
+      }
+    },
+    "Max": {
+      "Type": "Max"
+    }
+  },
+  "Windows": [
+      {
+      "Room": "Woonkamer",
+      "Type": "normalwindow",
+      "Height": 1.0,
+      "Width": 1.0,
+      "Preferred orientation": 0,
+      "Actuator": "TWoonAboveExt"
+      }
+   ],
+  "Ventilative cooling component": [
+    {
+      "Room": "Woonkamer",
+      "Discharge coefficient": 0.6,
+      "Area": 1,
+      "Preferred orientation": "180",
+      "Actuator": "TWoonAboveExt"
+    }
+  ],
+  "Signals": {
+    "TWoonkamer": {
+      "Type": "Single-TSensor",
+      "Room": "Woonkamer"
+    },
+	"Text":{
+	    "Type": "Single-TSensor",
+		"Room": "EXT"
+	},
+	"17":{
+		"Type": "Constant",
+		"Value": 290
+	},		
+	"25":{
+		"Type": "Constant",
+		"Value": 298
+	}		
+
+  },
+  "Actuators": {
+    "TWoonAboveExt": {
+      "SignalName": "TWoonkamer",
+      "ControlAlgorithmName": "GreaterThan",
+	  "SignalName2": "Text"
+    },
+    "ConstantClockActuator": {
+      "SignalName": "",
+      "ControlAlgorithmName": "DayClock"
+    }
+  }
+}

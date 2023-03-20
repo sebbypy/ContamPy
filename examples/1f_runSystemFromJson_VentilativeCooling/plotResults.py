@@ -12,15 +12,29 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 
-logFileWithPath = 'MHRV-And-VentilativeCooling.log'
+logFileWithPath = 'VentilativeCooling.log'
 
-contamLogDF = readContamLog(logFileWithPath).filter(regex='C_NS|C_VC|T_')
+contamLogDF = readContamLog(logFileWithPath).filter(regex='Q_VC|C_VC|T_')
 
-controls = contamLogDF.filter(regex='C_NS|C_VC')
+controls = contamLogDF.filter(regex='C_VC')
 
-others = contamLogDF.filter(regex='T_')
+flows = contamLogDF.filter(regex='Q_VC')
 
-print(controls.describe().to_string())
+temperatures = contamLogDF.filter(regex='^T_')-273.15
 
-print(others.describe().to_string())
+print(controls.columns)
+print(flows.columns)
+print(temperatures.columns)
 
+
+fig, axs = plt.subplots(3)
+fig.suptitle('Ventilative cooling case')
+
+temperatures.plot(ax=axs[0])
+controls.plot(ax=axs[1])
+
+flows.plot(ax=axs[2])
+
+plt.show()
+#☺axs[0].plot(x, y)
+#axs[1].plot(x, -y)

@@ -13,7 +13,7 @@ This is a Contam project file file with a few default flow elements and levels, 
 The following operations must be done in ContamW starting from the template:
 
 + draw one or more zones in the different floors (draw the zone,define the zone element and its name). No volume or dimensions are needed at this stage
-+ defineflow paths at every place where you consider there could be a flow in your model:
++ define flow paths at every place where you consider there could be a flow in your model:
 	+ 4 parallel flow paths between adjacent zones (both through walls or through floors, for example between two halls)
 	+ 4 parallel flow paths at each wall in contact with the outside
 	+ one flow path on the floor of zones in contact with the ground (or cellar that is not represented in the flow model)

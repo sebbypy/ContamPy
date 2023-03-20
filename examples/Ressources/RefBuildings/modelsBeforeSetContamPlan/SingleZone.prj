@@ -7,8 +7,8 @@ ContamW 3.4.0.0 0
 ! Ta       Pb      Ws    Wd    rh  day u..
 293.150 101325.0  0.000   0.0 0.000 1 2 0 0 1 ! steady simulation
 293.150 101325.0  1.000 270.0 0.000 1 2 0 0 1 ! wind pressure test
-null   !   no weather file
-null   !   no contaminant file
+null  !  no weather file
+null  !  no contaminant file
 null ! no continuous values file
 null ! no discrete values file
 null ! no WPC file
@@ -57,9 +57,9 @@ Jan01 00:00:00 Jan01 00:00:00 Dec31 24:00:00 00:05:00 00:05:00 24:00:00
 !cfd   cfdcnvg  var zref maxi dtcmo solv smooth   cnvgUVW     cnvgT
    0  1.00e-02    0    0 1000     1    1      1  1.00e-03  1.00e-03
 -999
-4 !   contaminants:
+4 !  contaminants:
 1 2 3 4 
-4 !   species:
+4 !  species:
 ! # s t   molwt    mdiam       edens       decay         Dm         CCdef        Cp          Kuv     u[5]      name
 1 1 0 44.0095 0 0 0 2e-05 0.0006079 1000 0 1 0 0 0 0 CO2 
 
@@ -110,10 +110,10 @@ VOC
 -999
 0 ! day-schedules:
 -999
-0 !   week-schedules:
+0 !  week-schedules:
 ! # utype uconv name
 -999
-7 !   wind pressure profiles:
+7 !  wind pressure profiles:
 1 9 2 A2.1-Roof>30° 
 Table A2.1 - Roof > 30° pitch average (AIVC guide)
 0.0 0.3
@@ -191,7 +191,7 @@ Flat roof constant
 -999
 0 ! filters:
 -999
-5 !   source/sink elements:
+5 !  source/sink elements:
 1 H2O bls Buffer_H2O
 Vochtbuffering
 0.0003 1.2 6.23 1.18 0 0 0 
@@ -208,7 +208,7 @@ Douche: 0.5 l/s gedurende 10 min
 VOC source
 1e-06 0 5 0 
 -999
-13 ! flow elements:
+9 ! flow elements:
 1 23 fan_cvf ConstantFlow 
 
 0.0555556 4 
@@ -236,103 +236,13 @@ Generic Crack for airthighness
 9 27 dor_door Window-Cd06 
 0.8 x 1.25 Window (1.0 m2) - Cd 0.6 (full opening))
 0.0234146 0.848528 0.5 0.01 1.25 0.8 0.6 0 0 0 
-10 23 plr_qcn SlopedR_crack 
-Generic crack for sloped roof
-1.17653e-09 2.1e-05 0.66 
-11 23 plr_qcn Floor_crack 
-Generic crack for floor
-1.17653e-09 2.1e-05 0.66 
-12 23 plr_qcn Wall_crack 
-Generic crack for walls
-1.17653e-09 2.1e-05 0.66 
-13 23 plr_qcn FlatR_crack 
-Generic crack ceiling or flat roof
-1.17653e-09 2.1e-05 0.66 
 -999
 0 ! duct elements:
 -999
 0 ! control super elements:
 -999
-26 ! control nodes:
+0 ! control nodes:
 ! # typ seq f n c1 c2 name 
-1 sns 1 0 0 0 0 CO2-sensor 
-zone sensor by Python
-0 1 0 0 1 1 0 0.0 0.0 0.0 0 CO2 
-2 log 2 1 1 1 0 CO2_Woonkamer 
-Report by Python
-0 658095.4545454546 0 CO2_Woonkamer ppm 
-3 sns 3 0 0 0 0 H2O-sensor 
-zone sensor by Python
-0 1 0 0 1 1 0 0.0 0.0 0.0 0 H2O 
-4 log 4 1 1 3 0 H2O_Woonkamer 
-Report by Python
-0 68.37 0 H2O_Woonkamer RH 
-5 sns 5 0 0 0 0 VOC-sensor 
-zone sensor by Python
-0 1 0 0 1 1 0 0.0 0.0 0.0 0 VOC 
-6 log 6 1 1 5 0 VOC_Woonkamer 
-Report by Python
-0 1 0 VOC_Woonkamer n/a 
-7 sns 7 0 0 0 0 occ-sensor 
-zone occupancy sensor by Python
-0 1 0 0 1 1 5 0.0 0.0 0.0 0 Occupancy 
-8 log 8 1 1 7 0 O_Woonkamer 
-Report by Python
-0 1 0 O_Woonkamer n/a 
-9 set 9 0 0 0 0 C_NS_0Woonkamer 
-Constant by Python
-1 
-10 sns 10 0 0 0 0 sensor_flow_3 
-flow sensor by Python
-0 1 0 0 3 2 2 0.0 0.0 0.0 0 <none> 
-11 log 11 1 1 10 0 Q_NS_0Woonkamer 
-Report by Python
-0 2989.78 0 Q_NS_0Woonkamer m3/h 
-12 set 12 0 0 0 0 C_NS_90Woonkame 
-Constant by Python
-1 
-13 sns 13 0 0 0 0 sensor_flow_7 
-flow sensor by Python
-0 1 0 0 7 2 2 0.0 0.0 0.0 0 <none> 
-14 log 14 1 1 13 0 Q_NS_90Woonkame 
-Report by Python
-0 2989.78 0 Q_NS_90Woonkame m3/h 
-15 set 15 0 0 0 0 C_MS_Woonkamer 
-Constant by Python
-1 
-16 sns 16 0 0 0 0 sensor_flow_10 
-flow sensor by Python
-0 1 0 0 10 2 2 0.0 0.0 0.0 0 <none> 
-17 log 17 1 1 16 0 Q_MS_Woonkamer 
-Report by Python
-0 2989.78 0 Q_MS_Woonkamer m3/h 
-18 set 18 0 0 0 0 C_ME_Woonkamer 
-Constant by Python
-1 
-19 sns 19 0 0 0 0 sensor_flow_11 
-flow sensor by Python
-0 1 0 0 11 2 2 0.0 0.0 0.0 0 <none> 
-20 log 20 1 1 19 0 Q_ME_Woonkamer 
-Report by Python
-0 2989.78 0 Q_ME_Woonkamer m3/h 
-21 set 21 0 0 0 0 C_NS_270Woonkam 
-Constant by Python
-1 
-22 sns 22 0 0 0 0 sensor_flow_14 
-flow sensor by Python
-0 1 0 0 14 2 2 0.0 0.0 0.0 0 <none> 
-23 log 23 1 1 22 0 Q_NS_270Woonkam 
-Report by Python
-0 2989.78 0 Q_NS_270Woonkam m3/h 
-24 set 24 0 0 0 0 C_NS_180Woonkam 
-Constant by Python
-1 
-25 sns 25 0 0 0 0 sensor_flow_18 
-flow sensor by Python
-0 1 0 0 18 2 2 0.0 0.0 0.0 0 <none> 
-26 log 26 1 1 25 0 Q_NS_180Woonkam 
-Report by Python
-0 2989.78 0 Q_NS_180Woonkam m3/h 
 -999
 1 ! simple AHS:
 ! # zr# zs# pr# ps# px# name
@@ -341,11 +251,11 @@ Report by Python
 -999
 3 ! zones:
 ! Z#  f  s#  c#  k#  l#  relHt    Vol  T0  P0  name  clr u[4]  axs cdvf <cdvf name> cfd <cfd name> <1D data:>
-1 3 0 0 0 2 0 60 291.15 0 Woonkamer -1 0 2 0 0 0 0  0
+1 3 0 0 0 2 0 0 291.15 0 Woonkamer -1 0 2 0 0 0 0  0
 2 10 0 0 0 2 0 0 291.15 0 AHS(Rec) -1 0 2 0 0 0 0  0
 3 10 0 0 0 2 0 0 291.15 0 AHS(Sup) -1 0 2 0 0 0 0  0
 -999
-12 !   initial zone concentrations:
+12 !  initial zone concentrations:
 ! Z# CO2 H2O VOC WC 
 1 6.079e-04 3.146e-03 0.000e+00 0.000e+00
 2 6.079e-04 3.146e-03 0.000e+00 0.000e+00
@@ -353,28 +263,28 @@ Report by Python
 -999
 22 ! flow paths:
 ! P#    f  n#  m#  e#  f#  w#  a#  s#  c#  l#    X       Y      relHt  mult wPset wPmod wazm Fahs Xmax Xmin icn dir u[4] cdvf <cdvf name> cfd <cfd data[4]>
-1 1 -1 1 12 0 2 0 0 0 2 0 0 0.65 1.5 0 0 0 0 0 0 23 4 -1 0 0 0 4 0  0    
-2 1 -1 1 12 0 2 0 0 0 2 0 0 1.85 1.5 0 0 0 0 0 0 23 4 -1 0 0 0 4 0  0    
-3 1 -1 1 3 0 2 0 0 9 2 0 0 1.5 0.0 0 0 0 0 0 0 23 4 -1 0 0 0 4 0  0    
-4 1 -1 1 5 0 2 0 0 0 2 0 0 1.5 0.0 0 0 0 0 0 0 23 4 -1 0 0 0 4 0  0    
-5 1 -1 1 12 0 2 0 0 0 2 0 0 0.65 1.5 0 0 90 0 0 0 23 5 -1 0 0 0 4 0  0    
-6 1 -1 1 12 0 2 0 0 0 2 0 0 1.85 1.5 0 0 90 0 0 0 23 5 -1 0 0 0 4 0  0    
-7 1 -1 1 3 0 2 0 0 12 2 0 0 1.5 0.0 0 0 90 0 0 0 23 5 -1 0 0 0 4 0  0    
-8 1 -1 1 5 0 2 0 0 0 2 0 0 1.5 0.0 0 0 90 0 0 0 23 5 -1 0 0 0 4 0  0    
-9 0 -1 1 11 0 0 0 0 0 2 0 0 0.0 25 0 0 -1 0 0 0 23 3 -1 0 0 0 4 0  0    
-10 8 3 1 0 0 0 1 0 15 2 0 0 0.0 0.0 0 0 0 0 0 0 128 2 -1 0 0 0 4 0  0    
-11 8 1 2 0 0 0 1 0 18 2 0 0 0.0 0.0 0 0 0 0 0 0 129 5 -1 0 0 0 4 0  0    
-12 1 -1 1 12 0 2 0 0 0 2 0 0 0.65 1.5 0 0 270 0 0 0 23 2 -1 0 0 0 4 0  0    
-13 1 -1 1 12 0 2 0 0 0 2 0 0 1.85 1.5 0 0 270 0 0 0 23 2 -1 0 0 0 4 0  0    
-14 1 -1 1 3 0 2 0 0 21 2 0 0 1.5 0.0 0 0 270 0 0 0 23 2 -1 0 0 0 4 0  0    
-15 1 -1 1 5 0 2 0 0 0 2 0 0 1.5 0.0 0 0 270 0 0 0 23 2 -1 0 0 0 4 0  0    
-16 1 -1 1 12 0 2 0 0 0 2 0 0 0.65 1.5 0 0 180 0 0 0 23 1 -1 0 0 0 4 0  0    
-17 1 -1 1 12 0 2 0 0 0 2 0 0 1.85 1.5 0 0 180 0 0 0 23 1 -1 0 0 0 4 0  0    
-18 1 -1 1 3 0 2 0 0 24 2 0 0 1.5 0.0 0 0 180 0 0 0 23 1 -1 0 0 0 4 0  0    
-19 1 -1 1 5 0 2 0 0 0 2 0 0 1.5 0.0 0 0 180 0 0 0 23 1 -1 0 0 0 4 0  0    
-20 16 2 3 0 0 0 0 0 0 2 0 0 1.5 0.0 0 0 -1 0 0 0 0 6 -1 0 0 0 4 0  0    
-21 32 -1 3 0 0 0 0 0 0 2 0 0 1.5 0.0 0 0 -1 0 0 0 0 6 -1 0 0 0 4 0  0    
-22 64 2 -1 0 0 0 0 0 0 2 0 0 1.5 0.0 0 0 -1 0 0 0 0 6 -1 0 0 0 4 0  0    
+1 0 -1 1 2 0 0 0 0 0 2 0 0 1.5 1 0 0 0 0 0 0 23 4 -1 0 0 0 4 0  0    
+2 0 -1 1 2 0 0 0 0 0 2 0 0 1.5 1 0 0 0 0 0 0 23 4 -1 0 0 0 4 0  0    
+3 0 -1 1 2 0 0 0 0 0 2 0 0 1.5 1 0 0 0 0 0 0 23 4 -1 0 0 0 4 0  0    
+4 0 -1 1 2 0 0 0 0 0 2 0 0 1.5 1 0 0 0 0 0 0 23 4 -1 0 0 0 4 0  0    
+5 0 -1 1 2 0 0 0 0 0 2 0 0 1.5 1 0 0 90 0 0 0 23 5 -1 0 0 0 4 0  0    
+6 0 -1 1 2 0 0 0 0 0 2 0 0 1.5 1 0 0 90 0 0 0 23 5 -1 0 0 0 4 0  0    
+7 0 -1 1 2 0 0 0 0 0 2 0 0 1.5 1 0 0 90 0 0 0 23 5 -1 0 0 0 4 0  0    
+8 0 -1 1 2 0 0 0 0 0 2 0 0 1.5 1 0 0 90 0 0 0 23 5 -1 0 0 0 4 0  0    
+9 0 -1 1 2 0 0 0 0 0 2 0 0 0.0 1 0 0 -1 0 0 0 23 3 -1 0 0 0 4 0  0    
+10 8 3 1 0 0 0 1 0 0 2 0 0 0.0 1 0 0 0 0 0 0 128 2 -1 0 0 0 4 0  0    
+11 8 1 2 0 0 0 1 0 0 2 0 0 0.0 1 0 0 0 0 0 0 129 5 -1 0 0 0 4 0  0    
+12 0 -1 1 2 0 0 0 0 0 2 0 0 1.5 1 0 0 270 0 0 0 23 2 -1 0 0 0 4 0  0    
+13 0 -1 1 2 0 0 0 0 0 2 0 0 1.5 1 0 0 270 0 0 0 23 2 -1 0 0 0 4 0  0    
+14 0 -1 1 2 0 0 0 0 0 2 0 0 1.5 1 0 0 270 0 0 0 23 2 -1 0 0 0 4 0  0    
+15 0 -1 1 2 0 0 0 0 0 2 0 0 1.5 1 0 0 270 0 0 0 23 2 -1 0 0 0 4 0  0    
+16 0 -1 1 2 0 0 0 0 0 2 0 0 1.5 1 0 0 180 0 0 0 23 1 -1 0 0 0 4 0  0    
+17 0 -1 1 2 0 0 0 0 0 2 0 0 1.5 1 0 0 180 0 0 0 23 1 -1 0 0 0 4 0  0    
+18 0 -1 1 2 0 0 0 0 0 2 0 0 1.5 1 0 0 180 0 0 0 23 1 -1 0 0 0 4 0  0    
+19 0 -1 1 2 0 0 0 0 0 2 0 0 1.5 1 0 0 180 0 0 0 23 1 -1 0 0 0 4 0  0    
+20 16 2 3 0 0 0 0 0 0 2 0 0 1.5 1 0 0 -1 0 0 0 0 6 -1 0 0 0 4 0  0    
+21 32 -1 3 0 0 0 0 0 0 2 0 0 1.5 1 0 0 -1 0 0 0 0 6 -1 0 0 0 4 0  0    
+22 64 2 -1 0 0 0 0 0 0 2 0 0 1.5 1 0 0 -1 0 0 0 0 6 -1 0 0 0 4 0  0    
 -999
 0 ! duct junctions:
 -999
@@ -382,12 +292,12 @@ Report by Python
 -999
 0 ! duct segments:
 -999
-0 !   source/sinks:
+0 !  source/sinks:
 ! # z e s c mult CC0 xmin ymin hmin xmax ymax hmax color u cdvf cfd 
 -999
 0 ! occupancy schedules:
 -999
-0 !   exposures:
+0 !  exposures:
 -999
 0 ! annotations:
 -999

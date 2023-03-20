@@ -49,6 +49,7 @@ def setContamPlan(inputFileName,csvFileNameWithPath,outputFileNameWithPath):
     defaultelem=flowelems.df[flowelems.df['name']=='DefaultPath'].index[0]
     nat_supply_id=flowelems.df[flowelems.df['name']=='Gen_NSV'].index[0]
     nat_transfer_id=flowelems.df[flowelems.df['name']=='Gen_NT'].index[0]
+    opening_id=flowelems.df[flowelems.df['name']=='Gen_OP'].index[0]
     constant_flow_id=flowelems.df[flowelems.df['name']=='ConstantFlow'].index[0]
     large_opening_id=flowelems.df[flowelems.df['name']=='LargeOpening'].index[0]
 
@@ -106,9 +107,11 @@ def setContamPlan(inputFileName,csvFileNameWithPath,outputFileNameWithPath):
         zonepaths=flowpaths.df[(flowpaths.df['pzn']==-1) & (flowpaths.df['pzm']==zoneid)]
     
         for azimuth in zonepaths['wazm'].unique():
+            
         
             dirpaths=zonepaths[ (zonepaths['wazm']==azimuth) & (zonepaths['dir'].isin([1,2,4,5]) ) ] # 'dir' in '1,2,4,5' = horizontal connections
                
+            
             if (int(azimuth) < 0 or len(dirpaths)==0):
                 continue
     
@@ -162,7 +165,16 @@ def setContamPlan(inputFileName,csvFileNameWithPath,outputFileNameWithPath):
                         return
                     """ 
     
-                # i==3 : the 4th one is unused for now. 
+    
+                if (i==3): #4th path --> opening for windows or ventilative cooling
+            
+                    index=dirpaths.index[i]
+                    flowpaths.df.loc[index,'pe']=opening_id
+                    flowpaths.df.loc[index,'flags']=1
+
+                    flowpaths.df.loc[index,'pw']=wprofiles.df[wprofiles.df['name'].str.contains('Wall')].index[0]
+
+    
     
                 # only if there is a fifth opening - i == 4
                 if (i==4):

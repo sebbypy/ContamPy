@@ -1,3 +1,10 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Thu Mar 16 15:38:54 2023
+
+@author: spec
+"""
+
 import os
 import sys
 
@@ -30,13 +37,13 @@ caseConfig = caseConfigurator(refBuildingsDir,occupancyDir,weatherDir,libraryDir
 consistently with the latest approach"""
 
 
-allParameters = {'building':'MaisonLimal-filled',
+allParameters = {'building':'SingleZone',
                  'simulationType':'transient',
                  'orientation':0,
-                 'airTightness':{'v50':3,'leaksDistribution':'uniform'},
+                 'airTightness':{'v50':0.01,'leaksDistribution':'uniform'},
                  'system':{
                         'definition':'JSONfile',
-                        'filename':'MHRV-And-VentilativeCooling.json'
+                        'filename':'VentilativeCooling.json'
                         },
                 'control':{
                     'controlType': 'systemJSONFile'
@@ -58,11 +65,11 @@ allParameters = {'building':'MaisonLimal-filled',
 
 caseConfig.readParameters(allParameters)
 caseConfig.applyParameters()
-caseConfig.writeContamFile('MHRV-And-VentilativeCooling.prj')
+caseConfig.writeContamFile('VentilativeCooling.prj')
 
 
 
 # Run an existing PRJ file
 contam = contamRunner(contamDir)    
-contam.runContam('MHRV-And-VentilativeCooling.prj')
+contam.runContam('VentilativeCooling.prj')
 

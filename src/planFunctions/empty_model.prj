@@ -1,0 +1,256 @@
+ContamW 3.4.0.0 0
+
+! rows cols ud uf    T   uT     N     wH  u  Ao    a
+   120  150  0  4 291.150 2    0.00 10.00 0 0.600 0.280
+!  scale     us  orgRow  orgCol  invYaxis showGeom
+  1.000e+00   0      56       1     0        0
+! Ta       Pb      Ws    Wd    rh  day u..
+293.150 101325.0  0.000   0.0 0.000 1 2 0 0 1 ! steady simulation
+293.150 101325.0  1.000 270.0 0.000 1 2 0 0 1 ! wind pressure test
+null ! no weather file
+null ! no contaminant file
+null ! no continuous values file
+null ! no discrete values file
+null ! no WPC file
+null ! no EWC file
+WPC description
+!  Xref    Yref    Zref   angle u
+   0.000   0.000   0.000   0.00 0
+! epsP epsS  tShift  dStart dEnd wp mf wpctrig
+  0.01 0.01 00:00:00   1/1   1/1  0  0  0
+! latd  longtd   tznr  altd  Tgrnd u..
+ 40.00  -90.00  -6.00     0 283.15 2 0
+!sim_af afcalc afmaxi afrcnvg afacnvg afrelax uac Pbldg uPb
+     1      1     30   1e-05   1e-06    0.75   0 50.00   0
+!   slae rs aflmaxi aflcnvg aflinit Tadj
+      0   1    100   1e-06      1    0
+!sim_mf slae rs maxi   relcnvg   abscnvg relax gamma ucc
+    2             30  1.00e-04  1.00e-15 1.250         0 ! (cyclic)
+          0   1  100  1.00e-06  1.00e-15 1.100 1.000   0 ! (non-trace)
+          0   1  100  1.00e-06  1.00e-15 1.100 1.000   0 ! (trace)
+          0   1  100  1.00e-06  1.00e-15 1.100         0 ! (cvode)
+!mf_solver sim_1dz sim_1dd   celldx  sim_vjt udx
+     0        1       0     1.00e-01    0     0
+!cvode    rcnvg     acnvg    dtmax
+   0     1.00e-06  1.00e-13   0.00
+!tsdens relax tsmaxi cnvgSS densZP stackD dodMdt
+   0    0.75    20     1      0      0      0
+!date_st time_st  date_0 time_0   date_1 time_1    t_step   t_list   t_scrn
+  Jan01 00:00:00  Jan01 00:00:00  Dec31 24:00:00  00:05:00 00:05:00 24:00:00
+!restart  date  time
+    0    Jan01 00:00:00
+!list doDlg pfsave zfsave zcsave
+   0     1      1      1      1
+!vol ach -bw cbw exp -bw age -bw
+  0   1   0   0   0   0   0   0
+!rzf rzm rz1 csm srf log
+  0   0   0   0   1   1
+!bcx dcx pfq zfq zcq
+  0   0   0   0   0
+!dens   grav
+ 1.2041 9.8055
+! 0  1  2  3  4  5  6  7  8  9  10 11 12 13 14 15 <- extra[]
+  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0
+0 ! rvals:
+!valZ valD valC
+   0    0    0
+!cfd   cfdcnvg  var zref maxi dtcmo solv smooth   cnvgUVW     cnvgT
+   0  1.00e-02    0    0 1000     1    1      1  1.00e-03  1.00e-03
+-999
+4 ! contaminants:
+   1 2 3 4
+4 ! species:
+! # s t   molwt    mdiam       edens       decay         Dm         CCdef        Cp          Kuv     u[5]      name
+  1 1 0  44.0095  0.0000e+00  0.0000e+00  0.0000e+00  2.0000e-05  6.0790e-04  1.0000e+03  0.0000e+00 1 0 0 0 0 CO2
+
+  2 1 0  18.0150  0.0000e+00  0.0000e+00  0.0000e+00  2.0000e-05  3.1460e-03  1.0000e+03  0.0000e+00 10 0 0 0 0 H2O
+
+  3 1 0   0.0000  0.0000e+00  0.0000e+00  0.0000e+00  2.0000e-05  0.0000e+00  1.0000e+00  0.0000e+00 0 0 0 0 0 VOC
+VOC 
+  4 1 0   0.0000  0.0000e+00  0.0000e+00  0.0000e+00  2.0000e-05  0.0000e+00  1.0000e+00  0.0000e+00 0 0 0 0 0 WC
+
+-999
+5 ! levels plus icon data:
+! #  refHt   delHt  ni  u  name
+  1  -3.000   3.000 0 0 0 Underground
+!icn col row  #
+  2   0.000   3.000 1 0 0 Ground
+!icn col row  #
+ 130   2   3   1
+  3   3.000   3.000 0 0 0 First
+!icn col row  #
+  4   6.000   3.000 0 0 0 Second
+!icn col row  #
+  5   9.000   3.000 0 0 0 Thrird
+!icn col row  #
+-999
+0 ! day-schedules:
+-999
+0 ! week-schedules:
+-999
+7 ! wind pressure profiles:
+1 9 2 A2.1-Roof>30°
+Table A2.1 - Roof > 30° pitch average (AIVC guide)
+   0.0    0.3
+  45.0   -0.4
+  90.0   -0.6
+ 135.0   -0.4
+ 180.0   -0.5
+ 225.0   -0.4
+ 270.0   -0.6
+ 315.0   -0.4
+ 360.0    0.3
+2 9 2 A2.1-Walls
+Table A2.1 - Face 1 (AIVC guide)
+   0.0    0.7
+  45.0   0.35
+  90.0   -0.5
+ 135.0   -0.4
+ 180.0   -0.2
+ 225.0   -0.4
+ 270.0   -0.5
+ 315.0   0.35
+ 360.0    0.7
+3 9 2 A2.2-Roof>30°
+Table A2.2 - Roof > 30° pitch average (AIVC guide)
+   0.0    0.3
+  45.0   -0.5
+  90.0   -0.6
+ 135.0   -0.5
+ 180.0   -0.5
+ 225.0   -0.5
+ 270.0   -0.6
+ 315.0   -0.5
+ 360.0    0.3
+4 9 2 A2.2-Walls
+Table A2.2 - Face 1 (AIVC guide page)
+   0.0    0.4
+  45.0    0.1
+  90.0   -0.3
+ 135.0  -0.35
+ 180.0   -0.2
+ 225.0  -0.35
+ 270.0   -0.3
+ 315.0    0.1
+ 360.0    0.4
+5 9 2 A2.3-Roof>30°
+Table A2.3 - Roof > 30° pitch average (AIVC guide)
+   0.0   0.25
+  45.0   -0.3
+  90.0   -0.5
+ 135.0   -0.3
+ 180.0   -0.4
+ 225.0   -0.3
+ 270.0   -0.5
+ 315.0   -0.3
+ 360.0   0.25
+6 9 2 A2.3-Walls
+Table A2.3 - Face 1 (AIVC guide)
+   0.0    0.2
+  45.0   0.05
+  90.0  -0.25
+ 135.0   -0.3
+ 180.0  -0.25
+ 225.0   -0.3
+ 270.0  -0.24
+ 315.0   0.05
+ 360.0    0.2
+7 2 1 FlatRoof
+Flat roof constant 
+   0.0   -0.5
+ 360.0   -0.5
+-999
+0 ! kinetic reactions:
+-999
+0 ! filter elements:
+-999
+0 ! filters:
+-999
+5 ! source/sink elements:
+1 H2O bls Buffer_H2O
+Vochtbuffering
+ 0.0003 1.2 6.23 1.18 0 0 0
+2 H2O ccf H2O_Badkamer
+Douche: 0.5 l/s gedurende 10 min
+ 0.000374532 0 9 0
+3 H2O ccf H2O_Keuken
+0.6 l/s 10 min + 1 l/s 10 min + 1.5 l/s 10 min
+ 0.0011236 0 9 7
+4 H2O ccf H2O_Wasplaats
+0.06 l/s gedurende 12h
+ 4.49439e-05 0 9 0
+5 VOC ccf VOC
+VOC source
+ 1e-06 0 5 0
+-999
+9 ! flow elements:
+1 23 fan_cvf ConstantFlow
+
+ 0.0555556 4
+2 23 plr_leak1 DefaultPath
+
+ 2.93534e-08 0.000300356 0.65 0.6 10 0.0005 0 0 2 2 2 0
+3 23 plr_qcn Gen_NSV
+Generic model for Natural Supply Vent (1m3/h at 1Pa)
+ 1.63401e-07 0.000277778 0.5
+4 23 plr_qcn Gen_NT
+Generic model for Natural Transfer Opening (between spaces)
+ 1.63401e-07 0.000277778 0.5
+5 23 plr_qcn Gen_OP
+General model for large opening; 1 m³h at 1 Pa
+ 1.63403e-07 0.00027778 0.5
+6 23 plr_qcn Gen_crack
+Generic Crack for airthighness
+ 1.17653e-09 2.1e-05 0.66
+7 25 plr_qcn LargeOpening
+
+ 0.0352946 1 0.5
+8 27 dor_door Window-Cd01
+0.8 x 1.25 Window (1.0 m2) - Cd 0.1 (bottom/hung opening)
+ 0.000650407 0.141421 0.5 0.01 1.25 0.8 0.1 0 0 0
+9 27 dor_door Window-Cd06
+0.8 x 1.25 Window (1.0 m2) - Cd 0.6 (full opening))
+ 0.0234146 0.848528 0.5 0.01 1.25 0.8 0.6 0 0 0
+-999
+0 ! duct elements:
+-999
+0 ! control super elements:
+-999
+0 ! control nodes:
+-999
+1 ! simple AHS:
+! # zr# zs# pr# ps# px# name
+  1   1   2   1   2   3 -1 AHS
+
+-999
+2 ! zones:
+! Z#  f  s#  c#  k#  l#  relHt    Vol  T0  P0  name  clr u[4]  axs cdvf <cdvf name> cfd <cfd name> <1D data:>
+   1 10   0   0   0   2   0.000     0 291.15 0 AHS(Rec) -1 0 2 0 0 0 0 0
+   2 10   0   0   0   2   0.000     0 291.15 0 AHS(Sup) -1 0 2 0 0 0 0 0
+-999
+8 ! initial zone concentrations:
+! Z#        CO2        H2O        VOC         WC
+   1  6.079e-04  3.146e-03  0.000e+00  0.000e+00
+   2  6.079e-04  3.146e-03  0.000e+00  0.000e+00
+-999
+3 ! flow paths:
+! P#    f  n#  m#  e#  f#  w#  a#  s#  c#  l#    X       Y      relHt  mult wPset wPmod wazm Fahs Xmax Xmin icn dir u[4] cdvf <cdvf name> cfd <cfd data[4]>
+   1   16   1   2   0   0   0   0   0   0   2   0.000   0.000   1.500 0 0 0 -1 0 0 0   0  6 -1 0 0 0 4 0 0
+   2   32  -1   2   0   0   0   0   0   0   2   0.000   0.000   1.500 0 0 0 -1 0 0 0   0  6 -1 0 0 0 4 0 0
+   3   64   1  -1   0   0   0   0   0   0   2   0.000   0.000   1.500 0 0 0 -1 0 0 0   0  6 -1 0 0 0 4 0 0
+-999
+0 ! duct junctions:
+-999
+0 ! initial junction concentrations:
+-999
+0 ! duct segments:
+-999
+0 ! source/sinks:
+-999
+0 ! occupancy schedules:
+-999
+0 ! exposures:
+-999
+0 ! annotations:
+-999
+* end project file.

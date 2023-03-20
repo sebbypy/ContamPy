@@ -540,13 +540,13 @@ class flowelements:
 
 
         if elemtype == 'VCC':
-            # 5 23 plr_qcn Gen_VCC
-            #Generic model for Ventilative Cooling (1m3/h at 1Pa)
-            #1.63401e-07 0.000277778 0.5
+            # Power law element whose Coefficients are based on a discharge coefficient
+            
+            Cd = valuesdict['Cd']
             
             n=0.5
-            rho=1.2
-            Cturb=np.sqrt(2/rho)
+            rho=1.204
+            Cturb=Cd*np.sqrt(2/rho)
             Clam=self.Clam(Cturb,n)
             self.nelems+=1
 
@@ -554,30 +554,16 @@ class flowelements:
             self.df['icon']=self.df['icon'].astype(int)
             self.df.loc[self.nelems,'dtype']='plr_qcn'
             self.df.at[self.nelems,'values']=[Clam,Cturb,n]
-            self.df.loc[self.nelems,'name']=elemtype+'_'+str(11)
-            self.df.loc[self.nelems,'comment']='Ventilative cooling component by Python'
+            self.df.loc[self.nelems,'name']=elemtype+'_'+str(Cd)
+            self.df.loc[self.nelems,'comment']='Ventilative cooling component by Python - Cd = '+str(Cd)
             self.df=convert_cols(self.df)
             
-        if elemtype =='RW': 
-            #8 27 dor_door Window-Cd06 
-            #0.8 x 1.25 Window (1.0 m2) - Cd 0.6 (full opening))
-            # 0.0234146 0.848528 0.5 0.01 1.25 0.8 0.6 0 0 0  
-            #lam // laminar flow coefficient (R4)
-            #turb // turbulent flow coefficient (R4)
-            #expt // pressure exponent (R4)
-            #dTmin // minimum temperature difference for two-way flow [C] (R4)
-            #// Not used since version 2.4.
-            #ht // height of doorway [m] (R4)
-            #wd // width of doorway [m] (R4)
-            #cd // discharge coefficient
-            #u_T // units of temperature (I2) {W}
-            #u_H // units of height (I2) {W}
-            #u_W // units of width (I2) {W}
+        if elemtype =='RW': #roofwindow
+            # NB: for dor_door elements, it seems that the rho value is not included to switch from Cd to C of power law
+            # But this has to be taken into account for the lam coefficient
+            # For now, I don't understand precisely why, I just duplicate the behavior of ContamW and check that the results were consistent
            
-            #model dor_door C_turb = np.sqrt(2)*A*Cd without rho
-            #toit pente 35 et fenetre ouverte
-           
-            rho=1.2
+            rho=1.204
             n=0.5
             h=valuesdict['h']*0.573576
             w=valuesdict['w']*valuesdict['h']/h
@@ -599,27 +585,14 @@ class flowelements:
             self.df.loc[self.nelems,'comment']='Roofwindow- by Python'
             self.df=convert_cols(self.df)
             
-        if elemtype =='NW': 
-            #8 27 dor_door Window-Cd06 
-            #0.8 x 1.25 Window (1.0 m2) - Cd 0.6 (full opening))
-            # 0.0234146 0.848528 0.5 0.01 1.25 0.8 0.6 0 0 0  
-            #lam // laminar flow coefficient (R4)
-            #turb // turbulent flow coefficient (R4)
-            #expt // pressure exponent (R4)
-            #dTmin // minimum temperature difference for two-way flow [C] (R4)
-            #// Not used since version 2.4.
-            #ht // height of doorway [m] (R4)
-            #wd // width of doorway [m] (R4)
-            #cd // discharge coefficient
-            #u_T // units of temperature (I2) {W}
-            #u_H // units of height (I2) {W}
-            #u_W // units of width (I2) {W}
-            #model dor_door C_turb = np.sqrt(2)*A*Cd without rho
-            # fenetre ouverte
+        if elemtype =='NW': #normal window --> vertical
+            # NB: for dor_door elements, it seems that the rho value is not included to switch from Cd to C of power law
+            # But this has to be taken into account for the lam coefficient
+            # For now, I don't understand precisely why, I just duplicate the behavior of ContamW and check that the results were consistent
               
             n=0.5
             Cd=0.6
-            rho=1.2
+            rho=1.204
             h=valuesdict['h']
             w=valuesdict['w']
             A=valuesdict['h']*valuesdict['w']  
@@ -640,27 +613,10 @@ class flowelements:
             self.df=convert_cols(self.df)    
             
         if elemtype =='D':
-       
-            #8 27 dor_door Window-Cd06 
-            #0.8 x 1.25 Window (1.0 m2) - Cd 0.6 (full opening))
-            # 0.0234146 0.848528 0.5 0.01 1.25 0.8 0.6 0 0 0  
-            #lam // laminar flow coefficient (R4)
-            #turb // turbulent flow coefficient (R4)
-            #expt // pressure exponent (R4)
-            #dTmin // minimum temperature difference for two-way flow [C] (R4)
-            #// Not used since version 2.4.
-            #ht // height of doorway [m] (R4)
-            #wd // width of doorway [m] (R4)
-            #cd // discharge coefficient
-            #u_T // units of temperature (I2) {W}
-            #u_H // units of height (I2) {W}
-            #u_W // units of width (I2) {W}
-            #model dor_door C_turb = np.sqrt(2)*A*Cd without rho
-            # fenetre ouverte
            
             n=0.5
             Cd=0.6
-            rho=1.2
+            rho=1.204
             h=valuesdict['h']
             w=valuesdict['w']
             A=float(valuesdict['h']*valuesdict['w'])

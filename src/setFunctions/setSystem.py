@@ -144,8 +144,6 @@ def apply(contam_data,systemJson):
                         print("No existing path between ",zones.df.loc[zoneid,'name'],"and outside on the facade",W['Preferred orientation'],"°")
                         continue
                 
-           
-            #A=W['Height']*W['Width']
             
             if W['Type']=='normalwindow':
                 
@@ -160,15 +158,6 @@ def apply(contam_data,systemJson):
                 if (flowelems.df['name'].isin([W_name]).max() == False):
                     flowelems.addflowelem('RW',{'h':float(W['Height']),'w':float(W['Width']) })
                 
-            #W_name='Window-Cd01'
-
-            #flowpaths.df.loc[fpid,'pe']=flowelems.df[flowelems.df['name']==W_name].index[0]
-            #flowpaths.df.loc[fpid,'mult']=float(W['Area'])
-            
-            #print(W_name)
-            #print(flowelems.df['name'])
-            #print(W_name)
-            print(fpid)
             flowpaths.df.loc[fpid,'pe']=flowelems.df[flowelems.df['name']==W_name].index[0]
             flowpaths.df.loc[fpid,'mult']=float(1.0)
 
@@ -255,8 +244,13 @@ def apply(contam_data,systemJson):
          # Ventilative cooling component
          # --------------
     if ('Ventilative cooling component' in systemJson.keys()):
+    
+    
         for VC in systemJson['Ventilative cooling component']:
-            generic_VCC_id = flowelems.df[flowelems.df['name']=='Gen_VCC'].index[0]  
+            
+            print("### PASS ###")
+            
+            generic_VCC_id = flowelems.df[flowelems.df['name']=='Gen_OP'].index[0]  
             zoneid=zones.df[zones.df['name']==VC['Room']].index[0] # find ID of zone which has the same name
             #print(flowpaths.df[flowpaths.df['pe']==generic_VCC_id])
             #flowpath index
@@ -277,6 +271,8 @@ def apply(contam_data,systemJson):
                     
                     print("WARNING, more than one location to define ventilative cooling")
                     print("Choosing the first one in the list, please check your model afterwards")
+                    
+                    
                 else:
                     
                     fpid=flowpaths.df[ (flowpaths.df['pzm']==zoneid) & (flowpaths.df['pe']==generic_VCC_id) & (flowpaths.df['wazm']== int(VC['Preferred orientation'])) ].index
@@ -289,21 +285,15 @@ def apply(contam_data,systemJson):
 
         #check if flow element with the required pressure exist
         
-            VCC_name='VCC_'+str(11)
-            
-          
+            Cd=VC['Discharge coefficient']
+        
+            VCC_name='VCC_'+str(Cd)
 
             if (flowelems.df['name'].isin([VCC_name]).max() == False):
-            #print(NSV_name+' element does not exist yet, adding it')
-
-        
-                    flowelems.addflowelem('VCC',{})
+                flowelems.addflowelem('VCC',{'Cd':Cd})
             
-            #flowelems.addflowelem('VCC',{})
-            #flowpaths.df.loc[fpid,'name']=VCC_name
-            #large_opening_id=flowelems.df[flowelems.df['name']=='LargeOpening'].index[0]
             flowpaths.df.loc[fpid,'pe']=flowelems.df[flowelems.df['name']==VCC_name].index[0]
-            flowpaths.df.loc[fpid,'mult']=float(VC['Area']*VC['Discharge coefficient'])
+            flowpaths.df.loc[fpid,'mult']=float(VC['Area'])
         
 
 

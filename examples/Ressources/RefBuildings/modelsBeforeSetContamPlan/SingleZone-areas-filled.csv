@@ -1,0 +1,7 @@
+roomid,roomname,surface,wall-length,wall-height,area,boundary,level
+1,Woonkamer,facade-E,5,3,3,vertical-outside,Ground
+1,Woonkamer,facade-N,5,3,3,vertical-outside,Ground
+1,Woonkamer,facade-S,5,3,3,vertical-outside,Ground
+1,Woonkamer,facade-W,5,3,3,vertical-outside,Ground
+1,Woonkamer,facade-ground,,,25,zero-pressure,Ground
+1,Woonkamer,floor-area,,,20,-,Ground
