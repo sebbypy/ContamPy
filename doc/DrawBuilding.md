@@ -4,7 +4,7 @@
 
 As ContamPy relies on a few default components, a new building should be drawed starting from the file: 
 
-*examples\Ressources\RefBuildings\empty_model.prj*
+[src\planFunctions\empty_model.prj](../src/planFunctions/empty_model.prj)
 
 This is a Contam project file file with a few default flow elements and levels, but not building drawn yet.  
 
