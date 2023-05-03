@@ -453,7 +453,7 @@ class flowelements:
                 Qnom = 1.0
                 
                 dPmax=(Qmax/Qnom)**2 * dp  # Pressure corresponding to 1.5 nominal flow, pressure from which the curve is broken
-                                           # Can be directly derived from nominal dp and flow equation 
+                                           # Can be directly derived from nominal dp and flow equation T
 
                 
                 # Given the formula :  Q = Q0*( 1 - exp(dp/dP0) )
@@ -509,20 +509,9 @@ class flowelements:
 
         if elemtype == 'OD':
             
-            # Power law 
-            #   Qv [m3/s]  = C*(dp)**0.5
-            
-            # discharge coefficient
-            #   m_dot = Cd*A*sqrt(2*rho*dp)
-            #  m_dot/rho =  Cd*A * sqrt(2/rho) * sqrt(dp)
-            # Qv [m3/s] = Cd*A*sqrt(2/rho) * (dp)**0.5
-            
-            
-            #   C  = Cd*A*sqr(2/rho)
-            
             Cd = 0.6
             Area = 2.0
-            rho = 1.2
+            rho = 1.204
 
             n=0.5            
             Cturb = Cd*Area*np.sqrt(2/rho)
@@ -562,11 +551,13 @@ class flowelements:
             # NB: for dor_door elements, it seems that the rho value is not included to switch from Cd to C of power law
             # But this has to be taken into account for the lam coefficient
             # For now, I don't understand precisely why, I just duplicate the behavior of ContamW and check that the results were consistent
-           
+                       
+            angle = np.radians(valuesdict['Inclination'])
+            
             rho=1.204
             n=0.5
-            h=valuesdict['h']*0.573576
-            w=valuesdict['w']*valuesdict['h']/h
+            h=valuesdict['h']*np.sin(angle)
+            w=valuesdict['w']/np.sin(angle)
             A=float(valuesdict['h']*valuesdict['w'])
             Cd=0.6
             Cturb=np.sqrt(2)*A*Cd

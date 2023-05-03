@@ -145,18 +145,21 @@ def apply(contam_data,systemJson):
                         continue
                 
             
-            if W['Type']=='normalwindow':
+            if W['Type']=='NormalWindow':
                 
                 W_name = 'NW'+'_'+str(float(W['Height']))+'_'+str(float(W['Width']))
                 if (flowelems.df['name'].isin([W_name]).max() == False):
                     flowelems.addflowelem('NW',{'h':float(W['Height']),'w':float(W['Width']) })
                 
               
-            if W['Type']=='roofwindow':
+            if W['Type']=='RoofWindow':
                 W_name = 'RW'+'_'+str(float(W['Height']))+'_'+str(float(W['Width']))
-                #print(W_name)
+                
+                
                 if (flowelems.df['name'].isin([W_name]).max() == False):
-                    flowelems.addflowelem('RW',{'h':float(W['Height']),'w':float(W['Width']) })
+                    flowelems.addflowelem('RW',{'h':float(W['Height']),'w':float(W['Width']) ,'Inclination':float(W['Inclination'])})
+                
+            print(W['Type'])
                 
             flowpaths.df.loc[fpid,'pe']=flowelems.df[flowelems.df['name']==W_name].index[0]
             flowpaths.df.loc[fpid,'mult']=float(1.0)

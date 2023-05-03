@@ -63,12 +63,22 @@
   "Windows": [
       {
       "Room": "Woonkamer",
-      "Type": "normalwindow",
+      "Type": "NormalWindow",
       "Height": 1.0,
       "Width": 1.0,
       "Preferred orientation": 0,
       "Actuator": "TWoonAboveExt"
+      },
+        {
+      "Room": "Woonkamer",
+      "Type": "RoofWindow",
+      "Height": 1.0,
+      "Width": 1.0,
+      "Inclination":45,
+      "Preferred orientation": 90,
+      "Actuator": "TWoonAboveExt"
       }
+
    ],
   "Ventilative cooling component": [
     {

@@ -187,7 +187,17 @@ The natural components design pressure (vents or openings bewteen rooms) and cap
 
 
 
+### List of components and hypotheses
 
+| Component name                      | Short notation | Type          | Inputs                                                                     | Underlying Contam model            | Assumptions or modelling tricks                                                                                                                            |
+|-------------------------------------|----------------|---------------|----------------------------------------------------------------------------|------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Natural supply                      | NSV            | From exterior | Design pressure (Pa)<br> Capacity (m³/h) <br> Preferred orientation (degrees)       | Powerlaw Model: Q = C(dP)^n        | n = 0.5                                                                                                                                                    |
+| Self-regulating natural supply vent | SR_NSV         | From exterior | Design pressure (Pa)<br> Capacity (m³/h) <br> Preferred orientation (degrees)       | Self-regulating Vent Model         | Q0 = 1.5 * Capacity dp0 computed to have the design capacity at the design pressure                                                                        |
+| Ventilative cooling component       | VCC            | From exterior | Discharge coefficient (-)<br>Area (m²)<br>referred orientation (degrees)        | Powerlaw Model: Q = C(dP)^n        | As they are mainly designed for cross ventilation, assuming one way flow component.                                                                        |
+| Normal window (wall mounted)        | NW             | From exterior | Width (m)<br>Height (m)<br>Preferred orientation (degrees)                       | Two-way Flow Model: Single Opening | Cd = 0.6                                                                                                                                                   |
+| Roof window (with slope)            | RW             | From exterior | Width (m)<br> Height (m)<br>Inclination (degrees)<br>Preferred orientation (degrees) | Two-way Flow Model: Single Opening | Cd = 0.6 Correction of height and width to have the correct stack  effect and to keep the correct area: h’ = h*sin(inclindation) w’ = w/sin(inclination)   |
+| Natural transfer opening            | NT             | Between rooms | Design pressure (Pa)<br>Capacity (m³/h)                                       | Powerlaw Model: Q = C(dP)^n        | n = 0.5                                                                                                                                                    |
+| Open door                           | OD             | Between rooms | -                                                                          | Powerlaw Model: Q = C(dP)^n        | n = 0.5 Cd = 0.6 Introduced to test the sensitivity of systems to low internal resistance                                                                  |
 
 
 
