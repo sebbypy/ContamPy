@@ -156,7 +156,8 @@ def read_standard_occupancy_file(csvf):
     lines=f.read().split('\n')
     nlines=len(lines)
 
-    df=pd.DataFrame(columns=['hour','zonename'])
+    df=pd.DataFrame(columns=['hour','zonename','shower'])
+    df['shower'] = df['shower'].astype(bool)
 
     for i in range(nlines):
 

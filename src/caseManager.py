@@ -599,7 +599,6 @@ class caseConfigurator:
         natTransfers = list(flowelems.df[flowelems.df['name'].str[0:2]=='NT'].index)
         
 
-        print(natTransfers)
 
         for index in flowpaths.df.index:
 
@@ -609,7 +608,6 @@ class caseConfigurator:
                 fromZid = flowpaths.df.loc[index,'pzm'] 
                 toZid =   flowpaths.df.loc[index,'pzn'] 
                 
-                print(fromZid,toZid)
     
                 fromZname = zones.df.loc[fromZid,'name']
                 toZname = zones.df.loc[toZid,'name']

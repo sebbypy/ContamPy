@@ -94,7 +94,7 @@ class levels:
         
         
         g.write(self.iconheader)
-        self.icons[levelid].to_csv(g,mode='a',header=False,sep=' ',index=False,line_terminator='\n')
+        self.icons[levelid].to_csv(g,mode='a',header=False,sep=' ',index=False,lineterminator='\n')
 
 
 
@@ -159,7 +159,7 @@ class zones:
         
         g.write(str(self.nzones)+' !'+self.comment)
         g.write(self.contamheader)
-        self.df.to_csv(g,header=False,sep=' ',line_terminator='\n')
+        self.df.to_csv(g,header=False,sep=' ',lineterminator='\n')
 
 
     def getZonesDataFrame(self):
@@ -320,7 +320,7 @@ class initialZonesConcentrations():
         [ g.write(c+' ') for c in self.df.columns]
         g.write('\n')
 
-        self.df.to_csv(g,header=False,sep=' ',line_terminator='\n')
+        self.df.to_csv(g,header=False,sep=' ',lineterminator='\n')
                
         
         #to write
@@ -1105,7 +1105,7 @@ class sources:
         [ g.write(x+' ') for x in self.headers ]
         g.write('\n')
         
-        self.df.to_csv(g,header=False,sep=' ',line_terminator='\n')
+        self.df.to_csv(g,header=False,sep=' ',lineterminator='\n')
         
         
     def addSource(self,roomid,sourceElemid,scheduleid,ctrlid,mult,CC0=0):
@@ -2298,7 +2298,15 @@ class occupancy_schedules:
             
             for l in range(npoints):
                 fields=filereader.readline().split()
-                sdict['dataframe']=sdict['dataframe'].append(dict(zip(cols,fields)),ignore_index=True)
+                
+                dictToAppend = dict(zip(cols,fields))
+                #sdict['dataframe']=sdict['dataframe'].append(dict(zip(cols,fields)),ignore_index=True)
+                sdict['dataframe'] = pd.concat( [sdict['dataframe'],pd.DataFrame.from_records(dictToAppend,index=[0]) ],ignore_index=True)                
+
+                #MODEL
+                #dictToAppend = dict(zip(cols,fields))
+                #sdict['dataframe']=sdict['dataframe'].append(dict(zip(cols,fields)),ignore_index=True)
+                #sdict['dataframe'] = pd.concat( [sdict['dataframe'],pd.DataFrame.from_records(dictToAppend,index=[0]) ],ignore_index=True)                
 
             
 
@@ -2322,10 +2330,10 @@ class occupancy_schedules:
             
             
             if 'shower' in v['dataframe'].columns:
-                v['dataframe'].drop(['shower'],axis=1).to_csv(g,header=False,index=False,sep=' ',line_terminator='\n')
+                v['dataframe'].drop(['shower'],axis=1).to_csv(g,header=False,index=False,sep=' ',lineterminator='\n')
 
             else:
-                v['dataframe'].to_csv(g,header=False,index=False,sep=' ',line_terminator='\n')
+                v['dataframe'].to_csv(g,header=False,index=False,sep=' ',lineterminator='\n')
             
 
     def addSchedule(self,name,description,profiledf):
@@ -2471,7 +2479,7 @@ class daySchedules:
             if ('\n' not in v['description']):
                 g.write('\n')
             
-            v['dataframe'].to_csv(g,header=False,index=False,sep=' ',line_terminator='\n')
+            v['dataframe'].to_csv(g,header=False,index=False,sep=' ',lineterminator='\n')
             
 
     def addSchedule(self,name,description,profiledf,shape=0):
@@ -2824,7 +2832,7 @@ class flowpaths:
         
         g.write(str(self.nfp)+' !'+self.comment)
         g.write(self.contamheader)
-        self.df.to_csv(g,header=False,sep=' ',line_terminator='\n')
+        self.df.to_csv(g,header=False,sep=' ',lineterminator='\n')
         
 
 class windpressureprofiles:
