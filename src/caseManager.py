@@ -10,6 +10,7 @@ sys.path.append(os.path.join(dirPath,'contamFunctions'))
 sys.path.append(os.path.join(dirPath,'computeFunctions/filters'))
 sys.path.append(os.path.join(dirPath,'setFunctions'))
 sys.path.append(os.path.join(dirPath,'tools'))
+sys.path.append(os.path.join(dirPath,'utilities'))
 
 
 
@@ -363,8 +364,14 @@ class caseConfigurator:
         if systemdefinition == 'namedSystem':
          
             systemName = self.actualParameters['system']['name']
-            systemJSON = self.computeSystem(systemName)
+
+            userArguments=None
+            
+            if 'arguments' in self.actualParameters['system'].keys():
+                userArguments=self.actualParameters['system']['arguments']
         
+            systemJSON = self.computeSystem(systemName,userArguments)
+
         
         elif systemdefinition =='JSONfile':
 
@@ -379,7 +386,7 @@ class caseConfigurator:
         return systemJSON
         
 
-    def computeSystem(self,systemName):
+    def computeSystem(self,systemName,userArguments=None):
         
         if self.systemsDir==None:
             print("No directory for namedSystems")
@@ -388,6 +395,9 @@ class caseConfigurator:
         #system=self.actualParameters['system']
 
         systemComputeFunction,systemArgs = existingSystems(self.systemsDir).functionAndArguments(systemName)
+
+        if userArguments is not None:
+            systemArgs = userArguments
 
         allArguments = [self.ContamModel] + systemArgs
 
@@ -400,6 +410,7 @@ class caseConfigurator:
             json = computeOpenDoors.compute(contamModel=self.ContamModel,systemJSON=json)
 
         return json
+
 
 
     def setSystem(self,systemJson):
@@ -568,6 +579,46 @@ class caseConfigurator:
         
         with open(outputFileName, 'w') as outfile:
             json.dump(controlJSON, outfile)
+        
+      
+    def addFlowSensors(self,transferOpening=True,cracks=True):
+        
+        from utilityFunctions import shortenTooLongName
+        
+        zones = self.ContamModel['zones']
+        flowelems = self.ContamModel['flowelems']
+        flowpaths = self.ContamModel['flowpaths']
+        controls = self.ContamModel['controls']
+
+
+        slopedcrackid = flowelems.df[flowelems.df['name']=='SlopedR_crack'].index[0]
+        floorcrackid = flowelems.df[flowelems.df['name']=='Floor_crack'].index[0]
+        wallcrackid = flowelems.df[flowelems.df['name']=='Wall_crack'].index[0]
+        flatroofcrackid = flowelems.df[flowelems.df['name']=='FlatR_crack'].index[0]
+
+        natTransfers = list(flowelems.df[flowelems.df['name'].str[0:2]=='NT'].index)
+        
+
+        print(natTransfers)
+
+        for index in flowpaths.df.index:
+
+
+            if flowpaths.df.loc[index,'pe'] in natTransfers:
+
+                fromZid = flowpaths.df.loc[index,'pzm'] 
+                toZid =   flowpaths.df.loc[index,'pzn'] 
+                
+                print(fromZid,toZid)
+    
+                fromZname = zones.df.loc[fromZid,'name']
+                toZname = zones.df.loc[toZid,'name']
+                 
+                shortFromZ = shortenTooLongName(fromZname,4)
+                shortToZ = shortenTooLongName(toZname,4)
+                
+                controls.addflowsensor(index,'Q_TR_'+shortFromZ+'_'+shortToZ)
+                
         
 
     def setExtraContaminants(self):
