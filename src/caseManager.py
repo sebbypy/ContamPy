@@ -598,25 +598,58 @@ class caseConfigurator:
 
         natTransfers = list(flowelems.df[flowelems.df['name'].str[0:2]=='NT'].index)
         
+        largeOpenings = list(flowelems.df[flowelems.df['name']=='LargeOpening'].index)
 
+        crackcounter = {x:0 for x in zones.df['name']}        
 
         for index in flowpaths.df.index:
 
 
             if flowpaths.df.loc[index,'pe'] in natTransfers:
 
-                fromZid = flowpaths.df.loc[index,'pzm'] 
-                toZid =   flowpaths.df.loc[index,'pzn'] 
-                
+                fromZid = flowpaths.df.loc[index,'pzn'] 
+                toZid =   flowpaths.df.loc[index,'pzm'] 
     
                 fromZname = zones.df.loc[fromZid,'name']
                 toZname = zones.df.loc[toZid,'name']
                  
                 shortFromZ = shortenTooLongName(fromZname,4)
                 shortToZ = shortenTooLongName(toZname,4)
-                
+
                 controls.addflowsensor(index,'Q_TR_'+shortFromZ+'_'+shortToZ)
                 
+            if flowpaths.df.loc[index,'pe'] in largeOpenings:
+
+                fromZid = flowpaths.df.loc[index,'pzn'] 
+                toZid =   flowpaths.df.loc[index,'pzm'] 
+    
+                fromZname = zones.df.loc[fromZid,'name']
+                toZname = zones.df.loc[toZid,'name']
+                 
+                shortFromZ = shortenTooLongName(fromZname,4)
+                shortToZ = shortenTooLongName(toZname,4)
+
+                
+                if flowpaths.df.loc[index,'mult'] > 0:
+                    controls.addflowsensor(index,'Q_LO_'+shortFromZ+'_'+shortToZ)
+                    
+
+            if flowpaths.df.loc[index,'pe'] in [slopedcrackid,floorcrackid,flatroofcrackid,wallcrackid]:
+
+                                
+                toZid =   flowpaths.df.loc[index,'pzm'] 
+                toZname = zones.df.loc[toZid,'name']
+                shortToZ = shortenTooLongName(toZname,4)
+
+                crackcounter[toZname] += 1
+                
+                controls.addflowsensor(index,'Q_CR'+str(crackcounter[toZname])+'_'+shortToZ)
+
+                
+                
+
+        
+            #if flowpaths.df.loc[index,'pe'] 
         
 
     def setExtraContaminants(self):

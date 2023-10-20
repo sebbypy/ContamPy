@@ -3,8 +3,8 @@ WindPressureProfilesLibrary ContamW 3.4.0.0
 9 ! wind pressure profiles:
 1 2 1 A2.1-FlatRoof
 Flat
-   0.0    0.6
- 360.0    0.6
+   0.0    -0.6
+ 360.0    -0.6
 2 9 2 A2.1-Roof>30
 Table A2.1 - Roof > 30° pitch average (AIVC guide)
    0.0    0.3

@@ -5,7 +5,9 @@ def apply(contam_data,weatherRoughness,terrainRoughness):
     
     flowpaths=contam_data['flowpaths']
 
-    wsmValue=wsm.wsm(6,weatherRoughness,terrainRoughness)
+    numberOfLevels = contam_data['zones'].getNumberOfLevelsWithzones()
+
+    wsmValue=wsm.wsm(numberOfLevels*3,weatherRoughness,terrainRoughness)
 
     for index in flowpaths.df.index:
             

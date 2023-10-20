@@ -281,6 +281,9 @@ class zones:
         else:
             return False
 
+    def getNumberOfLevelsWithzones(self):
+        return len(self.df['pl'].unique())
+
 class initialZonesConcentrations():
     
     def __init__(self):
@@ -462,7 +465,7 @@ class flowelements:
                 # We target that this point correspond to Pmax  
                 #  Pmax/dp0 = 3 <-->  dp0 = Pmax/3
                 self.df.loc[self.nelems,'dtype']='srv_jwa'
-                self.df.loc[self.nelems,'values']=[Qmax/3600,dPmax/3,1,4,0]
+                self.df.at[self.nelems,'values']=[Qmax/3600,dPmax/3,1,4,0]
 
                 # 5 23 srv_jwa SR_SSV
                 # comment
